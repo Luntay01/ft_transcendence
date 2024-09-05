@@ -4,6 +4,7 @@ This project is a multiplayer Pong game featuring real-time gameplay, AI opponen
 
 ## Project Structure
 
+```bash
 project/
 │
 ├── backend/                            # Django Backend
