@@ -55,6 +55,7 @@ project/
 ├── docker-compose.yml                  # Docker Compose file to orchestrate all containers
 ├── .env                                # Environment variables for sensitive data (PostgreSQL, Redis settings)
 
+```
 
 ## Technologies Used
 
