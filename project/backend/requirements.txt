@@ -1,0 +1,9 @@
+Django==5.1.1                   # Core Django framework
+djangorestframework==3.14.0      # Django REST framework for APIs
+channels==4.0.0                  # Django Channels for WebSocket support
+psycopg2-binary==2.9.8           # PostgreSQL adapter
+redis==5.0.0                     # Redis client for Django and Celery integration
+celery==5.3.0                    # Celery for asynchronous task processing
+django-cors-headers==3.14.0      # CORS headers for cross-origin requests
+django-environ==0.9.0            # Environment variable management for Django
+channels-redis==4.0.0            # Redis integration for Django Channels
