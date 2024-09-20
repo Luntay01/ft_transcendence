@@ -22,11 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=mj775y2rctj9mgdh2sz=_fi=f-65ng$_3&1dveu1*#x5gib9z'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+#SECRET_KEY = 'django-insecure-=mj775y2rctj9mgdh2sz=_fi=f-65ng$_3&1dveu1*#x5gib9z'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+DEBUG = int(os.environ.get("DJANGO_DEBUG", default=0))
 ALLOWED_HOSTS = []
 
 
@@ -85,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB', 'pongdb'),  # Default to 'pongdb' if env variable not found
         'USER': os.environ.get('POSTGRES_USER', 'ponguser'),  # Default to 'ponguser' if env variable not found
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_password'),  # Default to 'your_password'
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'qwe123'),  # Default to 'your_password'
         'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),  # Use 'localhost' for local dev
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),  # Default to port 5432
     }
@@ -127,6 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

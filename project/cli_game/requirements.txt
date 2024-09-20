@@ -1,0 +1,10 @@
+# These are common libraries you may need for CLI games or external communication.
+# You can adjust them based on what the CLI Pong game needs once you start development.
+
+# API or HTTP communication (if needed)
+requests==2.31.0
+
+# WebSocket support (if the game uses WebSocket to communicate with backend)
+websockets==11.0.2
+
+# Placeholder for additional libraries you may need

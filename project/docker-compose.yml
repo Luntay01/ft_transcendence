@@ -5,6 +5,9 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - static_files:/home/app/staticfiles
     ports:
       - "80:80"
     depends_on:
@@ -17,9 +20,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/app
-    ports:
-      - "8000:8000"
+      - ./backend:/usr/src/app/
+      - static_files:/usr/src/app/staticfiles
+    expose:
+      - "8000"
+    #ports:
+    #  - "8000:8000" #only if we want the port open to the browser otherwise expose
     depends_on:
       - postgres
       - redis
@@ -55,6 +61,15 @@ services:
     env_file:
       - .env
 
+  cli_game:
+    build:
+      context: ./cli_game
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    env_file:
+      - .env
+
   postgres:
     build:
       context: ./postgres
@@ -76,4 +91,5 @@ services:
       - "6379:6379"
 
 volumes:
+  static_files:
   redis-data:

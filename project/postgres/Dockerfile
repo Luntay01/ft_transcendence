@@ -1,8 +1,13 @@
 # Custom PostgreSQL
 FROM postgres:13
 
-# add custom configurations if needed
-COPY ./postgres/postgresql.conf /etc/postgresql/postgresql.conf
-COPY ./postgres/init.sql /docker-entrypoint-initdb.d/init.sql
+RUN apt-get update && apt-get install -yq gettext-base
 
-EXPOSE 5432
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+COPY ./init.sql /docker-entrypoint-initdb.d/init.sql
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["postgres"]

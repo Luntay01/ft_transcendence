@@ -1,12 +1,13 @@
 # CLI Pong Game
-FROM python:3.9-slim
+FROM python:3.10-slim
 WORKDIR /app
 
-COPY ./cli_game/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt -q
 
-COPY ./cli_game /app
+COPY . /app
 
-EXPOSE 8080
+COPY ./wait_for_depends_on.sh /wait_for_depends_on.sh
+RUN chmod +x /wait_for_depends_on.sh
 
-CMD ["python", "cli_pong.py"]
+CMD ["./wait_for_depends_on.sh", "websocket:8765", "--", "python", "cli_pong.py"]

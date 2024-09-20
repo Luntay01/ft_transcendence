@@ -2,17 +2,18 @@
 	"name": "project-frontend",
 	"version": "1.0.0",
 	"description": "Frontend for project Pong game",
-	"main": "index.js",
 	"scripts": {
-	  "start": "http-server -p 3000"
+	  "start": "parcel src/index.html --port 3000",
+	  "build": "parcel build src/index.html"
 	},
 	"dependencies": {
 	  "bootstrap": "^5.3.0",
 	  "three": "^0.152.0",
 	  "websocket": "^1.0.31",
-	  "http-server": "^14.1.1"
+	  "http-server": "^14.1.1",
+	  "parcel": "^2.7.0"
 	},
 	"devDependencies": {},
 	"author": "Kyle Mordaunt",
 	"license": "ISC"
-}
+  }

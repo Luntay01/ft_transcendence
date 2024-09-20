@@ -2,12 +2,14 @@
 FROM node:16-alpine
 WORKDIR /app
 
-COPY ./frontend/package.json ./frontend/package-lock.json /app/
+RUN apk add --no-cache bash
+
+COPY ./package.json ./package-lock.json /app/
 RUN npm install
 
-COPY ./frontend /app
+COPY . /app
 
-COPY ./scripts/wait_for_depends_on.sh /wait_for_depends_on.sh
+COPY ./wait_for_depends_on.sh /wait_for_depends_on.sh
 RUN chmod +x /wait_for_depends_on.sh
 
-CMD ["./wait_for_depends_on.sh", "backend:8000", "--", "npm", "start"]
+CMD ["bash", "-c", "./wait_for_depends_on.sh backend:8000 -- npm start"]
