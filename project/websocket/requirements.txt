@@ -1,2 +1,2 @@
-websockets==11.0.2    # For WebSocket handling
+websockets==13.0.1    # For WebSocket handling
 redis==5.0.0        # If you are using Redis to store some real-time data or pub/sub

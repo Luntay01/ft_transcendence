@@ -5,6 +5,6 @@
 requests==2.31.0
 
 # WebSocket support (if the game uses WebSocket to communicate with backend)
-websockets==11.0.2
+websockets==13.0.1
 
 # Placeholder for additional libraries you may need
