@@ -14,19 +14,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+#from django.contrib import admin
+#from django.urls import path, include
+#from django.http import HttpResponse
+#
+#def home(request):
+#    return HttpResponse("Welcome to the homepage!")
+#
+#urlpatterns = [
+#    path('admin/', admin.site.urls),
+#    path('', home),
+#    path('pong/', include('pong.urls')),    # Include pong app URLs
+#    path('users/', include('users.urls')),  # Include users app URLs
+#    path('game/', include('game.urls')),    # Include game app URLs
+#    path('chat/', include('chat.urls')),    # Include chat app URLs
+#    path('api/', include('api.urls')),      # Include API app URLs
+#]
+
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
-
-def home(request):
-    return HttpResponse("Welcome to the homepage!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home),
-    path('pong/', include('pong.urls')),    # Include pong app URLs
-    path('users/', include('users.urls')),  # Include users app URLs
-    path('game/', include('game.urls')),    # Include game app URLs
-    path('chat/', include('chat.urls')),    # Include chat app URLs
-    path('api/', include('api.urls')),      # Include API app URLs
+    path('api/users/', include('users.urls')),  # Adjust the path as needed
 ]
