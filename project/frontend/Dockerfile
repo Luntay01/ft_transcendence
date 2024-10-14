@@ -7,6 +7,8 @@ RUN apk add --no-cache bash
 COPY ./package.json ./package-lock.json /app/
 RUN npm install
 
+RUN npm install -g parcel@2.12.0
+
 COPY . /app
 
 COPY ./wait_for_depends_on.sh /wait_for_depends_on.sh
