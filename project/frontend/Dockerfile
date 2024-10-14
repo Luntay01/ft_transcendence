@@ -7,7 +7,7 @@ RUN apk add --no-cache bash
 COPY ./package.json ./package-lock.json /app/
 RUN npm install
 
-RUN npm install -g parcel@2.12.0
+RUN npm install -g parcel@2.7.0
 
 COPY . /app
 
