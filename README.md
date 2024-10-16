@@ -79,7 +79,15 @@ project/
    docker-compose up --build
 
 2. Add environment variables to the .env file
-   DJANGO_SECRET_KEY=your_secret_key
-   POSTGRES_DB=pongdb
-   POSTGRES_USER=ponguser
-   POSTGRES_PASSWORD=your_password
+   POSTGRES_HOST=<hostname>
+   POSTGRES_DB=<database_name>
+   POSTGRES_USER=<admin_name>
+   POSTGRES_PASSWORD=<admin_password>
+   
+   DJANGO_SUPERUSER_USERNAME=<user_name>
+   DJANGO_SUPERUSER_EMAIL=<user_mail>
+   DJANGO_SUPERUSER_PASSWORD=<user_password>
+   
+   # Django secret key
+   DJANGO_SECRET_KEY=<secret_key>
+   DJANGO_DEBUG=1
