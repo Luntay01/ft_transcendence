@@ -1,5 +1,5 @@
 # Custom PostgreSQL
-FROM postgres:13
+FROM postgres:16.4
 
 RUN apt-get update && apt-get install -yq gettext-base
 
