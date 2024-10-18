@@ -3,3 +3,9 @@ env/
 node_modules/
 dist/
 .parcel-cache/
+
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__/
