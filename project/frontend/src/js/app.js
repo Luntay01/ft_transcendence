@@ -8,32 +8,22 @@ function handleRoute() {
 window.addEventListener('load', handleRoute);
 window.addEventListener('hashchange', handleRoute);
 
-// Function to dynamically load HTML content into the #app element
+function navigateTo(view) {
+    window.location.hash = view;  // This changes the URL hash, triggering the route handling
+}
+
 async function loadView(view) {
-    console.log(`Loading view: ${view}`);
     try {
         const response = await fetch(`/views/${view}.html`);
-        console.log(`Fetched view: ${view} with status ${response.status}`);
         if (!response.ok) throw new Error('View not found');
-        const html2 = await response.text();
-        console.log('HTML content:', html2); // Log the fetched HTML content
+        const html = await response.text();
+        document.getElementById('app').innerHTML = html;
 
-        const appElement = document.getElementById('app');
-        if (!appElement) {
-            console.error('Error: #app element not found.');
-            return;
-        }
-		console.log(appElement);
-        appElement.innerHTML = html2; // Replace content in #app
-        console.log(`Loaded view: ${view}`);
-
-        // Attach form handlers after loading views
+        // After loading the view, set up the appropriate form handlers
         if (view === 'login') {
-            console.log('Setting up login form...');
             setupLoginForm();
         }
         if (view === 'signup') {
-            console.log('Setting up signup form...');
             setupSignupForm();
         }
     } catch (error) {
