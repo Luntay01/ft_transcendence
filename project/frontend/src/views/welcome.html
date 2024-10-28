@@ -21,24 +21,31 @@
 		}
 		.custom-background{
 			background-color: silver;
-			height: 800px;
-			width: 800px;
+			height: 100%;
+			width: 100vh;
+			min-height: 100vh;
+		}
+		.border-dotted {
+			border: 3px solid #646566;
+			border-radius: 10px;
 		}
 	</style>
 </head>
 <body>
 	<div class="container text-center mt-5 custom-background">
-		<h1>Welcome to Pong Games!</h1>
-		<p>Click below to login or signup:</p>
-		<div class="row">
-			<div class="col">
-				<button class="btn btn-secondary btn-custom" onclick="navigateTo('login')">Go to Login</button>
-			</div>
-			<div class="col">
-				<button class="btn btn-secondary btn-custom" onclick="navigateTo('signup')">Go to Signup</button>
-			</div>
-			<div class="col">
-				<button class="btn btn-secondary btn-custom" onclick="navigateTo('gamePong')">Play Pong</button>
+		<div class="border-dotted border border-primary border-lg-4 border-md-2 border-0 p-4">
+			<h1>Welcome to Pong Games!</h1>
+			<p>Click below to login or signup:</p>
+			<div class="row">
+				<div class="col">
+					<button class="btn btn-secondary btn-custom" onclick="navigateTo('login')">Go to Login</button>
+				</div>
+				<div class="col">
+					<button class="btn btn-secondary btn-custom" onclick="navigateTo('signup')">Go to Signup</button>
+				</div>
+				<div class="col">
+					<button class="btn btn-secondary btn-custom" onclick="navigateTo('gamePong')">Play Pong</button>
+				</div>
 			</div>
 		</div>
 	</div>
