@@ -5,3 +5,4 @@ dist/
 .parcel-cache/
 __pycache__/
 *.pyc
+.DS_Store
