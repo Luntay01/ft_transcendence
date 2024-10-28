@@ -16,7 +16,6 @@
 			border-radius: 10px;
 			padding: 20px;
 			width: 100%;
-			max-width: 600px; 
 		}
 		h1 {
 			font-family: 'Inknut Antiqua', serif;
@@ -25,6 +24,8 @@
 			font-family: 'Berkshire Swash', cursive;
 			font-size: 1,2rem;
 			width:100%;
+			position: relative;
+			overflow: hidden;
 		}
 		.custom-background{
 			background-color: silver;
@@ -41,6 +42,15 @@
 			width: 100%;
 			max-width: 600px; 
 		}
+		.glow {
+			color: yellow;
+			text-align: center;
+			text-shadow: 0 0 10px yellow, 0 0 20px yellow, 0 0 30 px yellow;
+			-webkit-animation: glow 1s ease-in-out infinite alternate;
+			-moz-animation: glow 1s ease-in-out infinite alternate;
+			animation: glow 1s ease-in-out infinite alternate;
+		}
+
 	</style>
 </head>
 <body>
@@ -50,13 +60,13 @@
 			<p>Click below to login or signup:</p>
 			<div class="row">
 				<div class="col">
-					<button class="btn btn-secondary btn-custom" onclick="navigateTo('login')">Go to Login</button>
+					<button class="btn btn-secondary btn-custom glow" onclick="navigateTo('login')">Go to Login</button>
 				</div>
 				<div class="col">
-					<button class="btn btn-secondary btn-custom" onclick="navigateTo('signup')">Go to Signup</button>
+					<button class="btn btn-secondary btn-custom glow" onclick="navigateTo('signup')">Go to Signup</button>
 				</div>
 				<div class="col">
-					<button class="btn btn-secondary btn-custom" onclick="navigateTo('gamePong')">Play Pong</button>
+					<button class="btn btn-secondary btn-custom glow" onclick="navigateTo('gamePong')">Play Pong</button>
 				</div>
 			</div>
 		</div>
