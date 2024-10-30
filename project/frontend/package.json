@@ -3,14 +3,12 @@
 	"version": "1.0.0",
 	"description": "Frontend for project Pong game",
 	"scripts": {
-	  "start": "http-server src -p 3000",
-	  "build": "parcel build src/index.html"
+	  "start": "npx http-server src -p 3000"
 	},
 	"dependencies": {
 	  "http-server": "^14.1.1",
 	  "bootstrap": "^5.3.0",
-	  "three": "^0.152.0",
-	  "parcel": "^2.7.0"
+	  "three": "^0.152.0"
 	},
 	"devDependencies": {}
   }
