@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chat history</title>
+	<style>
+		.history-container {
+			width: 400px;
+			max-width: 100%;
+			padding: 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			background: #fff;
+		}
+		.history-message {
+			margin: 8px 0;
+			padding: 10px;
+			background: #e1f5fe;
+			border-radius: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div class="history-container" id="history-container">
+
+	</div>
+	<script>
+		const historyContainer = document.getElementById('history-container');
+
+		function displayChatHistory(){
+			const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+			history.forEach(message =>{
+				const messageElement = document.createElement('div');
+				messageElement.className = 'history-message';
+				messageElement.innerText = message;
+				historyContainer.appendChild(messageElement);
+			});
+		}
+
+		displayChatHistory();
+	</script>
+</body>
+</html>
