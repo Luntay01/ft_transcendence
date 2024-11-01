@@ -56,6 +56,12 @@
 			cursor: pointer;
 			font-family: 'Inknut Antiqua', serif;
 		}
+		.center-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100hv;
+		}
 	</style>
 </head>
 <body>
@@ -67,7 +73,9 @@
 			<input type="text" id="chat-input" class="chat-input" placeholder="Type a message:">
 			<button id="send-button" class="send-button">Send</button>
 		</div>
-		<a href="history.html" target ="_blank">chat history</a>
+		<div class="center-container">
+			<a href="history.html" target ="_blank" class="btn-secondary">Chat History</a>
+		</div>
 	</div>
 	<script>
 		const chatBox = document.getElementById('chat-box');
