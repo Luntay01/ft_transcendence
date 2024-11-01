@@ -4,7 +4,18 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Pong Chat</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@400;700&family=Berkshire+Swash:wght@400;700&display=swap" rel="stylesheet">
 	<style>
+		body{
+			font-family: 'Inknut Antiqua', serif;
+			height: 100%;
+			width: 100%;
+		}
+		a{
+			font-family: 'Inknut Antiqua', serif;
+			color: gray;
+			position: relative;
+		}
 		.chat-container{
 			width: 400px;
 			border: 1px solid #5f5d5d;
@@ -29,18 +40,21 @@
 		.chat-input-container{
 			display: flex;
 			border-top: 1px solid #ccc;
+			font-family: 'Inknut Antiqua', serif;
 		}
 		.chat-input{
 			flex: 1px;
 			padding: 10px;
 			border: none;
+			font-family: 'Inknut Antiqua', serif;
 		}
 		.send-button{
 			padding: 10px;
-			background-color: #b4cccb;
+			background-color: aquamarine;
 			color: #fff;
 			border: none;
 			cursor: pointer;
+			font-family: 'Inknut Antiqua', serif;
 		}
 	</style>
 </head>
@@ -66,7 +80,7 @@
 		}
 		function addMessage(message){
 			const messageElement = document.createElement('div');
-			messageElement.className = 'chaT-message';
+			messageElement.className = 'chat-message';
 			messageElement.innerText = message;
 			chatBox.appendChild(messageElement);
 			chatBox.scrollTop = chatBox.scrollHeight;
