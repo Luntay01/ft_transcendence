@@ -27,6 +27,13 @@
 			align-items: center;
 			height: 100hv;
 		}
+        .border{
+            display: inline-block;
+            border: 5px solid gainsboro;
+            border-radius: 10px;
+            padding: 5px 10px;
+            margin-right: 10px;
+        }
     </style>
     <audio autoplay loop>
     </audio>
@@ -38,8 +45,17 @@
     <div class="center-container">
         <p>Welcome back, Cheese!</p>
     </div>
-        <p><a href="#profile">View Profile</a> | <a href="#match_history">Match History</a> | <a href="#friends">Friends</a> | <a href="#leaderboard">Leaderboard</a></p>
-    
+    <div class="row">
+        <div class="d-flex justify-content-center align-items-center">
+            <a href="#profile" class="border">View Profile</a>
+            <span class="mx-3"></span>
+            <a href="#match_history" class="border">Match History</a> 
+            <span class="mx-3"></span>
+            <a href="#friends" class="border">Friends</a>
+            <span class="mx-3"></span>
+            <a href="#leaderboard" class="border">Leaderboard</a>
+        </div>
+    </div>
     <div class="iframe-container">
         <iframe src="views/chatbox.html" width="100%" height="400" style="border: none;"></iframe>
     </div>
