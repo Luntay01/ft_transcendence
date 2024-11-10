@@ -54,35 +54,37 @@
         <p>Welcome back, Cheese!</p>
     </div>
 	<div class="row">
-		<div class ="d-flex justify-content-center align-items-center">
-			<i class="bi bi-person-circle"></i>
-			<span class="mx-3"></span>
-			<i class="bi bi-clock-history"></i>
-			<span class="mx-3"></span>
-			<i class="bi bi-people"></i>
-			<span class="mx-3"></span>
-			<i class="bi bi-trophy"></i>
+		<div class="d-flex justify-content-center align-items-center">
+			<div class="col text-center">
+				<i class="bi bi-person-circle"></i>
+			</div>
+			<div class="col text-center">
+				<i class="bi bi-clock-history"></i>
+			</div>
+			<div class="col text-center">
+				<i class="bi bi-people"></i>
+			</div>
+			<div class="col text-center">
+				<i class="bi bi-trophy"></i>
+			</div>
 		</div>
 	</div>
-    <div class="row">
-        <div class="d-flex justify-content-center align-items-center">
-			<div class="col">
+	<div class="row mt-2">
+		<div class="d-flex justify-content-center align-items-center">
+			<div class="col text-center">
 				<button class="btn btn-secondary btn-custom" onclick="navigateTo('profile')">View Profile</button>
 			</div>
-			<span class="mx-3"></span>
-			<div class="col">
+			<div class="col text-center">
 				<button class="btn btn-secondary btn-custom" onclick="navigateTo('match_history')">Match History</button>
 			</div>
-			<span class="mx-3"></span>
-			<div class="col">
+			<div class="col text-center">
 				<button class="btn btn-secondary btn-custom" onclick="navigateTo('friends')">Friends</button>
 			</div>
-			<span class="mx-3"></span>
-			<div class="col">
+			<div class="col text-center">
 				<button class="btn btn-secondary btn-custom" onclick="navigateTo('leaderboard')">Leaderboard</button>
 			</div>
-        </div>
-    </div>
+		</div>
+	</div>
     <div class="iframe-container">
         <iframe src="views/chatbox.html" width="100%" height="400" style="border: none;"></iframe>
     </div>
