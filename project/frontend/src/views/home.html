@@ -35,6 +35,13 @@
             padding: 5px 10px;
             margin-right: 10px;
         }
+		.btn-custom {
+			font-family: 'Berkshire Swash', cursive;
+			font-size: 1,2rem;
+			width:100%;
+			position: relative;
+			overflow: hidden;
+		}
     </style>
     <audio autoplay loop>
     </audio>
@@ -59,13 +66,21 @@
 	</div>
     <div class="row">
         <div class="d-flex justify-content-center align-items-center">
-            <a href="#profile" class="border">View Profile</a>
-            <span class="mx-3"></span>
-            <a href="#match_history" class="border">Match History</a> 
-            <span class="mx-3"></span>
-            <a href="#friends" class="border">Friends</a>
-            <span class="mx-3"></span>
-            <a href="#leaderboard" class="border">Leaderboard</a>
+			<div class="col">
+				<button class="btn btn-secondary btn-custom" onclick="navigateTo('profile')">View Profile</button>
+			</div>
+			<span class="mx-3"></span>
+			<div class="col">
+				<button class="btn btn-secondary btn-custom" onclick="navigateTo('match_history')">Match History</button>
+			</div>
+			<span class="mx-3"></span>
+			<div class="col">
+				<button class="btn btn-secondary btn-custom" onclick="navigateTo('friends')">Friends</button>
+			</div>
+			<span class="mx-3"></span>
+			<div class="col">
+				<button class="btn btn-secondary btn-custom" onclick="navigateTo('leaderboard')">Leaderboard</button>
+			</div>
         </div>
     </div>
     <div class="iframe-container">
