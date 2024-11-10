@@ -1,0 +1,14 @@
+.glow {
+	color: yellow;
+	text-align: center;
+	text-shadow: 0 0 10px yellow, 0 0 20px yellow, 0 0 30px yellow;
+	animation: glow 3s ease-in-out infinite alternate;
+}
+@keyframes glow{
+	0% {
+		text-shadow: 0 0 00px yellow, 0 0 00px yellow, 0 0 00px yellow;
+	}
+	100% {
+		text-shadow: 0 0 20px yellow, 0 0 30px yellow, 0 0 40px yellow;
+	}
+}
