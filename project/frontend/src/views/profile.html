@@ -15,10 +15,12 @@
 		}
 		.img-wrapper img{
 			width: 200px;
+			max-width: 150px;
 			height: auto;
 		}
 		.wrapper{
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 			justify-content: center;
 			width: 100%;
@@ -26,9 +28,10 @@
 		.custom-border{
 			border: 5px solid #646566;
 			border-radius: 10px;
-			padding: 20px;
+			padding: 10px;
 			width: 100%;
-			max-width: 600px; 
+			max-width: 160px;
+			text-align: center; 
 		}
 	</style>
 </head>
@@ -37,7 +40,7 @@
 		<h1>Cheese's Profile</h1>
 	</div>
 	<div class="wrapper">
-		<div class="custom-border">
+		<div class="custom-border img-wrapper">
 			<img src="views/crown.jpg" alt="crown">
 		</div>
 		<button class="btn btn-secondary btn-custom" onclick="navigateTo('')">Change Picture</button>
