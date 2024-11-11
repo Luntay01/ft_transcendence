@@ -13,28 +13,26 @@
 		h1{
 			font-family: 'Inknut Antiqua', serif;
 		}
-		.wrapper{
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			width: 100%;
-		}
-		.custom-border{
-			border: 5px solid #646566;
-			border-radius: 10px;
-			padding: 10px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			max-width: 200px;
-			text-align: center; 
-		}
-		.img-wrapper img{
-			max-width: 100%;
-			width: 150;
-			height: auto;
-		}
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .custom-border {
+            border: 5px solid #646566;
+            border-radius: 10px;
+            padding: 10px;
+            display: inline-block;
+            text-align: center;
+        }
+        .img-wrapper img {
+            width: 150px;
+            height: auto;
+            display: block; 
+        }
 	</style>
 </head>
 <body>
@@ -43,7 +41,9 @@
 	</div>
 	<div class="wrapper">
 		<div class="custom-border">
-			<img src="views/crown.jpg" alt="crown">
+			<div class="img-wrapper">
+				<img src="views/crown.jpg" alt="crown">
+			</div>
 		</div>
 		<button class="btn btn-secondary btn-custom" onclick="navigateTo('')">Change Picture</button>
 	</div>
