@@ -13,11 +13,6 @@
 		h1{
 			font-family: 'Inknut Antiqua', serif;
 		}
-		.img-wrapper img{
-			width: 200px;
-			max-width: 150px;
-			height: auto;
-		}
 		.wrapper{
 			display: flex;
 			flex-direction: column;
@@ -29,9 +24,16 @@
 			border: 5px solid #646566;
 			border-radius: 10px;
 			padding: 10px;
-			width: 100%;
-			max-width: 160px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			max-width: 200px;
 			text-align: center; 
+		}
+		.img-wrapper img{
+			max-width: 100%;
+			width: 150;
+			height: auto;
 		}
 	</style>
 </head>
@@ -40,7 +42,7 @@
 		<h1>Cheese's Profile</h1>
 	</div>
 	<div class="wrapper">
-		<div class="custom-border img-wrapper">
+		<div class="custom-border">
 			<img src="views/crown.jpg" alt="crown">
 		</div>
 		<button class="btn btn-secondary btn-custom" onclick="navigateTo('')">Change Picture</button>
