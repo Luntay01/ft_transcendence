@@ -16,9 +16,19 @@
 		.img-wrapper img{
 			width: 200px;
 			height: auto;
+		}
+		.wrapper{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+		}
+		.custom-border{
 			border: 5px solid #646566;
 			border-radius: 10px;
 			padding: 20px;
+			width: 100%;
+			max-width: 600px; 
 		}
 	</style>
 </head>
@@ -26,8 +36,12 @@
 	<div class="container text-center">
 		<h1>Cheese's Profile</h1>
 	</div>
-	<img src="views/crown.jpg" alt="crown">
-	<button class="btn btn-secondary btn-custom" onclick="navigateTo('')">Change Picture</button>
+	<div class="wrapper">
+		<div class="custom-border">
+			<img src="views/crown.jpg" alt="crown">
+		</div>
+		<button class="btn btn-secondary btn-custom" onclick="navigateTo('')">Change Picture</button>
+	</div>
     
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
 	integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
