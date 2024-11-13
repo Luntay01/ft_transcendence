@@ -13,7 +13,9 @@ h1{
 	font-family: 'Berkshire Swash', cursive;
 	font-size: 1,2rem;
 	width: auto;
-	max-width: 100px;
+	max-width: 150px;
+	margin: 5px auto;
+	padding: 10px 20px;
 	position: relative;
 	overflow: hidden;
 }
@@ -29,7 +31,7 @@ h1{
 }
 .translucent-background{
 	background-color: rgba(189, 195, 199, 0.8);
-	padding: 20px;
+	padding: 10px;
 	position: relative;
 	top: 0;
 	left: 0;
@@ -38,5 +40,6 @@ h1{
 	height: auto;
 	border-radius: 20px;
 	margin-left: auto;
+	margin-top: 0;
 	z-index: 1;
 }
