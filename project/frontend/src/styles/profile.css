@@ -58,3 +58,17 @@ h1{
 	margin-top: 10px;
 	z-index: 1;
 }
+.topleft-background{
+	background-color: rgba(189, 195, 199, 0.8);
+	padding: 10px;
+	position: right;
+	top: 0;
+	left: 0;
+	display: flex;
+	width: 100%;
+	height: auto;
+	border-radius: 20px;
+	margin-left: 50px;
+	margin-top: 10px;
+	z-index: 1;
+}
