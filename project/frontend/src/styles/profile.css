@@ -22,11 +22,11 @@ h1{
 .translucent-background{
 	background-color: rgba(189, 195, 199, 0.8);
 	padding: 20px;
-	position: absolute;
+	position: relative;
 	top: 0;
 	left: 0;
 	display: flex;
-	width: 100%;
+	width: auto;
 	height: auto;
 	border-radius: 20px;
 	margin-left: auto;
