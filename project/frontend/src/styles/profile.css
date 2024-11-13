@@ -9,6 +9,13 @@ h1{
 	width: 100%;
 	margin-top: 20px;
 }
+.btn-custom {
+	font-family: 'Berkshire Swash', cursive;
+	font-size: 1,2rem;
+	width:100%;
+	position: relative;
+	overflow: hidden;
+}
 .custom-border {
 	border: 5px solid #646566;
 	border-radius: 10px;
