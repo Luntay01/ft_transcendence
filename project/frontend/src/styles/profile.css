@@ -11,7 +11,7 @@ h1{
 }
 .btn-custom {
 	font-family: 'Berkshire Swash', cursive;
-	font-size: 1,2rem;
+	font-size: 1.2rem;
 	width: auto;
 	max-width: 150px;
 	margin: 0 auto;
@@ -36,10 +36,10 @@ h1{
 	top: 0;
 	left: 0;
 	display: flex;
-	width: auto;
+	width: 100%;
 	height: auto;
 	border-radius: 20px;
 	margin-left: 0;
-	margin-top: 0;
+	margin-top: 10px;
 	z-index: 1;
 }
