@@ -13,7 +13,7 @@ h1{
 	font-family: 'Berkshire Swash', cursive;
 	font-size: 1,2rem;
 	width: auto;
-	max-width: 25px;
+	max-width: 100px;
 	position: relative;
 	overflow: hidden;
 }
