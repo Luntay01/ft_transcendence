@@ -32,7 +32,7 @@ h1{
 .translucent-background{
 	background-color: rgba(189, 195, 199, 0.8);
 	padding: 10px;
-	position: relative;
+	position: right;
 	top: 0;
 	left: 0;
 	display: flex;
