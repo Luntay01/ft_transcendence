@@ -23,12 +23,12 @@ h1{
 	border: 5px solid #646566;
 	border-radius: 10px;
 	display: inline-block;
+	padding: 20px;
 }
 .img-wrapper {
 	display: flex;
 	justify-content: flex-start;
 	align-items: flex-start;
-	margin-bottom: 10px;
 }
 .img-wrapper img {
 	width: 150px;
