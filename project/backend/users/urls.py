@@ -1,13 +1,7 @@
-#from django.urls import path
-#from . import views
-
-#urlpatterns = [
-#    path('', views.index, name='users-home'),  # You can modify the view later
-#]
-
 from django.urls import path
-from .views import RegisterView
+from .views import UserRegisterView, UserRetrieveView
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
+    path('register/', UserRegisterView.as_view()),
+    path('retrieve/<str:username>/', UserRetrieveView.as_view(), name='detail'),
 ]

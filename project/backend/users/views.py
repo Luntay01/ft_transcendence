@@ -1,16 +1,15 @@
-#from django.shortcuts import render
-
-# Create your views here.
-#from django.http import HttpResponse
-
-#def index(request):
-#    return HttpResponse("Welcome to the users Home Page!")
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
-from django.contrib.auth.models import User
-from .serializers import RegisterSerializer
+from .models import User
+from .serializers import UserSerializer
 
-class RegisterView(generics.CreateAPIView):
+class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
-    serializer_class = RegisterSerializer
+    serializer_class = UserSerializer
+
+class UserRetrieveView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
+    lookup_field = 'username'
