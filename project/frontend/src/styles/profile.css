@@ -12,7 +12,8 @@ h1{
 .btn-custom {
 	font-family: 'Berkshire Swash', cursive;
 	font-size: 1,2rem;
-	width:100%;
+	width: auto;
+	max-width: 25px;
 	position: relative;
 	overflow: hidden;
 }
