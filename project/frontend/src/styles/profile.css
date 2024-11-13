@@ -19,6 +19,16 @@ h1{
 	position: relative;
 	overflow: hidden;
 }
+.btn-custom2 {
+	font-family: 'Berkshire Swash', cursive;
+	font-size: 1.2rem;
+	width: auto;
+	max-width: 150px;
+	padding: 10px 20px;
+	position: relative;
+	overflow: hidden;
+	align-self: flex-start;
+}
 .custom-border {
 	border: 5px solid #646566;
 	border-radius: 10px;
