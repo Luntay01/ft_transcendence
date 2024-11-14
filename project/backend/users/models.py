@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 # Create your models here.
 
@@ -8,4 +9,7 @@ from django.db import models
 class User(models.Model):
 	username = models.CharField(max_length=256, primary_key=True)
 	password = models.CharField(max_length=256)
-	email = models.EmailField(max_length=256, default="test@example.com")
+	def save(self, **kwargs):
+		hashed = make_password(self.password)
+		self.password = hashed
+		super().save(**kwargs)
