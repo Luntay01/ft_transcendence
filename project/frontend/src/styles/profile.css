@@ -62,51 +62,50 @@ h2{
 .translucent-background{
 	background-color: rgba(189, 195, 199, 0.8);
 	padding: 10px;
-	position: right;
-	top: 0;
-	left: 0;
+	justify-content: space-between;
 	display: flex;
 	width: 100%;
 	height: auto;
 	border-radius: 20px;
-	margin-left: 100px;
-	margin-top: 10px;
-	margin-right: 100px;
+	margin: 10px 100px;
+	z-index: 1;
+	gap: 15px;
+	overflow: hidden;
+}
+.topleft-background {
+	flex: 0 0 300px;
+	background-color: rgba(189, 195, 199, 0.8);
+	padding: 8px;
+	height: auto;
+	border-radius: 20px;
 	z-index: 1;
 }
-.topleft-background{
+.topright-background {
+	flex: 1;
 	background-color: rgba(189, 195, 199, 0.8);
-	padding: 8px 8px;
-	position: right;
-	top: 0;
-	left: 0;
-	display: flex;
-	width: 100%;
-	max-width: 300px;
-	height: auto;
+	padding: 8px;
 	border-radius: 20px;
-	margin-left: 10px;
-	margin-top: 10px;
-	margin-right: 50px;
+	min-height: 150px;
+	min-width: 300;
+	box-sizing: border-box;
 	margin-bottom: 10px;
-	z-index: 1;
 }
-.topright-background{
+.bottomright-background {
+	flex: 1;
 	background-color: rgba(189, 195, 199, 0.8);
-	padding: 8px 8px;
-	position: right;
-	top: 0;
-	left: 0;
-	display: flex;
-	width: 100%;
-	max-width: 300px;
-	height: auto;
+	padding: 8px;
 	border-radius: 20px;
-	margin-left: 40px;
-	margin-top: 10px;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	z-index: 1;
+	min-height: 150px;
+	box-sizing: border-box;
+	
+}
+.right-selction {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	gap: 10px;
+	box-sizing: border-box;
+	min-height: 300px;
 }
 .col-md-1{
 	padding: 10px 0px;
