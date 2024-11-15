@@ -12,6 +12,9 @@ class User(models.Model):
 	password = models.CharField(max_length=256)
 	email = models.EmailField(max_length=512, validators=[EmailValidator])
 
+	def __str__(self):
+		return f"{self.username} {self.password} {self.email}"
+
 	def save(self, **kwargs):
 		hashed = make_password(self.password)
 		self.password = hashed
