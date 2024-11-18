@@ -1,0 +1,32 @@
+h1{
+	font-family: 'Inknut Antiqua', serif;
+	position: relative;
+}
+.center-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100hv;
+}
+.border{
+	display: inline-block;
+	border: 5px solid gainsboro;
+	border-radius: 10px;
+	padding: 5px 10px;
+	margin-right: 10px;
+}
+.translucent-background {
+	flex: 1;
+	background-color: rgba(189, 195, 199, 0.8);
+	padding: 8px;
+	height: auto;
+	border-radius: 20px;
+	z-index: 1;
+}
+.btn-custom {
+	font-family: 'Berkshire Swash', cursive;
+	font-size: 1,2rem;
+	width:100%;
+	position: relative;
+	overflow: hidden;
+}
