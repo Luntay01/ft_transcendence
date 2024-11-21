@@ -6,9 +6,10 @@ export function setupLoginForm() {
         const password = form.password.value;
 
         try {
-            const response = await fetch('/api/login/', {
+            const response = await fetch('http://localhost:8000/api/users/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                url: `http://localhost:8000`,
                 body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
