@@ -1,21 +1,24 @@
 from django.db import models
 from django.core.validators import EmailValidator
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils import timezone
 
+from .managers import UserManager
 # Create your models here.
 
 # Users
 # TODO: validate inputs
-# TODO: password hashed
-class User(models.Model):
-	username = models.CharField(max_length=256, primary_key=True)
+class User(AbstractBaseUser, PermissionsMixin):
+	email = models.EmailField(max_length=512, validators=[EmailValidator], primary_key=True)
 	password = models.CharField(max_length=256)
-	email = models.EmailField(max_length=512, validators=[EmailValidator])
+	username = models.CharField(max_length=256, unique=True)
 
-	def __str__(self):
-		return f"{self.username} {self.password} {self.email}"
+	is_staff = models.BooleanField(default=False)
+	is_active = models.BooleanField(default=True)
+	date_joined = models.DateTimeField(default=timezone.now)
 
-	def save(self, **kwargs):
-		hashed = make_password(self.password)
-		self.password = hashed
-		super().save(**kwargs)
+	USERNAME_FIELD = "email"
+	REQUIRED_FIELDS = ["username"]
+
+	objects = UserManager()
