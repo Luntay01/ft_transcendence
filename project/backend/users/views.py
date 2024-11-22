@@ -11,14 +11,3 @@ class UserRegisterView(views.APIView):
         serializer.is_valid()
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
-
-
-# TODO: check password as well
-# TODO: return proper response
-class UserLoginView(views.APIView):
-    permission_classes = [AllowAny]
-    def post(self, request):
-        user = User.objects.filter(username=request.data['username'])
-        if user:
-            return Response("You login! Take a jwt!!")
-        return Response("Incorrect match of username and password", status.HTTP_403_FORBIDDEN)
