@@ -1,0 +1,55 @@
+body{
+	font-family: 'Inknut Antiqua', serif;
+	height: 100%;
+	width: 100%;
+}
+a{
+	font-family: 'Inknut Antiqua', serif;
+	color: gray;
+	position: relative;
+}
+.chat-container{
+	width: 400px;
+	border: 1px solid #5f5d5d;
+	border-radius: 5px;
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+}
+.chat-box{
+	padding:15px;
+	height: 300px;
+	overflow-y: auto;
+	border-bottom: 1px solid #ccc;
+}
+.chat-msg{
+	margin: 8px 0;
+	padding: 10px;
+	background: #e1f5fe;
+	border-radius: 5px;
+}
+.chat-input-container{
+	display: flex;
+	border-top: 1px solid #ccc;
+	font-family: 'Inknut Antiqua', serif;
+}
+.chat-input{
+	flex: 1px;
+	padding: 10px;
+	border: none;
+	font-family: 'Inknut Antiqua', serif;
+}
+.send-button{
+	padding: 10px;
+	background-color: aquamarine;
+	color: #fff;
+	border: none;
+	cursor: pointer;
+	font-family: 'Inknut Antiqua', serif;
+}
+.center-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100hv;
+}
