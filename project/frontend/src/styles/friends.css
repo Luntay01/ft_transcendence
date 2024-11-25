@@ -1,0 +1,14 @@
+h1{
+	font-family: 'Inknut Antiqua', serif;
+	position: relative;
+}
+.translucent-background {
+	flex: 1;
+	background-color: rgba(189, 195, 199, 0.8);
+	padding: 8px;
+	border-radius: 20px;
+	min-height: 150px;
+	min-width: 300;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+}
