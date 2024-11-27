@@ -15,7 +15,9 @@ export function setupLoginForm() {
             const data = await response.json();
             if (response.ok) {
                 alert('Login successful!');
-                window.location.hash = 'home';
+                localStorage.setItem('access', data.access);
+                localStorage.setItem('refresh', data.refresh);
+                navigateTo('home');
             } else {
                 alert(data.error || 'Login failed');
             }
