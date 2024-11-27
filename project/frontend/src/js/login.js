@@ -9,7 +9,6 @@ export function setupLoginForm() {
             const response = await fetch('http://localhost:8000/api/users/token/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                url: `http://localhost:8000`,
                 body: JSON.stringify({ email, password }),
             });
             const data = await response.json();
