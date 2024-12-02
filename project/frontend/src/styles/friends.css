@@ -1,14 +1,46 @@
+
 h1{
 	font-family: 'Inknut Antiqua', serif;
 	position: relative;
+    margin: 0px;
+}
+h2{
+    font-family: 'Berkshire Swash', cursive;
+    font-size: 1.5rem;
+}
+body{
+	font-family: 'Inknut Antiqua', serif;
+	min-height: 100vh;
+	background-color: grey;
+	border: 1px solid gainsboro;
+	border-radius: 10px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.header-background{
+    background-color: rgba(83, 85, 87, 0.8);
+    min-height: 100px;
+    width: 100%;
+    padding: 20px;
+    margin: 0;
 }
 .translucent-background {
 	flex: 1;
-	background-color: rgba(189, 195, 199, 0.8);
+	background-color: rgba(138, 145, 150, 0.8);
 	padding: 8px;
-	border-radius: 20px;
-	min-height: 150px;
+	min-height: 500px;
 	min-width: 300;
 	box-sizing: border-box;
-	margin-bottom: 10px;
+	margin: 0;
+    border: 1px solid black; 
+}
+.col-md-1{
+	padding: 0;
+    margin: 0;
+}
+.row{
+    margin: 0;
+    width: 100%;
+    padding: 0;
 }
