@@ -42,6 +42,11 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    develop:
+      watch:
+        - path: src/
+          target: /app/src/
+          action: sync
 
   websocket:
     build:
