@@ -4,8 +4,10 @@ WORKDIR /app
 
 RUN apk add --no-cache bash
 
+# remove cors from package,json for production and add it to nginx.conf file
 COPY ./package.json ./package-lock.json /app/
-RUN npm install --unsafe-perm
+
+RUN npm install
 
 COPY . /app
 
