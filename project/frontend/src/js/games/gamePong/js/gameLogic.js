@@ -1,6 +1,7 @@
-import ModelLoader from './utils/ModelLoader.js';
+//import ModelLoader from './utils/ModelLoader.js';
 import setupLighting from './utils/setupLighting.js';
 import setupPlayers from './utils/setupPlayers.js';
+import { processPlayerInput } from "./utils/PlayerInput.js";
 import setupGameElements from './utils/setupGameElements.js';
 import handleCollisions from './utils/handleCollisions.js';
 
@@ -26,7 +27,10 @@ class GameLogic {
 
     update(delta) {
         // Update all objects
-        this.players.forEach((player) => player.flowerPot.update(delta));
+		this.players.forEach((player) => {
+			processPlayerInput(player.flowerPot, player.controls);
+			player.flowerPot.update(delta);
+		});
         this.objects.forEach((obj) => {
             if (obj.update) obj.update(delta);
         });

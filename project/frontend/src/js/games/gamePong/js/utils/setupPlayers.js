@@ -1,3 +1,4 @@
+import mockUsers from "./mockUsers.js";
 import FlowerPot from '../components/FlowerPot.js';
 
 /**
@@ -6,6 +7,34 @@ import FlowerPot from '../components/FlowerPot.js';
  * @returns {Array} - An array of player objects.
  */
 
+export default async function setupPlayers(scene) {
+	const positions = {
+	  bottom: { x: 0, y: 0, z: 10, rotationY: 0 },
+	  top: { x: 0, y: 0, z: -10, rotationY: Math.PI },
+	  right: { x: 10, y: 0, z: 0, rotationY: Math.PI / 2 },
+	  left: { x: -10, y: 0, z: 0, rotationY: -Math.PI / 2 },
+	};
+  
+	const players = [];
+	for (const user of mockUsers) {
+	  const { x, y, z, rotationY } = positions[user.flowerPotId];
+	  const flowerPot = new FlowerPot();
+	  const potModel = await flowerPot.loadModel('/js/games/gamePong/assets/models/flower_pot.glb');
+	  potModel.position.set(x, y, z);
+	  potModel.rotation.y = rotationY;
+	  scene.add(potModel);
+  
+	  players.push({
+		playerId: user.id,
+		controls: user.controls,
+		flowerPot,
+	  });
+	}
+  
+	return players;
+}
+
+/*
 export default async function setupPlayers(scene)
 {
 	const positions = {
@@ -17,7 +46,7 @@ export default async function setupPlayers(scene)
 	const players = [];
 	for (const positionKey in positions)
 	{
-		const { x, y, z, rotationY } = positions[positionKey];
+		const { x, y, z, rotationY } = positions[user.flowerPotId];
 		const potModel = new FlowerPot();
 		const pot = await potModel.loadModel('/js/games/gamePong/assets/models/flower_pot.glb');
 		pot.position.set(x, y, z);
@@ -27,3 +56,4 @@ export default async function setupPlayers(scene)
 	}
 	return players;
 }
+*/
