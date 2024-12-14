@@ -1,9 +1,9 @@
 export function setupLoginForm() {
-    const form = document.getElementById('loginForm');
-    form.addEventListener('submit', async (event) => {
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const email = form.email.value;
-        const password = form.password.value;
+        const email = loginForm.email.value;
+        const password = loginForm.password.value;
 
         try {
             const response = await fetch('http://localhost:8000/api/users/token/', {
@@ -23,5 +23,21 @@ export function setupLoginForm() {
         } catch (error) {
             console.error('Login error:', error);
         }
+    });
+
+    const oauthForm = document.getElementById('oauthForm');
+    oauthForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        //TODO: define global varibales
+        const clientId = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38";
+        const redirectUrl = "http%3A%2F%2Flocalhost%3A3000%2Fcallback";
+        const state = "qweqweq";
+        const url = `https://api.intra.42.fr/oauth/authorize?` + 
+            `client_id=${clientId}&` +
+            `redirect_uri=${redirectUrl}&` +
+            `response_type=code&` +
+            `scope=public&` +
+            `state=${state}`;
+        window.location.href = url;
     });
 }
