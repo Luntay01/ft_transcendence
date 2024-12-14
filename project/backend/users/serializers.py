@@ -14,3 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(unhashed_password)
         instance.save()
         return instance
+
+class OauthCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
