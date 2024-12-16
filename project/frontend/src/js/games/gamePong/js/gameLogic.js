@@ -5,44 +5,47 @@ import { processPlayerInput } from "./utils/PlayerInput.js";
 import setupGameElements from './utils/setupGameElements.js';
 import handleCollisions from './utils/handleCollisions.js';
 
-class GameLogic {
-    constructor(renderer) {
-        this.renderer = renderer;
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.set(0, 9, 16);
-        this.camera.lookAt(0, -4, 0);
-        this.objects = []; // Store game objects for easy updates
-        this.ballPositions = []; // Ball positions for grass interaction
-        this.players = [];
-    }
+class GameLogic
+{
+	constructor(renderer)
+	{
+		this.renderer = renderer;
+		this.scene = new THREE.Scene();
+		this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+		this.camera.position.set(0, 9, 16);
+		this.camera.lookAt(0, -4, 0);
+		this.objects = []; // Store game objects for easy updates
+		this.ballPositions = []; // Ball positions for grass interaction
+		this.players = [];
+	}
 
-    async init() {
-        console.log('GameLogic: Initializing...');
-        setupLighting(this.scene);
-        await setupGameElements(this.scene, this.objects);
-        this.players = await setupPlayers(this.scene);
-        console.log('GameLogic: Initialization complete.');
-    }
+	async init()
+	{
+		console.log('GameLogic: Initializing...');
+		setupLighting(this.scene);
+		await setupGameElements(this.scene, this.objects);
+		this.players = await setupPlayers(this.scene);
+		console.log('GameLogic: Initialization complete.');
+	}
 
-    update(delta) {
-        // Update all objects
+	update(delta)
+	{
 		this.players.forEach((player) => {
-			processPlayerInput(player.flowerPot, player.controls);
+			//const { flowerPot, controls, movementDirection } = player;
+			processPlayerInput(player);
+			//processPlayerInput(flowerPot, controls, movementDirection);
 			player.flowerPot.update(delta);
 		});
-        this.objects.forEach((obj) => {
-            if (obj.update) obj.update(delta);
-        });
+		this.objects.forEach((obj) => {
+			if (obj.update) obj.update(delta);
+		});
+		handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
+	}
 
-        // Handle collisions and interactions
-        handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
-    }
-
-    onFlowerPotHit(flowerPot, ball) {
-        console.log('Collision detected between flower pot and ball.');
-        ball.velocity.multiplyScalar(-1); // Reflect the ball (example logic)
-    }
+	onFlowerPotHit(flowerPot, ball) {
+		console.log('Collision detected between flower pot and ball.');
+		ball.velocity.multiplyScalar(-1); // Reflect the ball (example logic)
+	}
 }
 
 export default GameLogic;
