@@ -47,6 +47,15 @@ async function silentRefresh()
     return false;
 }
 
+async function  getCurrentUser() {
+    const access = localStorage.getItem('access');
+    const currentResponse = await fetch('http://localhost:8000/api/me/', {
+        headers: {Authorization: `Bearer ${access}`}
+    });
+    return currentResponse.json();
+}
+
+
 async function loadView(view)
 {
     try {
@@ -74,6 +83,10 @@ async function loadView(view)
                 console.log("Token is invalid or expired. Please login again."); //TODO: display message to notify token invalid
                 navigateTo('login');
                 return;
+            }
+            if (view == 'home') {
+                const currentUser = await getCurrentUser();
+                document.getElementById('name').innerHTML = currentUser.first_name;
             }
             if (view === 'gamePong') {
                 const { initPong } = await import('./gamePong/gamePong.js');

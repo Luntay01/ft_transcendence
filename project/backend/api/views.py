@@ -28,6 +28,7 @@ class MeView(APIView):
             'is_superuser': str(user.is_superuser),
             'date_joined': str(user.date_joined),
             'birth_day': str(user.birth_day),
+            'first_name': str(user.first_name),
         }
         return Response(content)
 
