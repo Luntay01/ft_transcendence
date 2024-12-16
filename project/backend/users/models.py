@@ -14,9 +14,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 	password = models.CharField(max_length=256)
 	username = models.CharField(max_length=256, unique=True)
 
+	first_name = models.CharField(max_length=128)
+	last_name = models.CharField(max_length=128)
+
 	is_staff = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)
 	date_joined = models.DateTimeField(default=timezone.now)
+	birth_day = models.DateTimeField(default=timezone.now)
 
 	USERNAME_FIELD = "email"
 	REQUIRED_FIELDS = ["username"]

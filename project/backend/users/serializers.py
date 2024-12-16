@@ -17,3 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class OauthCodeSerializer(serializers.Serializer):
     code = serializers.CharField()
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'date_joined']
