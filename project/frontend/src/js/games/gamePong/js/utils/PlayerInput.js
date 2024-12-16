@@ -25,6 +25,82 @@ export function processPlayerInput(player)
 	  right: { minX: 8, maxX: 12, minZ: -7, maxZ: 7 },
 	}[position];
 
+
+
+
+
+	let movementDirection = 'neutral';
+	let isKeyHeld = false;
+
+	if (position === 'bottom') {
+		if (keyState[controls.left]) {
+			flowerPot.model.position.x -= speed;
+			movementDirection = 'left';
+			isKeyHeld = true;
+		}
+		if (keyState[controls.right]) {
+			flowerPot.model.position.x += speed;
+			movementDirection = 'right';
+			isKeyHeld = true;
+		}
+	} else if (position === 'top') {
+		if (keyState[controls.left]) {
+			flowerPot.model.position.x += speed;
+			movementDirection = 'left';
+			isKeyHeld = true;
+		}
+		if (keyState[controls.right]) {
+			flowerPot.model.position.x -= speed;
+			movementDirection = 'right';
+			isKeyHeld = true;
+		}
+	} else if (position === 'left') {
+		if (keyState[controls.up]) {
+			flowerPot.model.position.z -= speed;
+			movementDirection = 'left';
+			isKeyHeld = true;
+		}
+		if (keyState[controls.down]) {
+			flowerPot.model.position.z += speed;
+			movementDirection = 'right';
+			isKeyHeld = true;
+		}
+	} else if (position === 'right') {
+		if (keyState[controls.up]) {
+			flowerPot.model.position.z += speed;
+			movementDirection = 'left';
+			isKeyHeld = true;
+		}
+		if (keyState[controls.down]) {
+			flowerPot.model.position.z -= speed;
+			movementDirection = 'right';
+			isKeyHeld = true;
+		}
+	}
+
+	// Clamp the position to keep within the boundaries
+	flowerPot.model.position.x = THREE.MathUtils.clamp(
+		flowerPot.model.position.x,
+		boundaries.minX,
+		boundaries.maxX
+	);
+	flowerPot.model.position.z = THREE.MathUtils.clamp(
+		flowerPot.model.position.z,
+		boundaries.minZ,
+		boundaries.maxZ
+	);
+
+	// Update animation state based on movement
+	flowerPot.updateState(movementDirection, isKeyHeld);
+
+
+
+
+
+
+
+
+/*
 	let movementDirection = null;
 	if (position === 'bottom')
 	{
@@ -80,6 +156,7 @@ export function processPlayerInput(player)
 	flowerPot.model.position.x = THREE.MathUtils.clamp(flowerPot.model.position.x, boundaries.minX, boundaries.maxX);
 	flowerPot.model.position.z = THREE.MathUtils.clamp(flowerPot.model.position.z, boundaries.minZ, boundaries.maxZ);
 	flowerPot.updateState(movementDirection || 'neutral');
+*/
 }
 
 
