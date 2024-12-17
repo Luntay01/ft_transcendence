@@ -12,7 +12,12 @@ class GameLogic
 		this.renderer = renderer;
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-		this.camera.position.set(0, 9, 16);
+
+		this.camera.position.set(0, 9, 16);		//bottom player
+//		this.camera.position.set(0, 9, -16);	//top player
+//		this.camera.position.set(-16, 9, 0);	//left player
+//		this.camera.position.set(16, 9, 0);		//right player
+
 		this.camera.lookAt(0, -4, 0);
 		this.objects = []; // Store game objects for easy updates
 		this.ballPositions = []; // Ball positions for grass interaction
