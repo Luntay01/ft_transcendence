@@ -11,5 +11,5 @@ export default function setupLighting(scene)
 	scene.add(ambientLight);
 	scene.add(directionalLight);
 		// Set background color
-	scene.background = new THREE.Color(0x87ceeb);
+	scene.background = new THREE.Color(0x009900);
 }

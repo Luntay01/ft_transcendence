@@ -1,22 +1,22 @@
 
 class Grass
 {
-	constructor(bladeModel, rows, columns)
-	{
+	constructor(bladeModel, rows, columns) {
 		this.rows = rows;
 		this.columns = columns;
-
-		// Extract geometry and material from the child of the loaded model
-		const child = bladeModel.children[0]; // Assuming the first child contains the geometry/material
-		if (child && child.geometry && child.material) {
-			this.geometry = child.geometry;
-			this.material = child.material;
-		} else {
-			console.error('Grass blade model does not contain geometry or material.');
-			this.geometry = new THREE.PlaneGeometry(0.1, 0.5); // Fallback geometry
-			this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Fallback material
+	
+		// Extract geometry from the child of the loaded model
+		const child = bladeModel.children[0]; // Assuming the first child contains the geometry
+		if (child && child.geometry)
+		{
+			this.geometry = child.geometry.clone(); // Clone geometry
+			this.geometry.rotateX(Math.PI / 2); // Rotate upright
+			this.material = new THREE.MeshBasicMaterial({
+				color: 0x009000, // Green color
+				side: THREE.DoubleSide, // Render both sides of the plane
+			});
 		}
-
+	
 		this.instanceMesh = null; // InstancedMesh for performance
 	}
 
@@ -38,16 +38,16 @@ class Grass
 			for (let j = 0; j < this.columns; j++)
 			{
 				dummy.position.set(
-					(i - this.rows / 2) * 0.25 + Math.random() * 0.3,
+					(i - this.rows / 2) * 0.25 + Math.random() * 0.15,
 					0,
-					(j - this.columns / 2) * 0.25 + Math.random() * 0.3
+					(j - this.columns / 2) * 0.25 + Math.random() * 0.15
 				);
 				dummy.rotation.set(
-					(Math.random() - 0.5) * 0.1, // Small tilt on the X-axis
-				Math.random() * Math.PI * -0.07, // Random rotation around the Y-axis
-				(Math.random() - 1) * 0.4  // Small tilt on the Z-axis
+					(Math.random() - 0.5) * 0.2, // Small tilt on the X-axis
+					Math.random() * Math.PI * 2, // Random rotation around the Y-axis
+					(Math.random() - 0.5) * 0.2  // Small tilt on the Z-axis
 				);
-				const scale = 0.8 + Math.random() * 0.4;
+				const scale = 0.9;// + Math.random() * 0.6;
 				dummy.scale.set(scale, scale, scale);
 				dummy.updateMatrix();
 				this.instanceMesh.setMatrixAt(index++, dummy.matrix);
