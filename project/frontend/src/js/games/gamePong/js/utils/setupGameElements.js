@@ -31,7 +31,7 @@ export default async function setupGameElements(scene, objects)
 	// add ball
 	const fertilizerBall = new FertilizerBall();
 	const ball = await fertilizerBall.loadModel('/js/games/gamePong/assets/models/fertilizer_ball.glb');
-	fertilizerBall.setPosition(0, 2, 0);
+	fertilizerBall.setPosition(0, 0, 0);
 	scene.add(ball);
 	objects.push(fertilizerBall);
 }
