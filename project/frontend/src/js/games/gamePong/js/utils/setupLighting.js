@@ -1,3 +1,5 @@
+import { GAME_SETTINGS } from '../config.js';
+
 /**
  * Adds lighting to the Three.js scene.
  * @param {THREE.Scene} scene - The scene to which lights will be added.
@@ -5,11 +7,15 @@
 
 export default function setupLighting(scene)
 {
-	const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-	directionalLight.position.set(10, 10, 10);
-	const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-	scene.add(ambientLight);
-	scene.add(directionalLight);
-		// Set background color
-	scene.background = new THREE.Color(0x009900);
+	const { directionalLight, ambientLight, backgroundColor } = GAME_SETTINGS.lighting;
+	const dirLight = new THREE.DirectionalLight(directionalLight.color, directionalLight.intensity);
+	dirLight.position.set(
+		directionalLight.position.x,
+		directionalLight.position.y,
+		directionalLight.position.z
+	);
+	scene.add(dirLight);
+	const ambLight = new THREE.AmbientLight(ambientLight.color, ambientLight.intensity);
+	scene.add(ambLight);
+	scene.background = new THREE.Color(backgroundColor);
 }

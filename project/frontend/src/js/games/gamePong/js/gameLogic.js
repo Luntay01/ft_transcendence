@@ -1,9 +1,9 @@
-//import ModelLoader from './utils/ModelLoader.js';
 import setupLighting from './utils/setupLighting.js';
 import setupPlayers from './utils/setupPlayers.js';
 import { processPlayerInput } from "./utils/PlayerInput.js";
 import setupGameElements from './utils/setupGameElements.js';
 import handleCollisions from './utils/handleCollisions.js';
+import { GAME_SETTINGS } from './config.js';
 
 class GameLogic
 {
@@ -11,14 +11,11 @@ class GameLogic
 	{
 		this.renderer = renderer;
 		this.scene = new THREE.Scene();
+		const { position, lookAt } = GAME_SETTINGS.cameraStates.bottom;
 		this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-		this.camera.position.set(0, 9, 16);		//bottom player
-//		this.camera.position.set(0, 9, -16);	//top player
-//		this.camera.position.set(-16, 9, 0);	//left player
-//		this.camera.position.set(16, 9, 0);		//right player
-
-		this.camera.lookAt(0, -4, 0);
+		this.camera.position.set(position.x, position.y, position.z);
+		this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
 		this.objects = []; // Store game objects for easy updates
 		this.ballPositions = []; // Ball positions for grass interaction
 		this.players = [];
@@ -36,9 +33,7 @@ class GameLogic
 	update(delta)
 	{
 		this.players.forEach((player) => {
-			//const { flowerPot, controls, movementDirection } = player;
 			processPlayerInput(player);
-			//processPlayerInput(flowerPot, controls, movementDirection);
 			player.flowerPot.update(delta);
 		});
 		this.objects.forEach((obj) => {
@@ -49,7 +44,7 @@ class GameLogic
 
 	onFlowerPotHit(flowerPot, ball) {
 		console.log('Collision detected between flower pot and ball.');
-		ball.velocity.multiplyScalar(-1); // Reflect the ball (example logic)
+		ball.velocity.multiplyScalar(-GAME_SETTINGS.collision.reboundFactor); // Reflect the ball (example logic)
 	}
 }
 

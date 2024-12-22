@@ -2,9 +2,10 @@ export const DEBUG = true;
 
 export const GAME_SETTINGS = {
 	ballPhysics: {
-		initialVelocity: { x: 1, y: 0, z: 1 },
-		maxSpeed: 2.5,
-		reboundFactor: 1.1,
+		initialVelocity: { x: 1.5, y: 0, z: 1.2 },
+		bounds: { minX: -2, maxX: 2, minZ: -20, maxZ: 20 },//  TODO: increase values when done with testing
+		scale: 0.9,
+		maxSpeed: 20,
 	},
 	playerConfig: {
 		positions: {
@@ -25,6 +26,7 @@ export const GAME_SETTINGS = {
 		ballRadius: 0.5,
 		flowerPotRadius: 1.0,
 		gardenBedRadius: 2.0,
+		reboundFactor: 1.1, // bounce intensity
 	},
 	scoring: {
 		scoreToWin: 15,
@@ -38,6 +40,7 @@ export const GAME_SETTINGS = {
 		randomTiltZ: 0.2,
 		defaultScale: 0.9,
 		color: 0x009000,
+		reactionRadius: 1.0,
 	},
 	lighting: {
 		directionalLight: {

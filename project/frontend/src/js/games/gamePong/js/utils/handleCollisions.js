@@ -1,3 +1,4 @@
+import { GAME_SETTINGS } from '../config.js';
 import ColliderManager from '../components/ColliderManager.js';
 import FertilizerBall from '../components/FertilizerBall.js'
 
@@ -14,9 +15,7 @@ export default function handleCollisions(objects, players, onCollision)
 	const flowerPots = players.map((player) => player.flowerPot);
 	const gardenBeds = objects.filter((obj) => obj.type === 'gardenBed');
 
-	const ballRadius = 0.5;
-	const flowerPotRadius = 1.0;
-	const gardenBedRadius = 2.0;
+	const { ballRadius, flowerPotRadius, gardenBedRadius, reboundFactor } = GAME_SETTINGS.collision;
 	balls.forEach((ball) => {
 		// check collision with flower pots
 		flowerPots.forEach((flowerPot) => {
@@ -31,7 +30,7 @@ export default function handleCollisions(objects, players, onCollision)
 			if (ColliderManager.detect2DSphereCollision(ball.model, gardenBed.model, ballRadius, gardenBedRadius))
 			{
 				console.log('collision detected: ball with gardenBed');
-				ball.velocity.multiplyScalar(-1); // Example: Reverse ball's velocity
+				ball.velocity.multiplyScalar(-reboundFactor); // Example: Reverse ball's velocity
 			}
 		});
 	});

@@ -2,6 +2,7 @@ import GardenBed from '../components/GardenBed.js';
 import Grass from '../components/Grass.js';
 import FertilizerBall from '../components/FertilizerBall.js';
 import ModelLoader from '../utils/ModelLoader.js';
+import { GAME_SETTINGS } from '../config.js';
 
 /**
  * Loads and sets up game elements like garden beds, grass, and the ball.
@@ -11,26 +12,27 @@ import ModelLoader from '../utils/ModelLoader.js';
 
 export default async function setupGameElements(scene, objects)
 {
+	const { modelPaths, grass, playerConfig } = GAME_SETTINGS;
 	// load garden beds
 	const gardenBed = new GardenBed();
-	const gardenBedModel = await gardenBed.loadModel('/js/games/gamePong/assets/models/garden_bed.glb');
+	const gardenBedModel = await gardenBed.loadModel(modelPaths.gardenBed);
 	for (let i = 0; i < 4; i++)
 	{
 		const bedClone = gardenBedModel.clone();
-		bedClone.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));
+		bedClone.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));//TODO: remove hardcorded gardenBed offset use GAMESETTINGS instead using player bounds plus model offset
 		scene.add(bedClone);
 	}
 
 	// create and add grass
-	const grassModel = await ModelLoader.loadModel('/js/games/gamePong/assets/models/grass_blade.glb');
-	const grass = new Grass(grassModel, 80, 80);
-	const grassField = grass.createGrassField();
+	const grassModel = await ModelLoader.loadModel(modelPaths.grassBlade);
+	const grassInstance = new Grass(grassModel);
+	const grassField = grassInstance.createGrassField();
 	scene.add(grassField);
-	objects.push(grass);
+	objects.push(grassInstance);
 
 	// add ball
 	const fertilizerBall = new FertilizerBall();
-	const ball = await fertilizerBall.loadModel('/js/games/gamePong/assets/models/fertilizer_ball.glb');
+	const ball = await fertilizerBall.loadModel(modelPaths.fertilizerBall);
 	fertilizerBall.setPosition(0, 0, 0);
 	scene.add(ball);
 	objects.push(fertilizerBall);
