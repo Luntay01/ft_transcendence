@@ -4,12 +4,13 @@ class FertilizerBall
 {
 	constructor()
 	{
-		const { initialVelocity, bounds, scale } = GAME_SETTINGS.ballPhysics;
+		const { initialVelocity, bounds, scale, maxSpeed } = GAME_SETTINGS.ballPhysics;
 		this.model = null;
 		this.loader = new THREE.GLTFLoader();
 		this.velocity = new THREE.Vector3(initialVelocity.x, initialVelocity.y, initialVelocity.z);
 		this.bounds = bounds;
 		this.scale = scale;
+		this.maxSpeed = maxSpeed;
 	}
 
 	async loadModel(path)
@@ -29,9 +30,8 @@ class FertilizerBall
 	update(deltaTime)
 	{
 		if (!this.model) return;
-		const maxSpeed = GAME_SETTINGS.ballPhysics.maxSpeed;
-		if (this.velocity.length() > maxSpeed)
-			this.velocity.setLength(maxSpeed);
+		if (this.velocity.length() > this.maxSpeed)
+			this.velocity.setLength(this.maxSpeed);
 		this.velocity.y = 0; // no vertical motion
 		this.model.position.add(this.velocity.clone().multiplyScalar(deltaTime));
 		this.checkBoundaries();

@@ -11,7 +11,7 @@ class GameLogic
 	{
 		this.renderer = renderer;
 		this.scene = new THREE.Scene();
-		const { position, lookAt } = GAME_SETTINGS.cameraStates.bottom;
+		const { position, lookAt } = GAME_SETTINGS.cameraStates.spectator;
 		this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 		this.camera.position.set(position.x, position.y, position.z);

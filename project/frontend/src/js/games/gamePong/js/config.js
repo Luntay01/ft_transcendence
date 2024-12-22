@@ -3,7 +3,7 @@ export const DEBUG = true;
 export const GAME_SETTINGS = {
 	ballPhysics: {
 		initialVelocity: { x: 1.5, y: 0, z: 1.2 },
-		bounds: { minX: -2, maxX: 2, minZ: -20, maxZ: 20 },//  TODO: increase values when done with testing
+		bounds: { minX: -20, maxX: 20, minZ: -20, maxZ: 20 },//  TODO: increase values when done with testing
 		scale: 0.9,
 		maxSpeed: 20,
 	},
@@ -23,9 +23,9 @@ export const GAME_SETTINGS = {
 		speedMultiplier: 1.0,
 	},
 	collision: {
-		ballRadius: 0.5,
-		flowerPotRadius: 1.0,
-		gardenBedRadius: 2.0,
+		ballRadius: 0.2,
+		flowerPotRadius: 1.1,
+		gardenBedRadius: 2.1,
 		reboundFactor: 1.1, // bounce intensity
 	},
 	scoring: {
@@ -73,6 +73,7 @@ export const GAME_SETTINGS = {
 		top: { position: { x: 0, y: 9, z: -16 }, lookAt: { x: 0, y: -4, z: 0 } },
 		left: { position: { x: -16, y: 9, z: 0 }, lookAt: { x: 0, y: -4, z: 0 } },
 		right: { position: { x: 16, y: 9, z: 0 }, lookAt: { x: 0, y: -4, z: 0 } },
+		spectator: { position: { x: 0, y: 30, z: 0 }, lookAt: { x: 0, y: 0, z: 0 } },
 	},
 };
 

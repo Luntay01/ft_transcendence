@@ -14,13 +14,14 @@ export default async function setupGameElements(scene, objects)
 {
 	const { modelPaths, grass, playerConfig } = GAME_SETTINGS;
 	// load garden beds
-	const gardenBed = new GardenBed();
-	const gardenBedModel = await gardenBed.loadModel(modelPaths.gardenBed);
 	for (let i = 0; i < 4; i++)
 	{
-		const bedClone = gardenBedModel.clone();
-		bedClone.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));//TODO: remove hardcorded gardenBed offset use GAMESETTINGS instead using player bounds plus model offset
-		scene.add(bedClone);
+		const gardenBed = new GardenBed();
+		await gardenBed.loadModel(modelPaths.gardenBed);
+		//gardenBed.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));//TODO: remove hardcorded gardenBed offset use GAMESETTINGS instead using player bounds plus model offset
+		gardenBed.setPosition((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));
+		scene.add(gardenBed.model);;
+		objects.push(gardenBed);
 	}
 
 	// create and add grass

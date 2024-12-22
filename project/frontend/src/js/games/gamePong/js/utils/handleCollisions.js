@@ -1,6 +1,7 @@
-import { GAME_SETTINGS } from '../config.js';
+import { DEBUG, GAME_SETTINGS } from '../config.js';
 import ColliderManager from '../components/ColliderManager.js';
 import FertilizerBall from '../components/FertilizerBall.js'
+import GardenBed from '../components/GardenBed.js';
 
 /**
  * Handles collisions in the game using 2D sphere logic.
@@ -13,9 +14,38 @@ export default function handleCollisions(objects, players, onCollision)
 {
 	const balls = objects.filter((obj) => obj instanceof FertilizerBall);
 	const flowerPots = players.map((player) => player.flowerPot);
-	const gardenBeds = objects.filter((obj) => obj.type === 'gardenBed');
-
+	const gardenBeds = objects.filter((obj) => obj instanceof GardenBed);
+	console.log('GardenBeds for collision:', gardenBeds);
 	const { ballRadius, flowerPotRadius, gardenBedRadius, reboundFactor } = GAME_SETTINGS.collision;
+
+	if (DEBUG) {
+        // Visualize colliders
+        balls.forEach((ball) =>
+            ColliderManager.addColliderVisual(
+                ball.model.parent,
+                { x: ball.model.position.x, y: 0.01, z: ball.model.position.z }, // Raise slightly to avoid z-fighting
+                ballRadius,
+                0xff0000 // Red for balls
+            )
+        );
+        flowerPots.forEach((flowerPot) =>
+            ColliderManager.addColliderVisual(
+                flowerPot.model.parent,
+                { x: flowerPot.model.position.x, y: 0.01, z: flowerPot.model.position.z },
+                flowerPotRadius,
+                0x00ff00 // Green for flower pots
+            )
+        );
+        gardenBeds.forEach((gardenBed) =>
+            ColliderManager.addColliderVisual(
+                gardenBed.model.parent,
+                { x: gardenBed.model.position.x, y: 0.01, z: gardenBed.model.position.z },
+                gardenBedRadius,
+                0x0000ff // Blue for garden beds
+            )
+        );
+    }
+
 	balls.forEach((ball) => {
 		// check collision with flower pots
 		flowerPots.forEach((flowerPot) => {
