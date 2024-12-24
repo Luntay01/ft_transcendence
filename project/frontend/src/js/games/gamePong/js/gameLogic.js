@@ -42,9 +42,13 @@ class GameLogic
 		handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
 	}
 
-	onFlowerPotHit(flowerPot, ball) {
-		console.log('Collision detected between flower pot and ball.');
-		ball.velocity.multiplyScalar(-GAME_SETTINGS.collision.reboundFactor); // Reflect the ball (example logic)
+	onFlowerPotHit(flowerPot, ball)
+	{
+		const { dampingFactor, minimumSpeed } = GAME_SETTINGS.collision;
+		ball.velocity.multiplyScalar(dampingFactor);
+		if (ball.velocity.length() < minimumSpeed)
+			ball.velocity.setLength(minimumSpeed);
+
 	}
 }
 

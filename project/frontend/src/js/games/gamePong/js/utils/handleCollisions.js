@@ -15,53 +15,47 @@ export default function handleCollisions(objects, players, onCollision)
 	const balls = objects.filter((obj) => obj instanceof FertilizerBall);
 	const flowerPots = players.map((player) => player.flowerPot);
 	const gardenBeds = objects.filter((obj) => obj instanceof GardenBed);
-	console.log('GardenBeds for collision:', gardenBeds);
 	const { ballRadius, flowerPotRadius, gardenBedRadius, reboundFactor } = GAME_SETTINGS.collision;
-
-	if (DEBUG) {
-        // Visualize colliders
-        balls.forEach((ball) =>
-            ColliderManager.addColliderVisual(
-                ball.model.parent,
-                { x: ball.model.position.x, y: 0.01, z: ball.model.position.z }, // Raise slightly to avoid z-fighting
-                ballRadius,
-                0xff0000 // Red for balls
-            )
-        );
-        flowerPots.forEach((flowerPot) =>
-            ColliderManager.addColliderVisual(
-                flowerPot.model.parent,
-                { x: flowerPot.model.position.x, y: 0.01, z: flowerPot.model.position.z },
-                flowerPotRadius,
-                0x00ff00 // Green for flower pots
-            )
-        );
-        gardenBeds.forEach((gardenBed) =>
-            ColliderManager.addColliderVisual(
-                gardenBed.model.parent,
-                { x: gardenBed.model.position.x, y: 0.01, z: gardenBed.model.position.z },
-                gardenBedRadius,
-                0x0000ff // Blue for garden beds
-            )
-        );
-    }
-
+	if (DEBUG)
+	{
+		balls.forEach((ball) =>
+			ColliderManager.addColliderVisual(
+				ball.model.parent,
+				{ x: ball.model.position.x, y: 0.01, z: ball.model.position.z }, // Raise slightly to avoid z-fighting
+				ballRadius,
+				0xff0000
+			)
+		);
+		flowerPots.forEach((flowerPot) =>
+			ColliderManager.addColliderVisual(
+				flowerPot.model.parent,
+				{ x: flowerPot.model.position.x, y: 0.01, z: flowerPot.model.position.z },
+				flowerPotRadius,
+				0x00ff00
+			)
+		);
+		gardenBeds.forEach((gardenBed) =>
+			ColliderManager.addColliderVisual(
+				gardenBed.model.parent,
+				{ x: gardenBed.model.position.x, y: 0.01, z: gardenBed.model.position.z },
+				gardenBedRadius,
+				0x0000ff
+			)
+		);
+	}
 	balls.forEach((ball) => {
-		// check collision with flower pots
 		flowerPots.forEach((flowerPot) => {
 			if (ColliderManager.detect2DSphereCollision(ball.model, flowerPot.model, ballRadius, flowerPotRadius))
 			{
-				console.log(`collision detected: ball with flowerPot at position ${flowerPot.model.position}`);
+				ball.handleCollision(flowerPot, flowerPot.velocity || new THREE.Vector3(0, 0, 0));
 				onCollision(flowerPot, ball);
 			}
 		});
-		// check collision with garden beds
 		gardenBeds.forEach((gardenBed) => {
 			if (ColliderManager.detect2DSphereCollision(ball.model, gardenBed.model, ballRadius, gardenBedRadius))
-			{
-				console.log('collision detected: ball with gardenBed');
-				ball.velocity.multiplyScalar(-reboundFactor); // Example: Reverse ball's velocity
-			}
+				ball.handleCollision(gardenBed);
 		});
+		//if (!collisionOccurred)
+		//	ball.lastCollidedObject = null;
 	});
 }

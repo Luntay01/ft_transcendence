@@ -1,9 +1,9 @@
-export const DEBUG = true;
+export const DEBUG = false;
 
 export const GAME_SETTINGS = {
 	ballPhysics: {
 		initialVelocity: { x: 1.5, y: 0, z: 1.2 },
-		bounds: { minX: -20, maxX: 20, minZ: -20, maxZ: 20 },//  TODO: increase values when done with testing
+		bounds: { minX: -15, maxX: 15, minZ: -15, maxZ: 15 },//  TODO: increase values when done with testing
 		scale: 0.9,
 		maxSpeed: 20,
 	},
@@ -24,9 +24,11 @@ export const GAME_SETTINGS = {
 	},
 	collision: {
 		ballRadius: 0.2,
-		flowerPotRadius: 1.1,
+		flowerPotRadius: 1.2,
 		gardenBedRadius: 2.1,
 		reboundFactor: 1.1, // bounce intensity
+		dampingFactor: 1.01, // velocity multiplier for flower pots
+		minimumSpeed: 1.0,  // minimum velocity for the ball
 	},
 	scoring: {
 		scoreToWin: 15,

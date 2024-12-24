@@ -11,6 +11,9 @@ class FertilizerBall
 		this.bounds = bounds;
 		this.scale = scale;
 		this.maxSpeed = maxSpeed;
+		this.lastCollisionTime = 0; // Timestamp of the last collision
+		this.collisionCooldown = 0.1; // Cooldown in seconds
+		this.lastCollidedObject = null;
 	}
 
 	async loadModel(path)
@@ -48,6 +51,38 @@ class FertilizerBall
 		const maxSpeed = GAME_SETTINGS.ballPhysics.maxSpeed;
 		if (this.velocity.length() > maxSpeed)
 			this.velocity.setLength(maxSpeed);
+	}
+
+	/**
+	 * Handle collision with another object
+	 * @param {Object} object - The object the ball collided with.
+	 * @param {THREE.Vector3} objectVelocity - Velocity of the object (optional).
+	 */
+	handleCollision(object, objectVelocity = new THREE.Vector3(0, 0, 0))
+	{
+		if (this.lastCollidedObject === object)
+			return; // skip if it's the same object
+		this.lastCollidedObject = object; // update the last collided object
+		const ballVelocity = this.velocity.clone();
+		// calculate the normal vector at the point of collision
+		const collisionNormal = new THREE.Vector3()
+			.subVectors(this.model.position, object.model.position)
+			.normalize();
+		// reflect the ball's velocity based on the normal
+		const reflectedVelocity = ballVelocity.clone().sub(
+			collisionNormal.multiplyScalar(2 * ballVelocity.dot(collisionNormal))
+		);
+		// object velocity for dynamic interactions (e.g., flower pots)
+		reflectedVelocity.add(objectVelocity);
+		// Apply damping for flower pots
+//		if (object instanceof FlowerPot) {
+//			const dampingFactor = 0.5; // Reduce speed to half
+//			reflectedVelocity.multiplyScalar(dampingFactor);
+//		}
+		// adjust velocity magnitude (e.g., add spin effect or damping)
+		if (reflectedVelocity.length() > this.maxSpeed)
+			reflectedVelocity.setLength(this.maxSpeed);
+		this.velocity.copy(reflectedVelocity);
 	}
 }
 
