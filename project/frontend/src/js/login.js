@@ -4,12 +4,13 @@ export function setupLoginForm() {
         event.preventDefault();
         const email = loginForm.email.value;
         const password = loginForm.password.value;
+        const provider = 'Pong';
 
         try {
             const response = await fetch('http://localhost:8000/api/users/token/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email, password, provider }),
             });
             const data = await response.json();
             if (response.ok) {

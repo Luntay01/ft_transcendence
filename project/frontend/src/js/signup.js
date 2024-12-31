@@ -5,12 +5,13 @@ export function setupSignupForm() {
         const username = form.usernameSignup.value;
         const password = form.passwordSignup.value;
         const email = form.emailSignup.value;
+        const provider = 'Pong';
 
         try {
             const response = await fetch('http://localhost:8000/api/users/register/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, email }),
+                body: JSON.stringify({ username, password, email, provider }),
             });
             const data = await response.json();
             if (response.ok) {
