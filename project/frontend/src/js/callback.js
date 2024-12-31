@@ -15,10 +15,15 @@ async function handler(code) {
 
 	const response = await fetch("http://localhost:8000/api/users/oauth/", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams({ code }),
 	})
 
-	if (response.ok) window.location.href = 'http://localhost:3000/#login';
+	const data = await response.json();
+	if (response.ok) {
+		localStorage.setItem('access', data.access);
+		localStorage.setItem('refresh', data.refresh);
+		window.location.href = 'http://localhost:3000/#home';
+	}
 	return true;
 }
