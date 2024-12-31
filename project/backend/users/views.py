@@ -1,6 +1,8 @@
 from rest_framework import views, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt import views as jwt_views
+from rest_framework_simplejwt import exceptions as jwt_exp
 from .models import User
 from .serializers import UserSerializer, OauthCodeSerializer
 import requests
@@ -44,6 +46,34 @@ class OauthCodeView(views.APIView):
         # logging.warning('username: ' + content["login"])    #debug
         # logging.warning('email: ' + content["email"])    #debug
 
+        queryset = User.objects.filter(oauth_user_id=content["id"])
+        if (queryset):
+            data = { 'password': access_token, }
+            query = User.objects.get(provider='42Oauth', oauth_user_id=content['id'])
+            instance = UserSerializer(instance=query, data=data, partial=True)
+            if not (instance.is_valid()):
+                logging.warning("access token in password field is not valid")
+            instance.save()
+        else:
+            data = {
+                'email': content['email'],
+                'provider': '42Oauth',
+                'oauth_user_id': content['id'],
+                'password': access_token,
+                'username': content['login'],
+            }
+            userializer = UserSerializer(data=data, partial=True)
+            if not (userializer.is_valid()):
+                logging.warning("input is not valid")
+            userializer.save()
+
+        # return jwt token
+        post_data = {
+            'provider': '42Oauth',
+            'oauth_user_id': content['id'],
+            'password': access_token,
+        }
+        response = requests.post("http://localhost:8000/api/users/token/", data=post_data)
         return Response(response.json(), status.HTTP_200_OK)
     
 class TokenObtainPairView(jwt_views.TokenObtainPairView):
