@@ -17,7 +17,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 		'42Oauth': '42Oauth',
 	}
 	provider = models.CharField(max_length=20, choices=PROVIDER, default='Pong')
-	oauth_user_id = models.CharField(max_length=20)
+	oauth_user_id = models.CharField(max_length=20, null=True)
 	password = models.CharField(max_length=256)
 	username = models.CharField(max_length=256, unique=True)
 
@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	objects = UserManager()
 
 	class Meta:
-		unique_together = ('provider', 'oauth_user_id')
+		unique_together = ('provider', 'email')
 
 	def __str__(self):
 		return str(self.id)

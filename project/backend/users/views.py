@@ -11,7 +11,7 @@ import logging
 class UserRegisterView(views.APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data, partial=True)
         if not (serializer.is_valid()):
             return Response('', status.HTTP_422_UNPROCESSABLE_ENTITY)
         serializer.save()

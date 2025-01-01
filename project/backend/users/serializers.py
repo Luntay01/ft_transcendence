@@ -4,8 +4,8 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-
+        fields = ['email', 'password', 'username', 'provider', 'oauth_user_id']
+    
     # override to hash password
     def create(self, validated_data):
         unhashed_password = validated_data.pop('password', None)
