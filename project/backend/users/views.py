@@ -29,12 +29,15 @@ class OauthCodeView(views.APIView):
         logging.warning('code: ' + code)    #debug
         client_id = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38"
         client_secret = "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"
+        state = serializer.validated_data['state']
+        logging.warning('state: ' + state)    #debug
         post_data = {
             'grant_type': 'authorization_code',
             'code': code,
             'client_id': client_id,
             'client_secret': client_secret,
-            'redirect_uri': 'http://localhost:3000/callback'
+            'redirect_uri': 'http://localhost:3000/callback',
+            'state': state,
             }
         response = requests.post("https://api.intra.42.fr/oauth/token/", data=post_data)
 

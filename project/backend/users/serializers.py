@@ -24,3 +24,4 @@ class UserSerializer(serializers.ModelSerializer):
 
 class OauthCodeSerializer(serializers.Serializer):
     code = serializers.CharField()
+    state = serializers.CharField()

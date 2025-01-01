@@ -1,3 +1,15 @@
+function generateState(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+};
+
 export function setupLoginForm() {
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', async (event) => {
@@ -32,7 +44,7 @@ export function setupLoginForm() {
         //TODO: define global varibales
         const clientId = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38";
         const redirectUrl = "http%3A%2F%2Flocalhost%3A3000%2Fcallback";
-        const state = "qweqweq";
+        const state = generateState(20);
         const url = `https://api.intra.42.fr/oauth/authorize?` + 
             `client_id=${clientId}&` +
             `redirect_uri=${redirectUrl}&` +

@@ -4,19 +4,20 @@ async function handleRoute() {
 	const queryString = window.location.search;
 	const urlParms = new URLSearchParams(queryString);
 	const code = urlParms.get('code');
-	const res = await handler(code);
+	const state = urlParms.get('state');
+	const res = await handler(code, state);
     if (!res) console.log("code is not found");
 }
 
 window.addEventListener('load', handleRoute);
 
-async function handler(code) {
-	if (!code) return false;
+async function handler(code, state) {
+	if (!code || !state) return false;
 
 	const response = await fetch("http://localhost:8000/api/users/oauth/", {
         method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ code }),
+		body: new URLSearchParams({ code, state }),
 	})
 
 	const data = await response.json();
