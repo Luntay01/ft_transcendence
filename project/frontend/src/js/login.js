@@ -41,9 +41,8 @@ export function setupLoginForm() {
     const oauthForm = document.getElementById('oauthForm');
     oauthForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        //TODO: define global varibales
         const clientId = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38";
-        const redirectUrl = "http%3A%2F%2Flocalhost%3A3000%2Fcallback";
+        const redirectUrl = encodeURI("http://localhost:3000/callback");
         const state = generateState(20);
         const url = `https://api.intra.42.fr/oauth/authorize?` + 
             `client_id=${clientId}&` +
