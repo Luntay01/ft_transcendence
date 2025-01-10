@@ -20,10 +20,10 @@ class UserAdmin(UserAdmin):
     add_form = UserCreationForm
     form = UserChangeForm
     model = User
-    list_display = ("id", "email", "provider", "oauth_user_id", "username", "is_staff", "is_active",)
-    list_filter = ("id", "email", "provider", "oauth_user_id", "username", "is_staff", "is_active",)
+    list_display = ("id", "email", "provider", "oauth_user_id", "username", "picture", "is_staff", "is_active",)
+    list_filter = ("id", "email", "provider", "oauth_user_id", "username", "picture", "is_staff", "is_active",)
     fieldsets = (
-        (None, {"fields": ("email", "provider", "oauth_user_id", "password", "username")}),
+        (None, {"fields": ("email", "provider", "oauth_user_id", "password", "username", "picture")}),
         ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
     )
     add_fieldsets = (
