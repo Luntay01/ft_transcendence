@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=256, unique=True)),
                 ('first_name', models.CharField(max_length=128)),
                 ('last_name', models.CharField(max_length=128)),
+                ('picture', models.ImageField(upload_to='images/')),
                 ('is_staff', models.BooleanField(default=False)),
                 ('is_active', models.BooleanField(default=True)),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now)),

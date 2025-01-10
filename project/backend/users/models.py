@@ -20,6 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	oauth_user_id = models.CharField(max_length=20, null=True)
 	password = models.CharField(max_length=256)
 	username = models.CharField(max_length=256, unique=True)
+	picture = models.ImageField(upload_to='images/', default='images/default.png')
 
 	first_name = models.CharField(max_length=128)
 	last_name = models.CharField(max_length=128)
