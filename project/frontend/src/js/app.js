@@ -19,7 +19,7 @@ async function silentRefresh()
         return false;
     const access = localStorage.getItem('access');
 
-    const verifyAccessResponse = await fetch('http://localhost:8000/api/users/token/verify/', {
+    const verifyAccessResponse = await fetch('http://localhost:8000/api/token/verify/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 'token': access }),
@@ -28,14 +28,14 @@ async function silentRefresh()
         return true;
 
     const refresh = localStorage.getItem('refresh');
-    const verifyRefreshResponse = await fetch('http://localhost:8000/api/users/token/verify/', {
+    const verifyRefreshResponse = await fetch('http://localhost:8000/api/token/verify/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 'token': refresh }),
     });
 
     if (verifyRefreshResponse.ok) {
-        const refreshResponse = await fetch('http://localhost:8000/api/users/token/refresh/', {
+        const refreshResponse = await fetch('http://localhost:8000/api/token/refresh/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 'refresh': refresh }),

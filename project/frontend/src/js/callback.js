@@ -14,7 +14,7 @@ window.addEventListener('load', handleRoute);
 async function handler(code, state) {
 	if (!code || !state) return false;
 
-	const response = await fetch("http://localhost:8000/api/users/oauth/", {
+	const response = await fetch("http://localhost:8000/api/oauth/", {
         method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		body: new URLSearchParams({ code, state }),

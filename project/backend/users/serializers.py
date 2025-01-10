@@ -22,10 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class OauthCodeSerializer(serializers.Serializer):
-    code = serializers.CharField()
-    state = serializers.CharField()
-
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

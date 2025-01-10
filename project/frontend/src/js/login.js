@@ -19,7 +19,7 @@ export function setupLoginForm() {
         const provider = 'Pong';
 
         try {
-            const response = await fetch('http://localhost:8000/api/users/token/', {
+            const response = await fetch('http://localhost:8000/api/token/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email, password, provider }),
