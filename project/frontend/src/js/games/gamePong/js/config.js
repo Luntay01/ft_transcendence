@@ -6,6 +6,7 @@ export const GAME_SETTINGS = {
 		bounds: { minX: -15, maxX: 15, minZ: -15, maxZ: 15 },//  TODO: increase values when done with testing
 		scale: 0.9,
 		maxSpeed: 20,
+		rotationMultiplier: 1.0,
 	},
 	playerConfig: {
 		positions: {
