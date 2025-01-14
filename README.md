@@ -67,6 +67,24 @@ project/
 - **Celery** for handling AI logic in the background
 - **Docker** for containerization
 
+## API endpoint
+### Token
+| Method | Path | Usage | 
+| ---- | ---- | --- |
+| POST | /api/token | get jwt using email and password|
+| POST | /api/token/refresh | refresh jwt usign refresh token |
+| POST | /api/token/verify | verify acccess token or refresh token |
+| POST | /api/oauth| get jwt using authentication code in Oauth |
+
+### User
+| Method | Path | Loigin required | Usage | 
+| ----  | ---- | ---- | --- |
+| GET   | /api/users/ | Y | list all users' data |
+| POST  | /api/users/ | N | registrate a user |
+| PATCH | /api/users/ | Y | update current user's data |
+| GET   | /api/users/me | Y | get current user's data |
+| GET   | /api/users/\<username> | Y | retrieve specific user data |
+
 ## Project Setup
 
 1. Clone the repository:
@@ -74,11 +92,13 @@ project/
    ```bash
    git clone https://github.com/your-repo/ft_transcendence.git
    cd ft_transcendence/project
+   ```
 
-1. Build the Docker containers:
+2. Build the Docker containers:
    docker-compose up --build
 
-2. Add environment variables to the .env file
+3. Add environment variables to the .env file
+   ```
    POSTGRES_HOST=<hostname>
    POSTGRES_DB=<database_name>
    POSTGRES_USER=<admin_name>
@@ -91,3 +111,9 @@ project/
    # Django secret key
    DJANGO_SECRET_KEY=<secret_key>
    DJANGO_DEBUG=1
+
+   # 42 Oauth Authorization App
+   # NOTE: secret will expire on 22 Jan 2025
+   CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
+   CLIENT_SECRET=< client secret (*contact developers to get value) >
+   ```
