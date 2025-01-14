@@ -47,14 +47,6 @@ async function silentRefresh()
     return false;
 }
 
-async function  getCurrentUser() {
-    const access = localStorage.getItem('access');
-    const currentResponse = await fetch('http://localhost:8000/api/me/', {
-        headers: {Authorization: `Bearer ${access}`}
-    });
-    return currentResponse.json();
-}
-
 
 async function loadView(view)
 {
@@ -85,10 +77,10 @@ async function loadView(view)
                 return;
             }
             if (view == 'home') {
-                const currentUser = await getCurrentUser();
-                document.getElementById('name').innerHTML = currentUser.first_name;
+                const { setupHome } = await import('./home.js');
+                setupHome();
             }
-            if (view === 'gamePong') {
+            else if (view === 'gamePong') {
                 const { initPong } = await import('./gamePong/gamePong.js');
                 initPong();
             }
