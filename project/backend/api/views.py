@@ -113,36 +113,3 @@ class TokenObtainPairView(jwt_views.TokenObtainPairView):
             raise jwt_exp.InvalidToken(e.args[0])
         
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
-
-class MeView(APIView):
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        user: User = request.user
-        content = {
-            'user': str(user),  # `django.contrib.auth.User` instance.
-            'auth': str(request.auth),  # None
-            'is_superuser': str(user.is_superuser),
-            'date_joined': str(user.date_joined),
-            'birth_day': str(user.birth_day),
-            'first_name': str(user.first_name),
-        }
-        return Response(content)
-
-from rest_framework.viewsets import ViewSet
-from users.serializers import ProfileSerializer
-class UserViewSet(ViewSet):
-    queryset = User.objects.all()
-    serializer_class = ProfileSerializer
-    lookup_field = 'user__username'
-    lookup_url_kwarg = 'username'
-    
-    def list(self, request):
-        serializer = ProfileSerializer(self.queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, username=None):
-        item = get_object_or_404(self.queryset, username=self.kwargs['username'])
-        serializer = ProfileSerializer(item)
-        return Response(serializer.data)
