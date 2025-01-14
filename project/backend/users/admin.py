@@ -40,7 +40,7 @@ class UserAdmin(UserAdmin):
             "classes": ("wide",),
             "fields": (
                 "email", "provider", "oauth_user_id", "password1", "password2", "username",
-                "first_name", "last_name", "birth_date", "is_staff",
+                "first_name", "last_name", "birth_day", "is_staff",
                 "is_active", "groups", "user_permissions"
             )}
         ),
