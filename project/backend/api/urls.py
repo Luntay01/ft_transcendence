@@ -5,7 +5,6 @@ from .views import OauthCodeView, TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
-    path('ping/', views.ping, name='ping'),  # Ensure this is present
     path('token/', TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('token/verify/', TokenVerifyView.as_view()),
