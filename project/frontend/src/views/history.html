@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chat history</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@400;700&family=Berkshire+Swash:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles/body.css">
+	<link rel="stylesheet" href="../styles/history.css">
+</head>
+<body>
+	<div class="center-container">
+		<div class="history-container" id="history-container">
+		</div>
+	</div>
+	<script>
+		const historyContainer = document.getElementById('history-container');
+
+		function displayChatHistory(){
+			const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+			history.forEach(message =>{
+				const messageElement = document.createElement('div');
+				messageElement.className = 'history-message';
+				messageElement.innerText = message;
+				historyContainer.appendChild(messageElement);
+			});
+		}
+
+		displayChatHistory();
+	</script>
+</body>
+</html>
