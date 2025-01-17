@@ -8,7 +8,7 @@ export async function setupHome() {
 		});
 		const data = await response.json();
 		if (response.ok) {
-			let nickname = data.username;
+			let username = data.username;
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
@@ -17,7 +17,7 @@ export async function setupHome() {
 			let height = '200px';
 			userinfo.innerHTML = 
 			`
-			<h4> Nickname:  ${nickname} </h4>
+			<h4> Username:  ${username} </h4>
 			<h4> Email: ${email} </h4>
 			<h4> Provider: ${provider} </h4>
 			<h4> Picture: </h4><img src="${src}" alt="picture is not found" width=${width} height=${height}>
