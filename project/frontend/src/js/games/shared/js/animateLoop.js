@@ -13,6 +13,9 @@ export function startAnimation(gameLogic, renderer)
 		const delta = clock.getDelta();
 		gameLogic.update(delta);
 		renderer.render(gameLogic.scene, gameLogic.camera);
+		renderer.autoClear = false; // prevent clearing the previous render
+		renderer.render(gameLogic.uiScene, gameLogic.uiCamera);
+		renderer.autoClear = true; // restore auto-clear
 		requestAnimationFrame(tick);
 	}
 	return requestAnimationFrame(tick);

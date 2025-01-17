@@ -33,7 +33,24 @@ export const GAME_SETTINGS = {
 		minimumSpeed: 1.0,  // minimum velocity for the ball
 	},
 	scoring: {
-		scoreToWin: 15,
+		startingScore: 15,
+		spriteConfig: {
+			radius: 40,
+			textSize: 100,
+			textConfig: {
+				font: 'bold 100px Arial',
+				color: 'black', 
+				canvasSize: 256, 
+				opacity: 0.8,
+			},
+			positions: [
+				{ x: -500, y: 450, z: 2 },
+				{ x: -200, y: 450, z: 2 },
+				{ x: 200, y: 450, z: 2 },
+				{ x: 500, y: 450, z: 2 }
+			],
+			colors: ['#C8643A', '#A0A0A0', '#5B92D8', '#6A206E'], // player-specific colors
+		},
 	},
 	grass: {
 		rows: 80,
@@ -73,10 +90,10 @@ export const GAME_SETTINGS = {
 		goal: '/js/games/gamePong/assets/goal.mp3',//doens exist
 	},
 	cameraStates: {
-		bottom: { position: { x: 0, y: 9, z: 16 }, lookAt: { x: 0, y: -4, z: 0 } },
-		top: { position: { x: 0, y: 9, z: -16 }, lookAt: { x: 0, y: -4, z: 0 } },
-		left: { position: { x: -16, y: 9, z: 0 }, lookAt: { x: 0, y: -4, z: 0 } },
-		right: { position: { x: 16, y: 9, z: 0 }, lookAt: { x: 0, y: -4, z: 0 } },
+		bottom: { position: { x: 0, y: 11, z: 17 }, lookAt: { x: 0, y: -2, z: 0 } },
+		top: { position: { x: 0, y: 11, z: -17 }, lookAt: { x: 0, y: -2, z: 0 } },
+		left: { position: { x: -17, y: 11, z: 0 }, lookAt: { x: 0, y: -2, z: 0 } },
+		right: { position: { x: 17, y: 11, z: 0 }, lookAt: { x: 0, y: -2, z: 0 } },
 		spectator: { position: { x: 0, y: 30, z: 0 }, lookAt: { x: 0, y: 0, z: 0 } },
 	},
 };
