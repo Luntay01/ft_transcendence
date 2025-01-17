@@ -80,6 +80,20 @@ class FlowerPot
 				this.playAnimation('Netural_from_right', true, 2.0);
 		}
 	}
+
+	setColor(hexColor)
+	{
+		if (!this.model) return;
+		this.model.traverse((child) => {
+			if (child.isMesh && child.material)
+			{
+				if (Array.isArray(child.material))
+					child.material.forEach((mat) => { if (mat.color) mat.color.set(hexColor); });
+				else if (child.material.color)
+					child.material.color.set(hexColor);
+			}
+		});
+	}
 }
 
 export default FlowerPot;

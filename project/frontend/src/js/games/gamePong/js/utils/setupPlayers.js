@@ -10,9 +10,9 @@ import FlowerPot from '../components/FlowerPot.js';
 
 export default async function setupPlayers(scene)
 {
-	const { positions } = GAME_SETTINGS.playerConfig;
+	const { positions, playerColors } = GAME_SETTINGS.playerConfig;
 	const players = [];
-	for (const user of mockUsers)
+	for (const [index, user] of mockUsers.entries())
 	{
 		const position = positions[user.flowerPotId];
 		if (!position)
@@ -26,6 +26,8 @@ export default async function setupPlayers(scene)
 		potModel.position.set(x, y, z);
 		potModel.rotation.y = rotationY;
 		scene.add(potModel);
+		const color = playerColors[index % playerColors.length];
+		flowerPot.setColor(color);
 		players.push({
 			playerId: user.id,
 			name: user.name,

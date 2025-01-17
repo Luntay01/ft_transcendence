@@ -15,6 +15,7 @@ export const GAME_SETTINGS = {
 			left: { x: -10, y: 0, z: 0, rotationY: -Math.PI / 2, movementDirection: 'vertical' },
 			right: { x: 10, y: 0, z: 0, rotationY: Math.PI / 2, movementDirection: 'vertical' },
 		},
+		playerColors: ['#2A1A14', '#1E1E1E', '#10224E', '#1A0D20'],
 		bounds: {
 			bottom: { minX: -7, maxX: 7, minZ: 8, maxZ: 12 },
 			top: { minX: -7, maxX: 7, minZ: -12, maxZ: -8 },
