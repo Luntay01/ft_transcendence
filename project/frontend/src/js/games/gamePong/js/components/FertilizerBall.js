@@ -62,25 +62,11 @@ class FertilizerBall
 	resetRotationAfterCollision(collisionNormal)
 	{
 		if (!this.model || !this.model.children.length) return;
-
-		console.log('Collision Normal:', collisionNormal);
-
-		// Assume the first child is the ball
 		const ballMesh = this.model.children[0];
-
-		// Reflect velocity
 		const reflectedVelocity = this.velocity.clone().sub(
 			collisionNormal.multiplyScalar(2 * this.velocity.dot(collisionNormal))
 		);
-
-		console.log('Reflected Velocity:', reflectedVelocity);
-
-		// Update rotation axis based on reflected velocity
 		this.rotationAxis.set(reflectedVelocity.z, 0, -reflectedVelocity.x).normalize();
-
-		console.log('Updated Rotation Axis:', this.rotationAxis);
-
-		// Reset rotation of the ball (child object)
 		ballMesh.rotation.set(0, 0, 0); // Reset rotation
 	}
 
@@ -121,19 +107,12 @@ class FertilizerBall
 		const collisionNormal = new THREE.Vector3()
 			.subVectors(this.model.position, object.model.position)
 			.normalize();
-		console.log('Collision Normal:', collisionNormal);
 		// reflect the ball's velocity based on the normal
 		const reflectedVelocity = ballVelocity.clone().sub(
 			collisionNormal.multiplyScalar(2 * ballVelocity.dot(collisionNormal))
 		);
 		// object velocity for dynamic interactions (e.g., flower pots)
 		reflectedVelocity.add(objectVelocity);
-		// Apply damping for flower pots
-//		if (object instanceof FlowerPot) {
-//			const dampingFactor = 0.5; // Reduce speed to half
-//			reflectedVelocity.multiplyScalar(dampingFactor);
-//		}
-		// adjust velocity magnitude (e.g., add spin effect or damping)
 		if (reflectedVelocity.length() > this.maxSpeed)
 			reflectedVelocity.setLength(this.maxSpeed);
 		this.velocity.copy(reflectedVelocity);
