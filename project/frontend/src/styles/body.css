@@ -1,0 +1,9 @@
+body{
+	font-family: 'Inknut Antiqua', serif;
+	min-height: 100vh;
+	background-color: grey;
+	border: 5px solid gainsboro;
+	border-radius: 10px;
+	padding: 20px;
+	box-sizing: border-box;
+}
