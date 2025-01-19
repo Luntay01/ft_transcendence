@@ -1,22 +1,62 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = [
+            'id', 'email', 'password', 'username', 'picture', 
+            'first_name', 'last_name', 'birth_day', 'provider', 'oauth_user_id',
+            ]
+        extra_kwargs = {
+            'id': {
+                'read_only': True,
+            },
+            'password': {
+                'write_only': True,
+            },
+            'picture': {
+                'required': False,
+            },
+            'first_name': {
+                'required': False,
+            },
+            'last_name': {
+                'required': False,
+            },
+            'birth_day': {
+                'required': False,
+            },
+            'oauth_user_id': {
+                'required': False,
+            },
+        }
+    
+    # override to hash password
+    def create(self, validated_data):
+        unhashed_password = validated_data.pop('password', None)
+        instance = self.Meta.model(**validated_data)
+        if unhashed_password is not None:
+            instance.set_password(unhashed_password)
+        instance.save()
+        return instance
+    
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        unhashed_password = validated_data.pop('password', None)
+        if unhashed_password is not None:
+            instance.set_password(unhashed_password)
+        instance.username = validated_data.get('username', instance.username)
+        instance.picture = validated_data.get('picture', instance.picture)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.birth_day = validated_data.get('birth_day', instance.birth_day)
+        instance.provider = validated_data.get('provider', instance.provider)
+        instance.oauth_user_id = validated_data.get('oauth_user_id', instance.oauth_user_id)
+        instance.save()
+        return instance
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
-            email=validated_data.get('email')
-        )
-        return user
+        fields = ['username', 'date_joined']

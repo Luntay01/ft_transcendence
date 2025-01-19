@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 services:
   nginx:
@@ -24,8 +24,8 @@ services:
       - static_files:/usr/src/app/staticfiles
     expose:
       - "8000"
-    #ports:
-    #  - "8000:8000" #only if we want the port open to the browser otherwise expose
+    ports:
+     - "8000:8000" #only if we want the port open to the browser otherwise expose
     depends_on:
       - postgres
       - redis
@@ -38,6 +38,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     depends_on:
@@ -47,7 +48,7 @@ services:
         - path: src/
           target: /app/src/
           action: sync
-
+        
   websocket:
     build:
       context: ./websocket

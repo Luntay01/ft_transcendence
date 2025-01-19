@@ -1,13 +1,9 @@
-#from django.urls import path
-#from . import views
-
-#urlpatterns = [
-#    path('', views.index, name='users-home'),  # You can modify the view later
-#]
-
 from django.urls import path
-from .views import RegisterView
+from .views import UserView, MeView, UserDetailView
+from rest_framework import routers
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
+    path('', UserView.as_view()),
+    path('me', MeView.as_view()),
+    path('<str:username>', UserDetailView.as_view()),
 ]
