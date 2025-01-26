@@ -46,6 +46,7 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+      - websocket
     develop:
       watch:
         - path: src/
@@ -61,6 +62,7 @@ services:
       - "8765:8765"
     depends_on:
       - backend
+      - redis
 
   ai_worker:
     build:
