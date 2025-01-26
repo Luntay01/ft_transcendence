@@ -81,7 +81,7 @@ async function loadView(view)
                 setupHome();
             }
             else if (view === 'gamePong') {
-                const { initPong } = await import('./gamePong/gamePong.js');
+                const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
             }
         }

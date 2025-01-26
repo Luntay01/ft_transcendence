@@ -126,7 +126,8 @@ PASSWORD_HASHERS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # Replace with your frontend domain if you have one
+    'http://localhost:3000',
+	'http://localhost',    # Replace with your frontend domain if you have one
 ]
 
 REST_FRAMEWORK = {
