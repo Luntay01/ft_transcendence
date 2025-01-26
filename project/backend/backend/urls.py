@@ -38,6 +38,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+	path('api/pong/', include('pong.urls')),
     path('api/users/', include('users.urls')),  # Adjust the path as needed
     path('api/', include('api.urls')),
     re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework"))
