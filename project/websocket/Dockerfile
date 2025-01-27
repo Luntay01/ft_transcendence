@@ -14,4 +14,4 @@ COPY . /app
 COPY ./wait_for_depends_on.sh /wait_for_depends_on.sh
 RUN chmod +x /wait_for_depends_on.sh
 
-CMD ["./wait_for_depends_on.sh", "backend:8000", "--", "python", "ws_server.py"]
+CMD ["./wait_for_depends_on.sh", "backend:8000", "--", "python", "-m", "websocket_server.main"]
