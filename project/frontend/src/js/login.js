@@ -29,6 +29,10 @@ export function setupLoginForm() {
                 alert('Login successful!');
                 localStorage.setItem('access', data.access);
                 localStorage.setItem('refresh', data.refresh);
+				if (data.id)
+					localStorage.setItem('player_id', data.id);
+				else
+					console.warn('No player ID returned by the backend.');
                 navigateTo('home');
             } else {
                 alert(data.error || 'Login failed');
