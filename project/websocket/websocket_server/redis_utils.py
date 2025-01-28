@@ -14,16 +14,18 @@ send a message to all players in a room
 """
 async def notify_players(room_id, message):
 	from .room_manager import connected_players
-	if room_id in connected_players:
-		for ws in connected_players[room_id]:
-			if ws.open:
-				await ws.send(json.dumps(message))
+	for player in connected_players.get(room_id, []):
+		ws = player["websocket"]
+		if ws.open:
+			await ws.send(json.dumps(message))
+			logger.debug(f"Sent data to WebSocket: {message}")
 
 """
 broadcast a message to all players in the room, excluding the sender
 """
 async def broadcast_to_room(room_id, message, exclude=None):
 	from .room_manager import connected_players
-	for ws in connected_players.get(room_id, []):
+	for player in connected_players.get(room_id, []):
+		ws = player["websocket"]
 		if ws != exclude and ws.open:
 			await ws.send(json.dumps(message))

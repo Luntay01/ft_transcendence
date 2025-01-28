@@ -3,6 +3,8 @@ import redis
 import logging
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from .models import Room
 from users.models import User
 
@@ -43,10 +45,33 @@ def matchmaking(request):
 	room = Room.objects.available_rooms().first() or Room.objects.create_room()
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
-	logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
+	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
-	logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
+	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
 	if room.is_full:
-		logger.info(f"Room {room.id} is now full. Broadcasting start_game event.")
-		redis_client.publish("start_game", json.dumps({ "event": "start_game", "room_id": room.id, "players": [player.username for player in room.players.all()], }))
-	return JsonResponse({'room_id': room.id, 'is_full': room.is_full, 'players': [player.username for player in room.players.all()],})
+		start_game_payload = {
+			"event": "start_game",
+			"room_id": room.id, 
+			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
+		}
+		#logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
+		redis_client.publish("start_game", json.dumps(start_game_payload))
+	response_payload = { 'room_id': room.id, 'is_full': room.is_full, 'players': [{"player_id": player.id, "username": player.username} for player in room.players.all()], }
+	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
+	return JsonResponse(response_payload)
+
+
+@api_view(['GET'])
+def room_status(request, room_id):
+    try:
+        room = Room.objects.get(id=room_id)
+        data = {
+            "room_id": room.id,
+            "players": [
+                {"player_id": player.id, "username": player.username}
+                for player in room.players.all()
+            ],
+        }
+        return Response(data, status=200)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=404)

@@ -14,12 +14,13 @@ async def handler(websocket, path):
 		query_params = parse_qs(parsed_path.query)
 		room_id = query_params.get("room_id", [None])[0]
 		player_id = query_params.get("player_id", [None])[0]
-		if not room_id or not player_id:
-			raise ValueError("Missing room_id or player_id")
-		return room_id, player_id
+		username = query_params.get("username", [None])[0]
+		if not room_id or not player_id or not username:
+			raise ValueError("Missing room_id, player_id, or username")
+		return room_id, player_id, username
 	try:
-		room_id, player_id = parse_connection_params(path)
-		await register_player(websocket, room_id, player_id)
+		room_id, player_id, username = parse_connection_params(path)
+		await register_player(websocket, room_id, player_id, username)
 		async for message in websocket:
 			data = json.loads(message)
 			data.update({"room_id": room_id, "player_id": player_id})

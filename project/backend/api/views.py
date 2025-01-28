@@ -114,6 +114,8 @@ class TokenObtainPairView(jwt_views.TokenObtainPairView):
         
          # including the user ID in the response
         token_response = serializer.validated_data
-        token_response['id'] = user.get().id  # Add the user ID to the response
+        user_instance = user.get()
+        token_response['id'] = user_instance.id  # Add the user ID
+        token_response['username'] = user_instance.username  # Add the username
 
         return Response(token_response, status=status.HTTP_200_OK)

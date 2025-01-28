@@ -16,6 +16,7 @@ async def redis_listener():
 			message = pubsub.get_message(ignore_subscribe_messages=True)
 			if message and message["type"] == "message":
 				data = json.loads(message["data"])
+				logger.debug(f"Redis message received: {data}")
 				room_id = data.get("room_id")
 				if room_id:
 					await notify_players(room_id, data)
