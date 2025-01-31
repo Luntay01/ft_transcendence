@@ -12,7 +12,15 @@ import GameLogic from './gameLogic.js';
 
 export async function initPong()
 {
-	console.log('initPong: Function started');
+	const roomId = localStorage.getItem('roomId');
+	const players = JSON.parse(localStorage.getItem('players'));
+	if (!roomId || !players)
+	{
+		console.error("Missing game data. Redirecting to matchmaking...");
+		navigateTo('matchmaking');
+		return;
+	}
+	console.log(`Initializing game for Room ${roomId} with players:`, players);
 	const container = document.getElementById('pongContainer');
 	if (!container)
 	{

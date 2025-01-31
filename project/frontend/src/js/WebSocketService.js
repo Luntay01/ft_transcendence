@@ -5,12 +5,20 @@ class WebSocketService
 	{
 		this.ws = null;
 		this.eventHandlers = new Map();
+		console.log("WebSocketService: New instance created");
 	}
 	static getInstance()
 	{
 		if (!WebSocketService.instance)
-			WebSocketService.instance = new WebSocketService();
-		return WebSocketService.instance;
+			{
+				console.log("WebSocketService: Creating new instance");
+				WebSocketService.instance = new WebSocketService();
+			}
+			else
+			{
+				console.log("WebSocketService: Reusing existing instance");
+			}
+			return WebSocketService.instance;
 	}
 	connect(url)
 	{
@@ -24,7 +32,9 @@ class WebSocketService
 		this.ws.onmessage = (event) => {
 			const message = JSON.parse(event.data);
 			console.log("Message received:", message);
-			const handlers = this.eventHandlers.get(message.event) || [];
+			const eventType = typeof message.event === "string" ? message.event : message.event.event;
+			const handlers = this.eventHandlers.get(eventType) || [];
+			console.log(`Found ${handlers.length} handlers for event '${eventType}'`);
 			handlers.forEach((handler) => handler(message));
 		};
 		this.ws.onclose = () => { console.log("WebSocket connection closed."); };
@@ -42,6 +52,7 @@ class WebSocketService
 	{
 		if (!this.eventHandlers.has(event))
 			this.eventHandlers.set(event, []);
+		console.log(`Registering event: ${event}`);
 		this.eventHandlers.get(event).push(handler);
 	}
 	unregisterEvent(event, handler)
