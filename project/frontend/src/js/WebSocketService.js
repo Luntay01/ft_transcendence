@@ -1,3 +1,36 @@
+/*
+ * handles websocket connections and event management
+ * this singleton class ensures only one WebSocket connection is active per client
+ * establishes a connection with the websocket server when matchmaking is successful
+ * sends player actions (e.g., movement) to the server
+ * listens for game-related events and forwards them to appropriate handlers
+ * works with `GameWebSocketHandlers.js` to process incoming events
+ * 
+ * static getInstance()				returns the singleton instance of Websocket Service Ensures only one instance exists at any time
+ * 
+ * connect(url)						Establishes a WebSocket connection to the server
+ * 	-this.ws = new WebSocket(url);	-Create a new WebSocket connection to the given URL
+ * 	-this.ws.onopen					-Event triggered when the WebSocket connection is successfully established
+ *	-this.ws.onmessage				-event triggered when a WebSocket message is received from the server
+ *									-parses the incoming JSON message
+ *									-Extracts the event type
+ *									-finds and executes all registered handlers for that event
+ *									-@param {MessageEvent} event - WebSocket message event containing data
+ *	-this.ws.onclose				-event triggered when the WebSocket connection is closed
+ *	-this.ws.onerror				-event triggered when an error occurs with the WebSocket connection
+ *
+ * disconnect()						Disconnects the WebSocket connection.
+ * 
+ * registerEvent(event, handler)	Registers an event listener for ws-messages 
+ * 									@param {string} event the event name 
+ * 									@param {Function} handler The function to call when the event occurs 
+ * 									like wsService.registerEvent('player_move', (message)-from `GameWebSocketHandlers.js`
+ * 
+ * unregisterEvent(event, handler)	Unregisters an event listener. 
+ * 
+ * send(event, data)				Sends a message through the WebSocket. @param {string} event - the event name. @param {Object} data - The payload to send
+ */
+
 class WebSocketService
 {
 	static instance;

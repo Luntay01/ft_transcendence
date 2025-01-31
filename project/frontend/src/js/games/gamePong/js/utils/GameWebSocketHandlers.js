@@ -2,8 +2,16 @@ import WebSocketService from '../../../../WebSocketService.js';
 import { GAME_SETTINGS } from '../config.js';
 
 /**
- * Registers gameplay-specific WebSocket event handlers.
- * @param {GameLogic} gameLogic - The instance of GameLogic to interact with.
+ * sets up WebSocket event handlers for in-game events
+ * this function registers event listeners that handle real-time game updates from the WebSocket server
+ * retrieves a singleton instance of `WebSocketService`.
+ * registers handlers for key game events (`player_move`, `ball_update`, `score_update`, `game_end`).
+ * when the WebSocket server broadcasts an event, the corresponding handler updates the game state.
+ * @param {GameLogic} gameLogic - The instance of GameLogic responsible for managing game state.
+ * wsService.registerEvent('player_move', (message)	
+ *	- Handles player movement updates received from the WebSocket server.
+ *	- Updates the player's movement direction and state.
+ *	- Ensures movement updates only happen if there is an actual change.
  */
 export function setupGameWebSocketHandlers(gameLogic)
 {
@@ -17,9 +25,7 @@ export function setupGameWebSocketHandlers(gameLogic)
 			return;
 		}
 		if (player.flowerPot.direction !== direction || player.flowerPot.isMoving !== isMoving)
-		{
 			player.flowerPot.updateState(direction, isMoving);
-		}
 	});
 
 	wsService.registerEvent('ball_update', (message) => {
