@@ -8,11 +8,11 @@ h1{
 	align-items: center;
 	height: 100hv;
 }
-.top-left {
+.top-right {
 	display: flex;
 	position: absolute;
-	top: 50px;
-	left: 50px;
+	top: 40px;
+	right: 50px;
 }
 .bottom-container{
 	position: fixed;

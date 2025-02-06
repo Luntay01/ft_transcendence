@@ -17,7 +17,7 @@ export async function setupHome() {
 			let height = '50px';
 			userinfo.innerHTML = 
 			`
-			<div class ="top-left">
+			<div class ="top-right">
 			<img src="${src}" alt="picture is not found" width=${width} height=${height}>
 			</div>
 			<div class="center-container">
