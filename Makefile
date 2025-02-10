@@ -102,11 +102,10 @@ help:
 	@echo "  test					- Runs backend tests."
 	@echo "  migrate				- Runs Django migrations."
 	@echo "  reload-nginx			- Reloads NGINX configuration."
-	@echo "  restart-nginx			- Restarts NGINX container."
 	@echo "  restart-[name]			- Restarts the specified container."
 	@echo "  shell-[name]			- Access shell in the specified container (e.g., backend, nginx)."
 	@echo "  logs-[name]			- Display logs for the specified container."
 	@echo "  logs_stream-[name]		- Display logs for the specified container continuesly."
 	@echo "  logs					- Display logs for all containers."
 
-.PHONY: all start up down clean fclean re prune reset-db test migrate reload-nginx restart-nginx logs help shell-% restart-%
+.PHONY: all start up down clean fclean re prune reset-db test migrate reload-nginx logs help shell-% restart-%
