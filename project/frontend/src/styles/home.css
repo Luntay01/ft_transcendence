@@ -8,6 +8,21 @@ h1{
 	align-items: center;
 	height: 100hv;
 }
+.top-right {
+	display: flex;
+	position: absolute;
+	top: 40px;
+	right: 50px;
+}
+.bottom-container{
+	position: fixed;
+	bottom: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 10px;
+	width: 100%;
+	text-align: center;
+}
 .border{
 	display: inline-block;
 	border: 5px solid gainsboro;

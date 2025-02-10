@@ -84,6 +84,10 @@ async function loadView(view)
                 const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
             }
+            else if (view === 'profile') {
+                const { setupProfile } = await import('./profile.js');
+                setupProfile();
+            }
         }
     } catch (error) {
         console.error('Error loading view:', error);
