@@ -34,6 +34,7 @@ export function setupMatchmaking()
 			updateStatusMessage(roomId, roomData.players);
 			const ws = WebSocketService.getInstance(); // singleton WebSocket instance
 			ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);
+			//ws.connect(`ws://${window.location.host}/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);// window.location.host does not work need to debug
 			ws.registerEvent('start_game', (message) => {
 				console.log("Start game event received:", message);
 				localStorage.setItem('roomId', message.room_id);
@@ -106,6 +107,10 @@ async function fetchRoomStatus(roomId)
 function updateStatusMessage(roomId, players)
 {
 	const statusMessage = document.getElementById('statusMessage');
+	if (!statusMessage)
+	{
+		return;
+	}
 	const playerNames = players
 		.filter(player => player.username) // Only include players with valid usernames
 		.map(player => player.username)
