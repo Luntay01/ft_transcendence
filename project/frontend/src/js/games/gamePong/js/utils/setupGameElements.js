@@ -10,7 +10,7 @@ import { GAME_SETTINGS } from '../config.js';
  * @param {Array} objects - Array to store objects for updates.
  */
 
-export default async function setupGameElements(scene, objects)
+export default async function setupGameElements(scene, objects, ballPool)
 {
 	const { modelPaths, grass, playerConfig } = GAME_SETTINGS;
 	// load garden beds
@@ -31,10 +31,14 @@ export default async function setupGameElements(scene, objects)
 	scene.add(grassField);
 	objects.push(grassInstance);
 
-	// add ball
-	const fertilizerBall = new FertilizerBall();
-	const ball = await fertilizerBall.loadModel(modelPaths.fertilizerBall);
-	fertilizerBall.setPosition(0, 0, 0);
-	scene.add(ball);
-	objects.push(fertilizerBall);
+	// create and add FertilizerBalls to the ballPool
+	for (let i = 0; i < 5; i++)
+	{  // preload 5 balls (adjust as needed)
+		const fertilizerBall = new FertilizerBall();
+		await fertilizerBall.loadModel(modelPaths.fertilizerBall);
+		fertilizerBall.deactivate();
+		scene.add(fertilizerBall.model);
+		ballPool.push(fertilizerBall);  // sdd to the pool
+	}
+
 }

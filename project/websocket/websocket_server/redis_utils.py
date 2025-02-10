@@ -1,5 +1,4 @@
-from .config import redis_client
-from .logger import logger
+from .config import redis_client, logger
 import json
 
 """

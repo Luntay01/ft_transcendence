@@ -19,6 +19,8 @@ class GameLogic
 		this.camera.position.set(position.x, position.y, position.z);
 		this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
 		this.objects = [];
+		this.ballMap = {};
+		this.ballPool = [];
 		this.ballPositions = [];
 		this.players = [];
 		this.playerMap = {};
@@ -41,7 +43,8 @@ class GameLogic
 	{
 		console.log('GameLogic: Initializing...');
 		setupLighting(this.scene);
-		await setupGameElements(this.scene, this.objects);
+		await setupGameElements(this.scene, this.objects, this.ballPool);
+		console.log("⚡ Initializing Game WebSocket Handlers FIRST...");
 		setupGameWebSocketHandlers(this);
 		const players = JSON.parse(localStorage.getItem('players'))
 		this.players = await setupPlayers(this.scene, players);
@@ -72,7 +75,21 @@ class GameLogic
 			processPlayerInput(this.currentPlayer);
 		this.players.forEach(player => { player.flowerPot.update(delta); });
 		this.objects.forEach((obj) => { if (obj.update) obj.update(delta); });
-		handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
+		this.ballPool.forEach(ball => { if (ball.active) ball.update(delta); });
+		//handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
+	}
+
+	handleBallSpawn(data)
+	{
+		const availableBall = this.ballPool.find(ball => !ball.active);
+		if (availableBall)
+			availableBall.addBall(data.position, data.velocity);
+	}
+
+	handleBallOutOfBounds(ball)
+	{
+		console.log("Ball out of bounds, deactivating...");
+		ball.deactivate();
 	}
 
 	onFlowerPotHit(flowerPot, ball)

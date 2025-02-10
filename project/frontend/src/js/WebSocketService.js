@@ -38,43 +38,82 @@ class WebSocketService
 	{
 		this.ws = null;
 		this.eventHandlers = new Map();
-		console.log("WebSocketService: New instance created");
+		this.url = null;
+		this.reconnectAttempts = 0;
+		this.maxReconnectAttempts = 5;
+		this.reconnectDelay = 3000;
+		this.isReconnecting = false;
+		this.shouldReconnect = true;
 	}
 	static getInstance()
 	{
 		if (!WebSocketService.instance)
-			{
-				console.log("WebSocketService: Creating new instance");
 				WebSocketService.instance = new WebSocketService();
-			}
-			else
-			{
-				console.log("WebSocketService: Reusing existing instance");
-			}
-			return WebSocketService.instance;
+		return WebSocketService.instance;
 	}
 	connect(url)
 	{
-		if (this.ws)
-		{
-			console.warn("WebSocket already connected. Disconnecting and reconnecting...");
-			this.disconnect();
+		if (this.ws && this.ws.readyState === WebSocket.OPEN)
+			{
+			console.warn("WebScoket already connected. Skipping reconnection.");
+			return;
 		}
+		this.url = url;
 		this.ws = new WebSocket(url);
-		this.ws.onopen = () => { console.log("WebSocket connection established!"); };
+		this.ws.onopen = () => {
+			console.log("WebSocket connection established!");
+			this.reconnectAttempts = 0;
+			this.isReconnecting = false;
+			//Notify server that this is a reconnection
+			const playerId = localStorage.getItem('player_id');
+			const roomId = localStorage.getItem('roomId');
+			if (playerId && roomId) {
+				console.log("Sending reconnection event...");
+				this.send("reconnect", { player_id: playerId, room_id: roomId });
+			}
+		};
+
 		this.ws.onmessage = (event) => {
 			const message = JSON.parse(event.data);
-			console.log("Message received:", message);
 			const eventType = typeof message.event === "string" ? message.event : message.event.event;
 			const handlers = this.eventHandlers.get(eventType) || [];
-			console.log(`Found ${handlers.length} handlers for event '${eventType}'`);
+			if (eventType === "player_reconnected" && this.isReconnecting) {
+				return;
+			}
 			handlers.forEach((handler) => handler(message));
 		};
-		this.ws.onclose = () => { console.log("WebSocket connection closed."); };
+
+		this.ws.onclose = (event) => {
+			if (!this.shouldReconnect) {
+				console.warn("WebSocket closed intentionally, no reconnection.");
+				return;
+			}
+			console.warn("WebSocket connection lost. Attempting to reconnect...");
+			if (!this.isReconnecting) {
+				this.isReconnecting = true;
+				this.reconnect();
+			}
+		};
 		this.ws.onerror = (error) => { console.error("WebSocket error:", error); };
+	}
+	reconnect()
+	{
+		if (this.reconnectAttempts >= this.maxReconnectAttempts)
+		{
+			console.error("Max reconnection attempts reached. Stopping.");
+			return;
+		}
+		this.reconnectAttempts++;
+		console.log(`Reconnection attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts}...`);
+		setTimeout(() => {
+			console.log("Reconnecting WebSocket...");
+			this.connect(this.ws.url);
+		}, this.reconnectDelay);
 	}
 	disconnect()
 	{
+		console.log("WebSocketService: Disconnecting...");
+		this.shouldReconnect = false;
 		if (this.ws)
 		{
 			this.ws.close();

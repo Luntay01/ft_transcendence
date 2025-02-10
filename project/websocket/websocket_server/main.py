@@ -2,8 +2,10 @@ import asyncio
 import websockets
 import json
 from .handler import handler
-from .redis_utils import redis_client, notify_players
-from .logger import logger
+from .redis_utils import redis_client, notify_players, publish_to_redis
+from .config import logger
+from .game_manager import GameManager
+from .room_manager import connected_players
 
 """
 WebSocket Server Architecture
@@ -47,36 +49,42 @@ It acts as a bridge between players by ensuring real-time communication through 
 - `start_game(room_id)`: triggers game start when a room is full
 
 """
+game_manager = GameManager()
 
+async def handle_event(event, room_id, data):
+	if event == "start_game":
+		players = connected_players.get(room_id, [])
+		game_manager.create_game(room_id, players)
+		game_manager.start_game(room_id)
+		logger.info(f"game started for Room {room_id}")
+	# add more costom event handling if needed in the future
+	# elif event == "score_update":
+	#	 handle_score_update(room_id, data)
 
-"""
-listen to Redis channels and relay messages to players
-"""
 async def redis_listener():
 	pubsub = redis_client.pubsub()
-	pubsub.subscribe("start_game", "update_position")
-	try:
-		while True:
-			message = pubsub.get_message(ignore_subscribe_messages=True)
-			if message and message["type"] == "message":
-				data = json.loads(message["data"])
-				logger.debug(f"Redis message received: {data}")
-				room_id = data.get("room_id")
-				if room_id:
-					await notify_players(room_id, data)
-			await asyncio.sleep(0.1)  # Prevent high CPU usage
-	except Exception as e:
-		logger.error(f"Redis listener error: {e}")
+	pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn", "start_game_countdown")
+	while True:
+		message = pubsub.get_message(ignore_subscribe_messages=True)
+		if message and message["type"] == "message":
+			data = json.loads(message["data"])
+			room_id = str(data.get("room_id"))
+			event = data.get("event")
+			await handle_event(event, room_id, data)
+			await notify_players(room_id, data)
+		await asyncio.sleep(0.016)  # prevent high CPU usage
 
+async def game_update_loop():
+	while True:
+		game_manager.update_games(delta_time=0.016)
+		await asyncio.sleep(0.016)
 
-"""
-main entry point to start the WebSocket server and Redis listener
-"""
 async def main():
-	logger.info("Starting WebSocket server on ws://0.0.0.0:8765...")
+	logger.info("Starting WebSocket server...")
 	await asyncio.gather(
 		websockets.serve(handler, "0.0.0.0", 8765),
 		redis_listener(),
+		game_update_loop(),
 	)
 
 if __name__ == "__main__":
@@ -85,4 +93,112 @@ if __name__ == "__main__":
 	except Exception as e:
 		logger.error(f"Critical server error: {e}")
 
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+# Store ball managers per room
+ball_managers = {}
+
+
+async def start_game(room_id):
+	#players = [f"Player{index + 1}" for index in range(MAX_PLAYERS_PER_ROOM)]
+
+	if room_id not in ball_managers:
+		ball_managers[room_id] = BallManager(room_id)
+		ball_managers[room_id].spawn_ball()
+	else:
+		logger.warning(f"start_game called for {room_id}, but BallManager already exists.")
+
+	start_game_event = {
+		"event": "start_game",
+		"room_id": room_id,
+		"players": [
+			{"player_id": player["player_id"], "username": player["username"]}
+			for player in connected_players.get(room_id, [])
+		]
+	}
+	await publish_to_redis("start_game", start_game_event)
+	logger.info(f"Room {room_id} is now full. Game started.")
+
+
+async def redis_listener():
+    pubsub = redis_client.pubsub()
+    pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn")
+    logger.debug("📡 Subscribed to Redis channels: start_game, update_position, ball_update, ball_spawn")
+    try:
+        while True:
+            message = pubsub.get_message(ignore_subscribe_messages=True)
+            if message and message["type"] == "message":
+                data = json.loads(message["data"])
+                logger.debug(f"Redis message received: {data}")
+
+                room_id = str(data.get("room_id"))
+                event = data.get("event")
+                # Handle start_game
+                if event == "start_game":
+                    if room_id not in ball_managers:
+                        ball_managers[room_id] = BallManager(room_id)
+                        ball_managers[room_id].game_active = True
+                        logger.debug(f"🏀 BallManager created for room {room_id}")
+                    await notify_players(room_id, data)
+                # Handle ball_spawn
+                elif event == "ball_spawn":
+                    if room_id in ball_managers:
+                        ball_managers[room_id].balls.append({
+                            "id": data["ball_id"],
+                            "position": data["position"],
+                            "velocity": data["velocity"]
+                        })
+                        logger.debug(f"⚽ Ball {data['ball_id']} added to room {room_id}")
+                    await notify_players(room_id, data)
+                elif event == "ball_update":
+                    logger.debug(f"🔄 Ignoring ball_update event in redis_listener (handled by ball_update_loop)")
+                elif event == "update_position":
+                    await notify_players(room_id, data)
+                else:
+                    logger.warning(f"Unhandled event type: {event}")
+            await asyncio.sleep(0.016)  # Prevent high CPU usage
+    except Exception as e:
+        logger.error(f"Redis listener error: {e}")
+
+
+
+async def ball_update_loop():
+    logger.info("⚙️ Ball update loop is running. Waiting for games to start...")
+
+    while True:
+        for room_id, manager in ball_managers.items():
+            if getattr(manager, 'game_active', False):  # Check if the game is active
+                logger.debug(f"🚀 Updating balls for active game in Room {room_id}.")
+                manager.update_balls(delta_time=0.016)
+            else:
+                logger.debug(f"⏸️ Game not active for Room {room_id}. Skipping ball updates.")
+
+        await asyncio.sleep(0.016)  # 60 FPS update rate
+
+
+async def main():
+	logger.info("Starting WebSocket server on ws://0.0.0.0:8765...")
+	await asyncio.gather(
+		websockets.serve(handler, "0.0.0.0", 8765),
+		redis_listener(),
+		ball_update_loop(),
+	)
+
+if __name__ == "__main__":
+	try:
+		asyncio.run(main())
+	except Exception as e:
+		logger.error(f"Critical server error: {e}")
+"""
 

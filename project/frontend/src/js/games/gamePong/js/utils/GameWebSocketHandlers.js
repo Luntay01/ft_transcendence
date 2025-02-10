@@ -1,5 +1,6 @@
 import WebSocketService from '../../../../WebSocketService.js';
 import { GAME_SETTINGS } from '../config.js';
+import FertilizerBall from '../components/FertilizerBall.js';
 
 /**
  * sets up WebSocket event handlers for in-game events
@@ -28,9 +29,32 @@ export function setupGameWebSocketHandlers(gameLogic)
 			player.flowerPot.updateState(direction, isMoving);
 	});
 
-	wsService.registerEvent('ball_update', (message) => {
-		console.log("Ball Update Event:", message);
-		gameLogic.updateBallPosition(message.ballPosition);
+ 	wsService.registerEvent('ball_update', (message) => {
+		const ball = gameLogic.ballMap[message.ball_id];
+
+		if (ball)
+		{
+			ball.updateFromServer({
+				position: message.position,
+				velocity: message.velocity
+			});
+		}
+	});
+
+	wsService.registerEvent("ball_spawn", (message) => {
+
+		const availableBall = gameLogic.ballPool.find(ball => !ball.active);
+
+		if (availableBall)
+		{
+			availableBall.addBall(message.position, message.velocity);
+			gameLogic.ballMap[message.ball_id] = availableBall;
+			console.log(`Ball spawned and stored with ID: ${message.ball_id}`);
+		}
+	});
+
+	wsService.registerEvent('start_game_countdown', (message) => {
+		console.log(`⏳ Countdown: ${message.countdown}`);
 	});
 
 	wsService.registerEvent('score_update', (message) => {
