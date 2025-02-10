@@ -14,6 +14,7 @@ class FlowerPot
 		this.isMoving = false;
 		this.direction = 'neutral';
 		this.position = null;
+		this.lastSentPosition = null;
 		this.movementAxis = null;
 		this.movementMultiplier = null;
 	}
@@ -70,17 +71,16 @@ class FlowerPot
 	{
 		if (this.mixer) this.mixer.update(delta);
 		if (this.isMoving && this.direction !== "neutral")
-		{
 			this.move();
-		}
 	}
 
 	move()
 	{
-		if (this.direction === "neutral") return; // Stop moving
+		if (this.direction === "neutral") return;
 		const boundaries = GAME_SETTINGS.playerConfig.bounds[this.position];
-		if (!boundaries) {
-			console.error(`Invalid boundaries for position: ${this.position}`);
+		if (!boundaries)
+		{
+			console.error(`invalid boundaries for position: ${this.position}`);
 			return;
 		}
 		this.model.position[this.movementAxis] += this.speed * this.movementMultiplier * (this.direction === "left" ? -1 : 1);

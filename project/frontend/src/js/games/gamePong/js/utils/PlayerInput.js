@@ -17,7 +17,16 @@ export function processPlayerInput(player)
 	if (movementDirection !== player.flowerPot.direction || isMoving !== player.flowerPot.isMoving)
 	{
 		player.flowerPot.updateState(movementDirection, isMoving);
-		wsService.send('player_move', { player_id: player.playerId, direction: movementDirection, isMoving: isMoving });
+		wsService.send('player_move', { player_id: player.playerId, direction: movementDirection, isMoving: isMoving});
+	}
+	if (isMoving)
+	{
+		const { x, z } = player.flowerPot.model.position;
+		if (!player.lastSentPosition || player.lastSentPosition.x !== x || player.lastSentPosition.z !== z)
+		{
+			wsService.send('player_position', { player_id: player.playerId, position: { x, z } });
+			player.lastSentPosition = { x, z };
+		}
 	}
 }
 

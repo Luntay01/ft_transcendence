@@ -1,7 +1,6 @@
-from .room_manager import register_player, unregister_player
+from .room_manager import register_player, unregister_player, connected_players
 from .redis_utils import broadcast_to_room, notify_players
-from .config import MAX_PLAYERS_PER_ROOM
-from .logger import logger
+from .config import logger, MAX_PLAYERS_PER_ROOM
 import json
 
 """
@@ -20,13 +19,31 @@ async def handler(websocket, path):
 		return room_id, player_id, username
 	try:
 		room_id, player_id, username = parse_connection_params(path)
-		await register_player(websocket, room_id, player_id, username)
+		# check if this player is reconnecting
+		if player_id in [p["player_id"] for p in connected_players.get(room_id, [])]:
+			logger.info(f"Player {player_id} is reconnecting to Room {room_id}")
+		else:
+			await register_player(websocket, room_id, player_id, username)
 		async for message in websocket:
 			data = json.loads(message)
 			data.update({"room_id": room_id, "player_id": player_id})
-			await broadcast_to_room(room_id, data, exclude=websocket)
+			await process_incoming_event(data, websocket)
 	except ValueError as ve:
 		logger.warning(f"Connection rejected: {ve}")
 		await websocket.close()
 	finally:
 		await unregister_player(websocket, room_id, player_id)
+
+
+async def process_incoming_event(data, websocket):
+	event = data.get("event")
+	room_id = data.get("room_id")
+	player_id = data.get("player_id")
+	if event == "reconnect":
+		logger.info(f"Player {player_id} has reconnected to Room {room_id}")
+		await notify_players(room_id, {"event": "player_reconnected", "room_id": room_id, "player_id": player_id})
+	elif event == "player_position":
+		logger.info(f"Received position update from Player {player_id} in Room {room_id}")
+		# store position data for collision handling (to be implemented)
+	else:
+		await broadcast_to_room(room_id, data, exclude=websocket)
