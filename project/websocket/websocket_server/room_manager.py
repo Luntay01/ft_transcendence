@@ -1,6 +1,5 @@
 from .redis_utils import notify_players
 from .config import logger, MAX_PLAYERS_PER_ROOM, redis_client
-import asyncio
 import json
 
 
@@ -20,11 +19,11 @@ async def register_player(websocket, room_id, player_id, username):
 		for player in connected_players[room_id]:
 			if player["player_id"] == player_id:
 				previous_state = player
-				already_connected = True  # ✅ Mark as already connected
+				already_connected = True
 				break
 	if already_connected:
 		logger.info(f"Player {player_id} is already connected in Room {room_id}. Updating WebSocket reference.")
-		previous_state["websocket"] = websocket  # ✅ Just update WebSocket reference
+		previous_state["websocket"] = websocket
 	else:
 		connected_players.setdefault(room_id, []).append({
 			"websocket": websocket,
@@ -63,7 +62,3 @@ async def unregister_player(websocket, room_id, player_id):
 			redis_client.set(f"player_state:{player_id}", json.dumps(player_state))
 			leave_event = {"event": "player_left", "room_id": room_id, "player_id": player_id}
 			await notify_players(room_id, leave_event)
-			if not connected_players[room_id]:
-				del connected_players[room_id]
-
-

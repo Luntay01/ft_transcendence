@@ -1,4 +1,4 @@
-import WebSocketService from '../../../../WebSocketService.js';
+//import WebSocketService from '../../../../WebSocketService.js';
 import { GAME_SETTINGS } from '../config.js';
 import FertilizerBall from '../components/FertilizerBall.js';
 

@@ -1,4 +1,4 @@
-import WebSocketService from './WebSocketService.js';
+//import WebSocketService from './WebSocketService.js';
 
 /*
  * - retrieves the player's ID from localStorage

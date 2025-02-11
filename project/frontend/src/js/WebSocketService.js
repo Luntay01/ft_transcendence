@@ -110,6 +110,10 @@ class WebSocketService
 			this.connect(this.ws.url);
 		}, this.reconnectDelay);
 	}
+	isConnected()
+	{
+		return this.ws && this.ws.readyState === WebSocket.OPEN;
+	}
 	disconnect()
 	{
 		console.log("WebSocketService: Disconnecting...");
@@ -144,4 +148,5 @@ class WebSocketService
 	}
 }
 
-export default WebSocketService;
+//export default WebSocketService;
+window.WebSocketService = WebSocketService;

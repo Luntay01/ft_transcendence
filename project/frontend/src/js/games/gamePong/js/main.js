@@ -10,7 +10,7 @@ import
 }	from '../../shared/js/index.js';
 import GameLogic from './gameLogic.js';
 
-import WebSocketService from '../../../WebSocketService.js'
+//import WebSocketService from '../../../WebSocketService.js'
 
 //import { loadGameSettings } from './config.js';
 
