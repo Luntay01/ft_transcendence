@@ -51,8 +51,20 @@ It acts as a bridge between players by ensuring real-time communication through 
 """
 game_manager = GameManager()
 
+async def ensure_all_players_connected(room_id, expected_players_data):
+	expected_player_ids = {str(player["player_id"]) for player in expected_players_data}
+	logger.info(f"Waiting for players {expected_player_ids} to connect to Room {room_id}...")
+	while True:
+		connected_player_ids = {player["player_id"] for player in connected_players.get(room_id, [])}
+		# Check if all expected players are connected
+		if expected_player_ids.issubset(connected_player_ids):
+			logger.info(f"All players connected to Room {room_id}: {connected_player_ids}")
+			break
+		await asyncio.sleep(0.1)  # Check every 100ms
+
 async def handle_event(event, room_id, data):
 	if event == "start_game":
+		await ensure_all_players_connected(room_id, data["players"])
 		players = connected_players.get(room_id, [])
 		game_manager.create_game(room_id, players)
 		game_manager.start_game(room_id)

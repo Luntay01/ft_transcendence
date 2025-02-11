@@ -12,14 +12,14 @@ class Game:
 		self.is_active = False
 		self.ball_manager = BallManager(room_id)
 		logger.debug(f"game initialized for room {room_id}")
-	
+
 	def start(self):
 		self.is_active = True
 		logger.info(f"starting game for Room {self.room_id}")
 		asyncio.create_task(self._start_game_sequence())
 
 	async def _start_game_sequence(self):
-		await asyncio.sleep(2)
+		#await asyncio.sleep(1)
 		await self._start_countdown()
 		self.ball_manager.spawn_ball()
 		# notify players the game has started not needed as django backend is already doing this
@@ -42,7 +42,7 @@ class Game:
 			}
 			await publish_to_redis("start_game_countdown", countdown_event)
 			logger.info(f"Room {self.room_id}: Countdown {count}")
-			await asyncio.sleep(2)  # 2-second interval between countdowns
+			await asyncio.sleep(1)  # 1 second interval between countdowns
 
 	def update(self, delta_time):
 		self.ball_manager.update_balls(delta_time)
