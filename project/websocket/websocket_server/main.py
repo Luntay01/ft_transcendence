@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import json
+import signal
 from .handler import handler
 from .redis_utils import redis_client, notify_players, publish_to_redis
 from .config import logger
@@ -93,11 +94,27 @@ async def game_update_loop():
 
 async def main():
 	logger.info("Starting WebSocket server...")
-	await asyncio.gather(
-		websockets.serve(handler, "0.0.0.0", 8765),
-		redis_listener(),
-		game_update_loop(),
-	)
+	stop_event = asyncio.Event()
+	# Shutdown handler
+	def shutdown():
+		logger.info("Shutdown signal received. Cleaning up...")
+		stop_event.set()
+	# Handle SIGTERM and SIGINT
+	loop = asyncio.get_event_loop()
+	loop.add_signal_handler(signal.SIGTERM, shutdown)
+	loop.add_signal_handler(signal.SIGINT, shutdown)
+	try:
+		server = await websockets.serve(handler, "0.0.0.0", 8765)
+		await asyncio.gather(
+			redis_listener(),
+			game_update_loop(),
+			stop_event.wait()  # Wait until shutdown signal is received
+		)
+	finally:
+		logger.info("WebSocket server shutting down...")
+		server.close()
+		await server.wait_closed()
+		logger.info("WebSocket server has stopped.")
 
 if __name__ == "__main__":
 	try:
@@ -144,59 +161,59 @@ async def start_game(room_id):
 
 
 async def redis_listener():
-    pubsub = redis_client.pubsub()
-    pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn")
-    logger.debug("📡 Subscribed to Redis channels: start_game, update_position, ball_update, ball_spawn")
-    try:
-        while True:
-            message = pubsub.get_message(ignore_subscribe_messages=True)
-            if message and message["type"] == "message":
-                data = json.loads(message["data"])
-                logger.debug(f"Redis message received: {data}")
+	pubsub = redis_client.pubsub()
+	pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn")
+	logger.debug("📡 Subscribed to Redis channels: start_game, update_position, ball_update, ball_spawn")
+	try:
+		while True:
+			message = pubsub.get_message(ignore_subscribe_messages=True)
+			if message and message["type"] == "message":
+				data = json.loads(message["data"])
+				logger.debug(f"Redis message received: {data}")
 
-                room_id = str(data.get("room_id"))
-                event = data.get("event")
-                # Handle start_game
-                if event == "start_game":
-                    if room_id not in ball_managers:
-                        ball_managers[room_id] = BallManager(room_id)
-                        ball_managers[room_id].game_active = True
-                        logger.debug(f"🏀 BallManager created for room {room_id}")
-                    await notify_players(room_id, data)
-                # Handle ball_spawn
-                elif event == "ball_spawn":
-                    if room_id in ball_managers:
-                        ball_managers[room_id].balls.append({
-                            "id": data["ball_id"],
-                            "position": data["position"],
-                            "velocity": data["velocity"]
-                        })
-                        logger.debug(f"⚽ Ball {data['ball_id']} added to room {room_id}")
-                    await notify_players(room_id, data)
-                elif event == "ball_update":
-                    logger.debug(f"🔄 Ignoring ball_update event in redis_listener (handled by ball_update_loop)")
-                elif event == "update_position":
-                    await notify_players(room_id, data)
-                else:
-                    logger.warning(f"Unhandled event type: {event}")
-            await asyncio.sleep(0.016)  # Prevent high CPU usage
-    except Exception as e:
-        logger.error(f"Redis listener error: {e}")
+				room_id = str(data.get("room_id"))
+				event = data.get("event")
+				# Handle start_game
+				if event == "start_game":
+					if room_id not in ball_managers:
+						ball_managers[room_id] = BallManager(room_id)
+						ball_managers[room_id].game_active = True
+						logger.debug(f"🏀 BallManager created for room {room_id}")
+					await notify_players(room_id, data)
+				# Handle ball_spawn
+				elif event == "ball_spawn":
+					if room_id in ball_managers:
+						ball_managers[room_id].balls.append({
+							"id": data["ball_id"],
+							"position": data["position"],
+							"velocity": data["velocity"]
+						})
+						logger.debug(f"⚽ Ball {data['ball_id']} added to room {room_id}")
+					await notify_players(room_id, data)
+				elif event == "ball_update":
+					logger.debug(f"🔄 Ignoring ball_update event in redis_listener (handled by ball_update_loop)")
+				elif event == "update_position":
+					await notify_players(room_id, data)
+				else:
+					logger.warning(f"Unhandled event type: {event}")
+			await asyncio.sleep(0.016)  # Prevent high CPU usage
+	except Exception as e:
+		logger.error(f"Redis listener error: {e}")
 
 
 
 async def ball_update_loop():
-    logger.info("⚙️ Ball update loop is running. Waiting for games to start...")
+	logger.info("⚙️ Ball update loop is running. Waiting for games to start...")
 
-    while True:
-        for room_id, manager in ball_managers.items():
-            if getattr(manager, 'game_active', False):  # Check if the game is active
-                logger.debug(f"🚀 Updating balls for active game in Room {room_id}.")
-                manager.update_balls(delta_time=0.016)
-            else:
-                logger.debug(f"⏸️ Game not active for Room {room_id}. Skipping ball updates.")
+	while True:
+		for room_id, manager in ball_managers.items():
+			if getattr(manager, 'game_active', False):  # Check if the game is active
+				logger.debug(f"🚀 Updating balls for active game in Room {room_id}.")
+				manager.update_balls(delta_time=0.016)
+			else:
+				logger.debug(f"⏸️ Game not active for Room {room_id}. Skipping ball updates.")
 
-        await asyncio.sleep(0.016)  # 60 FPS update rate
+		await asyncio.sleep(0.016)  # 60 FPS update rate
 
 
 async def main():

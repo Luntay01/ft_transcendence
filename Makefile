@@ -68,6 +68,10 @@ reload-nginx:
 
 restart-%:
 	@echo "Restarting $* container..."
+	@if [ "$*" = "websocket" ]; then \
+		$(COMPOSE_CMD) exec websocket pkill -f websocket_server.main || true; \
+		sleep 2; \
+	fi
 	@$(COMPOSE_CMD) restart $*
 
 shell-%:

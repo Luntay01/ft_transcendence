@@ -61,8 +61,10 @@ services:
       context: ./websocket
       dockerfile: Dockerfile
     container_name: websocket
+    init: true
     volumes:
       - ./config/settings.json:/config/settings.json
+      - ./websocket:/app
     ports:
       - "8765:8765"
     depends_on:

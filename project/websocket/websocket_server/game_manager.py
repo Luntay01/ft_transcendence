@@ -25,7 +25,6 @@ class GameManager:
 
 	def update_games(self, delta_time):
 		from .room_manager import connected_players
-		
 		inactive_rooms = []
 		current_time = time.time()
 		for room_id, game in self.games.items():
