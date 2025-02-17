@@ -35,6 +35,13 @@ export async function setupProfile() {
 			</div>
 			`;
 		}
+
+		const response2 = await fetch('http://localhost:8000/api/game/thelordruler', {
+			method: 'GET',
+			headers: { 'Authorization': `Bearer ${access}` }
+		});	
+		const data2 = await response.json();
+
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
 	}

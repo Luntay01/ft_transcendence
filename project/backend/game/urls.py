@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from .views import UserGamesView, GameView
 
 urlpatterns = [
-    path('', views.index, name='game-home'),  # You can modify the view later
+    path('<str:username>', UserGamesView.as_view()),
+    path('<int:game_id>', GameView.as_view()),
 ]

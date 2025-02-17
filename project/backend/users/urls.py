@@ -1,6 +1,5 @@
 from django.urls import path
 from .views import UserView, MeView, UserDetailView
-from rest_framework import routers
 
 urlpatterns = [
     path('', UserView.as_view()),
