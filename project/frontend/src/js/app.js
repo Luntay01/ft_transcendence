@@ -92,7 +92,7 @@ async function loadView(view)
                 const { setupHome } = await import('./home.js');
                 setupHome();
             }
-			else if (view === 'matchmaking') {
+			else if (view === 'game_matchmaking') {
 				await import('./WebSocketService.js');
 				const { setupMatchmaking } = await import('./matchmaking.js');
 				setupMatchmaking();
