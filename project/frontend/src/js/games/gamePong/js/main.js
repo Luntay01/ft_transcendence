@@ -10,9 +10,26 @@ import
 }	from '../../shared/js/index.js';
 import GameLogic from './gameLogic.js';
 
+//import WebSocketService from '../../../WebSocketService.js'
+
+//import { loadGameSettings } from './config.js';
+
 export async function initPong()
 {
-	console.log('initPong: Function started');
+	const roomId = localStorage.getItem('roomId');
+	const players = JSON.parse(localStorage.getItem('players'));
+	const playerId = localStorage.getItem('player_id');
+	const username = localStorage.getItem('username');
+	if (!roomId || !players|| !playerId)
+	{
+		console.error("Missing game data. Redirecting to matchmaking...");
+		navigateTo('matchmaking');
+		return;
+	}
+	console.log(`Initializing game for Room ${roomId} with players:`, players);
+	//  reconnect WebSocket
+	const ws = WebSocketService.getInstance();
+	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);
 	const container = document.getElementById('pongContainer');
 	if (!container)
 	{
@@ -21,6 +38,7 @@ export async function initPong()
 	}
 	try
 	{
+		//await loadGameSettings();
 		const renderer = createRenderer(container);
 		const gameLogic = new GameLogic(renderer);
 		const handleResize = setupResizeListener(renderer, gameLogic);

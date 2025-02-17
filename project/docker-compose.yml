@@ -9,6 +9,7 @@ services:
     volumes:
       - ./nginx/conf.d/:/etc/nginx/conf.d/
       - static_files:/home/app/staticfiles
+      - ./config/settings.json:/config/settings.json
     ports:
       - "80:80"
     depends_on:
@@ -24,6 +25,7 @@ services:
     volumes:
       - ./backend:/usr/src/app/
       - static_files:/usr/src/app/staticfiles
+      - ./config/settings.json:/config/settings.json
     expose:
       - "8000"
     ports:
@@ -42,10 +44,12 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ./config/settings.json:/config/settings.json
     ports:
       - "3000:3000"
     depends_on:
       - backend
+      - websocket
     develop:
       watch:
         - path: src/
@@ -57,10 +61,15 @@ services:
       context: ./websocket
       dockerfile: Dockerfile
     container_name: websocket
+    init: true
+    volumes:
+      - ./config/settings.json:/config/settings.json
+      - ./websocket:/app
     ports:
       - "8765:8765"
     depends_on:
       - backend
+      - redis
 
   ai_worker:
     build:

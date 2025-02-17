@@ -1,11 +1,52 @@
-import { GAME_SETTINGS } from '../config.js';
-import mockUsers from './mockUsers.js'; 
+//import WebSocketService from '../../../../WebSocketService.js';
 
+const wsService = WebSocketService.getInstance();
 const keyState = {};
-
-// listen for key press and release events
 window.addEventListener("keydown", (e) => { keyState[e.key] = true; });
 window.addEventListener("keyup", (e) => { keyState[e.key] = false; });
+function getCurrentKeyState() { return { ...keyState }; } // return a copy to avoid mutation issues
+export function processPlayerInput(player)
+{
+	const controls = player.controls;
+	const currentKeys = getCurrentKeyState();
+	let movementDirection = "neutral";
+	let isMoving = false;
+	if (currentKeys[controls.left]) { movementDirection = "left"; isMoving = true; } 
+	if (currentKeys[controls.right]) { movementDirection = "right"; isMoving = true; }
+	if (!currentKeys[controls.left] && !currentKeys[controls.right]) { movementDirection = "neutral"; isMoving = false; }
+	if (movementDirection !== player.flowerPot.direction || isMoving !== player.flowerPot.isMoving)
+	{
+		player.flowerPot.updateState(movementDirection, isMoving);
+		wsService.send('player_move', { player_id: player.playerId, direction: movementDirection, isMoving: isMoving});
+	}
+	if (isMoving)
+	{
+		const { x, z } = player.flowerPot.model.position;
+		if (!player.lastSentPosition || player.lastSentPosition.x !== x || player.lastSentPosition.z !== z)
+		{
+			wsService.send('player_position', { player_id: player.playerId, position: { x, z } });
+			player.lastSentPosition = { x, z };
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//const keyState = {};
+
+// listen for key press and release events
+//window.addEventListener("keydown", (e) => { keyState[e.key] = true; });
+//window.addEventListener("keyup", (e) => { keyState[e.key] = false; });
 
 /**
  * Process player input and update the flower pot's position.
@@ -13,8 +54,7 @@ window.addEventListener("keyup", (e) => { keyState[e.key] = false; });
  * @param {Object} controls - The player's control mappings.
  * @param {string} movementDirection - Allowed movement direction ("horizontal" or "vertical").
  */
-
-
+/*
 export function processPlayerInput(player)
 {
 	const { flowerPot, controls, position } = player;
@@ -52,23 +92,23 @@ export function processPlayerInput(player)
 			isKeyHeld = true;
 		}
 	} else if (position === 'left') {
-		if (keyState[controls.up]) {
+		if (keyState[controls.left]) {
 			flowerPot.model.position.z -= speed;
 			movementDirection = 'left';
 			isKeyHeld = true;
 		}
-		if (keyState[controls.down]) {
+		if (keyState[controls.right]) {
 			flowerPot.model.position.z += speed;
 			movementDirection = 'right';
 			isKeyHeld = true;
 		}
 	} else if (position === 'right') {
-		if (keyState[controls.up]) {
+		if (keyState[controls.left]) {
 			flowerPot.model.position.z += speed;
 			movementDirection = 'left';
 			isKeyHeld = true;
 		}
-		if (keyState[controls.down]) {
+		if (keyState[controls.right]) {
 			flowerPot.model.position.z -= speed;
 			movementDirection = 'right';
 			isKeyHeld = true;
@@ -91,3 +131,5 @@ export function processPlayerInput(player)
 	flowerPot.updateState(movementDirection, isKeyHeld);
 
 }
+
+*/

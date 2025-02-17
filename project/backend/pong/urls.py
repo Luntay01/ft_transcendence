@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from .views import matchmaking, room_status
 
 urlpatterns = [
-    path('', views.index, name='pong-home'),  # You can modify the view later
+	path('matchmaking/', matchmaking, name='matchmaking'),
+	path('rooms/<int:room_id>/', room_status, name='room_status'),
 ]

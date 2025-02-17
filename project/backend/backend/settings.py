@@ -28,6 +28,59 @@ MEDIA_URL = '/media/'
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = int(os.environ.get("DJANGO_DEBUG", default=0))
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+REDIS_HOST = os.environ.get("REDIS_HOST", default="localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", default=6379))
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+
+"""
+LOGGING Configuration
+This setup handles application logging for debugging and monitoring. 
+It adjusts automatically for development (DEBUG=True) and production (DEBUG=False).
+(`DEBUG=True`):
+    - Logs everything down to DEBUG level (very detailed).
+    - Uses a verbose format with timestamps for easier debugging.
+(`DEBUG=False`):
+    - Logs only warnings and errors to reduce noise.
+    - Uses a simple format for clarity.
+- Logs are sent to the console.
+"""
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'formatters': {
+		'verbose': {
+			'format': '{asctime} {levelname} {name} {message}',
+			'style': '{',
+		},
+		'simple': {
+			'format': '{levelname} {message}',
+			'style': '{',
+		},
+	},
+	'handlers': {
+		'console': {
+			'class': 'logging.StreamHandler',
+			'formatter': 'verbose' if DEBUG else 'simple',
+		},
+	},
+	'root': {
+		'handlers': ['console'],
+		'level': 'DEBUG' if DEBUG else 'WARNING',  # Use higher level in production
+	},
+	'loggers': {
+		'django': {
+			'handlers': ['console'],
+			'level': 'DEBUG' if DEBUG else 'INFO',
+			'propagate': False,
+		},
+		'localhost': {
+			'handlers': ['console'],
+			'level': 'DEBUG' if DEBUG else 'INFO',
+			'propagate': False,
+		},
+	},
+}
 
 
 # Application definition
