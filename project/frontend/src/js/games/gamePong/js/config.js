@@ -137,6 +137,7 @@ export const GAME_SETTINGS = {
 		reboundFactor: null,
 		dampingFactor: null,
 		minimumSpeed: null,
+		ejectForce: null,
 	},
 	scoring: {
 		startingScore: null,
@@ -168,6 +169,15 @@ export const GAME_SETTINGS = {
 		defaultScale: null,
 		color: null,
 		reactionRadius: null,
+	},
+	gardenBeds: {
+		positions: [
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }
+		],
+		radius: 2.1
 	},
 	lighting: {
 		directionalLight: {

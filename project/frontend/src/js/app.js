@@ -4,7 +4,9 @@ let currentView = '';// track the current view
 function handleRoute()
 {
 	const newView = window.location.hash.replace('#', '') || 'welcome';
-	if (currentView === 'matchmaking' || currentView === 'gamePong')
+	if (currentView === 'gamePong' && newView !== 'gamePong')
+		disconnectWebSocket();
+	else if (currentView === 'matchmaking' && newView !== 'gamePong')
 		disconnectWebSocket();
 	currentView = newView;
 	loadView(newView);

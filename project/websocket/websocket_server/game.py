@@ -1,5 +1,5 @@
 from .ball_manager import BallManager
-from .config import logger
+from .config import logger, GAME_SETTINGS
 import asyncio
 from .redis_utils import publish_to_redis
 
@@ -10,8 +10,23 @@ class Game:
 		self.room_id = room_id
 		self.players = players
 		self.is_active = False
-		self.ball_manager = BallManager(room_id)
-		logger.debug(f"game initialized for room {room_id}")
+		self.countdown_finished = False
+		self.player_positions = {}
+		self.ball_manager = BallManager(room_id, self.player_positions)
+
+	def update_player_position(self, player_id, position):
+		if position is None:
+			logger.error(f"Error: Received None position for Player {player_id}!")
+			return
+		last_position = self.player_positions.get(player_id, position)  # Get last known position
+		velocity_x = position["x"] - last_position["x"]
+		velocity_z = position["z"] - last_position["z"]
+		self.player_positions[player_id] = {
+			"x": position["x"],
+			"z": position["z"],
+			"velocity": {"x": velocity_x, "z": velocity_z}  # Store velocity
+		}
+		logger.info(f"Updated position for Player {player_id}: {position} (Velocity: {velocity_x}, {velocity_z})")
 
 	def start(self):
 		self.is_active = True
@@ -19,18 +34,9 @@ class Game:
 		asyncio.create_task(self._start_game_sequence())
 
 	async def _start_game_sequence(self):
-		#await asyncio.sleep(1)
 		await self._start_countdown()
+		self.countdown_finished = True
 		self.ball_manager.spawn_ball()
-		# notify players the game has started not needed as django backend is already doing this
-		#start_game_event = {
-		#	"event": "start_game",
-		#	"room_id": self.room_id,
-		#	"players": [
-		#		{"player_id": player["player_id"], "username": player["username"]}
-		#		for player in self.players
-		#	]
-		#}
 
 	async def _start_countdown(self):
 		countdown_values = [3, 2, 1, "GO"]
