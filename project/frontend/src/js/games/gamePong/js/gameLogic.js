@@ -7,6 +7,8 @@ import { setupGameWebSocketHandlers } from './utils/GameWebSocketHandlers.js';
 import { createScoreUI, updateScoreText } from './components/ScoreSprites.js';
 import { GAME_SETTINGS }		from './config.js';
 
+const wsService = WebSocketService.getInstance();
+
 class GameLogic
 {
 	constructor(renderer)
@@ -57,6 +59,7 @@ class GameLogic
 			const { position, lookAt } = this.currentPlayer.cameraState;
 			this.camera.position.set(position.x, position.y, position.z);
 			this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
+			this.sendInitialPlayerPosition();
 		}
 		else//spectator view
 		{
@@ -77,6 +80,15 @@ class GameLogic
 		this.objects.forEach((obj) => { if (obj.update) obj.update(delta); });
 		this.ballPool.forEach(ball => { if (ball.active) ball.update(delta); });
 		//handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
+	}
+
+	sendInitialPlayerPosition()
+	{
+		if (!this.currentPlayer)
+			return;
+		const { x, z } = this.currentPlayer.flowerPot.model.position;
+		wsService.send('player_position', { player_id: this.currentPlayer.playerId, position: { x, z } });
+		this.currentPlayer.lastSentPosition = { x, z };
 	}
 
 	handleBallSpawn(data)

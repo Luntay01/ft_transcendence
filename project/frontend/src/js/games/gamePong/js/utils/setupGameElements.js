@@ -12,15 +12,15 @@ import { GAME_SETTINGS } from '../config.js';
 
 export default async function setupGameElements(scene, objects, ballPool)
 {
-	const { modelPaths, grass, playerConfig } = GAME_SETTINGS;
+	const { modelPaths, gardenBeds, grass, playerConfig } = GAME_SETTINGS;
+	const gardenBedPositions = gardenBeds.positions;
 	// load garden beds
-	for (let i = 0; i < 4; i++)
+	for (const pos of gardenBedPositions)
 	{
 		const gardenBed = new GardenBed();
 		await gardenBed.loadModel(modelPaths.gardenBed);
-		//gardenBed.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));//TODO: remove hardcorded gardenBed offset use GAMESETTINGS instead using player bounds plus model offset
-		gardenBed.setPosition((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));
-		scene.add(gardenBed.model);;
+		gardenBed.setPosition(pos.x, pos.y, pos.z);
+		scene.add(gardenBed.model);
 		objects.push(gardenBed);
 	}
 

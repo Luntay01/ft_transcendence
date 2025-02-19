@@ -3,14 +3,24 @@ from .game import Game
 import time
 
 class GameManager:
+	_instance = None
+	def __new__(cls, *args, **kwargs):
+		if cls._instance is None:
+			cls._instance = super(GameManager, cls).__new__(cls)
+			cls._instance.__initialized = False
+		return cls._instance
+	
 	def __init__(self):
-		self.games = {}  # {room_id: game instance}
+		if self.__initialized:
+			return
+		self.__initialized = True
+		self.games = {}
 		self.room_cleanup_timers = {}
 	
 	def create_game(self, room_id, players):
+		room_id = str(room_id)
 		if room_id not in self.games:
 			self.games[room_id] = Game(room_id, players)
-			logger.info(f"created new game for room {room_id}")
 		else:
 			logger.warning(f"game for room {room_id} already exists.")
 	
@@ -28,11 +38,14 @@ class GameManager:
 		inactive_rooms = []
 		current_time = time.time()
 		for room_id, game in self.games.items():
+			if not game.is_active and not hasattr(game, "countdown_finished"):
+				logger.info(f"Skipping cleanup for Room {room_id} as countdown is still running.")
+				continue
 			if room_id not in connected_players or not connected_players[room_id]:
 				if room_id not in self.room_cleanup_timers:
 					self.room_cleanup_timers[room_id] = current_time
-					logger.info(f"Room {room_id} marked for cleanup, waiting 10 seconds for possible reconnect.")
-				elif current_time - self.room_cleanup_timers[room_id] > 10:
+					logger.info(f"Room {room_id} marked for cleanup, waiting 30 seconds for possible reconnect.")
+				elif current_time - self.room_cleanup_timers[room_id] > 30:
 					logger.info(f"No players reconnected in Room {room_id}. Cleaning up.")
 					inactive_rooms.append(room_id)
 			elif game.is_active:
@@ -45,6 +58,7 @@ class GameManager:
 	def cleanup_game(self, room_id):
 		from .config import redis_client
 		if room_id in self.games:
+			self.games[room_id].ball_manager.stop()
 			del self.games[room_id]
 			logger.info(f"Game state for Room {room_id} removed.")
 			redis_client.delete(f"room_state:{room_id}")

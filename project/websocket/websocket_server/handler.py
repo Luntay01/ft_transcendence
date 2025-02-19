@@ -19,7 +19,6 @@ async def handler(websocket, path):
 		return room_id, player_id, username
 	try:
 		room_id, player_id, username = parse_connection_params(path)
-		# check if this player is reconnecting
 		if player_id in [p["player_id"] for p in connected_players.get(room_id, [])]:
 			logger.info(f"Player {player_id} is reconnecting to Room {room_id}")
 		else:
@@ -36,6 +35,8 @@ async def handler(websocket, path):
 
 
 async def process_incoming_event(data, websocket):
+	from .game_manager import GameManager
+	game_manager = GameManager()
 	event = data.get("event")
 	room_id = data.get("room_id")
 	player_id = data.get("player_id")
@@ -43,7 +44,12 @@ async def process_incoming_event(data, websocket):
 		logger.info(f"Player {player_id} has reconnected to Room {room_id}")
 		await notify_players(room_id, {"event": "player_reconnected", "room_id": room_id, "player_id": player_id})
 	elif event == "player_position":
-		logger.info(f"Received position update from Player {player_id} in Room {room_id}")
-		# store position data for collision handling (to be implemented)
+		position = data.get("position")
+		room_id = str(room_id)
+		game_instance = game_manager.games.get(room_id)
+		if not game_instance:
+			logger.error(f"Game instance for Room {room_id} not found. Cannot update player position.")
+			return
+		game_instance.update_player_position(player_id, position)
 	else:
 		await broadcast_to_room(room_id, data, exclude=websocket)
