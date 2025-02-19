@@ -1,3 +1,4 @@
-from django.db import models
+# pong/models.py
+from .models.room import Room
 
-# Create your models here.
+__all__ = ["Room"]

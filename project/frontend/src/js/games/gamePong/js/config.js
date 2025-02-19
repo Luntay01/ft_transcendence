@@ -1,3 +1,4 @@
+/*
 export const DEBUG = false;
 
 export const GAME_SETTINGS = {
@@ -99,3 +100,153 @@ export const GAME_SETTINGS = {
 };
 
 export default { DEBUG, GAME_SETTINGS };
+*/
+
+//variable now stored in /config/settings.json
+
+export const DEBUG = false;
+
+export const GAME_SETTINGS = {
+	ballPhysics: {
+		initialVelocity: null,
+		bounds: null,
+		scale: null,
+		maxSpeed: null,
+		rotationMultiplier: null,
+	},
+	playerConfig: {
+		positions: {
+			bottom: null,
+			top: null,
+			left: null,
+			right: null,
+		},
+		playerColors: null,
+		bounds: {
+			bottom: null,
+			top: null,
+			left: null,
+			right: null,
+		},
+		speedMultiplier: null,
+	},
+	collision: {
+		ballRadius: null,
+		flowerPotRadius: null,
+		gardenBedRadius: null,
+		reboundFactor: null,
+		dampingFactor: null,
+		minimumSpeed: null,
+		ejectForce: null,
+	},
+	scoring: {
+		startingScore: null,
+		spriteConfig: {
+			radius: null,
+			textSize: null,
+			textConfig: {
+				font: null,
+				color: null,
+				canvasSize: null,
+				opacity: null,
+			},
+			positions: [
+				{ x: null, y: null, z: null },
+				{ x: null, y: null, z: null },
+				{ x: null, y: null, z: null },
+				{ x: null, y: null, z: null }
+			],
+			colors: null,
+		},
+	},
+	grass: {
+		rows: null,
+		columns: null,
+		randomPositionOffset: null,
+		randomTiltX: null,
+		randomTiltY: null,
+		randomTiltZ: null,
+		defaultScale: null,
+		color: null,
+		reactionRadius: null,
+	},
+	gardenBeds: {
+		positions: [
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }, 
+			{ x: null, y: null, z: null }
+		],
+		radius: 2.1
+	},
+	lighting: {
+		directionalLight: {
+			color: null,
+			intensity: null,
+			position: { x: null, y: null, z: null },
+		},
+		ambientLight: {
+			color: null,
+			intensity: null,
+		},
+		backgroundColor: null,
+	},
+	animations: {
+		tiltSpeed: null,
+		returnSpeed: null,
+	},
+	modelPaths: {
+		flowerPot: null,
+		gardenBed: null,
+		grassBlade: null,
+		fertilizerBall: null,
+	},
+	sounds: {
+		collision: null,
+		goal: null,
+	},
+	cameraStates: {
+		bottom: { position: { x: null, y: null, z: null }, lookAt: { x: null, y: null, z: null } },
+		top: { position: { x: null, y: null, z: null }, lookAt: { x: null, y: null, z: null } },
+		left: { position: { x: null, y: null, z: null }, lookAt: { x: null, y: null, z: null } },
+		right: { position: { x: null, y: null, z: null }, lookAt: { x: null, y: null, z: null } },
+		spectator: { position: { x: null, y: null, z: null }, lookAt: { x: null, y: null, z: null } },
+	},
+};
+
+function mergeSettings(target, source)
+{
+	for (const key in source)
+	{
+		if (Array.isArray(source[key]))
+			target[key] = [...source[key]];
+		else if (typeof source[key] === 'object' && source[key] !== null)
+		{
+			if (!target[key]) target[key] = {};
+				mergeSettings(target[key], source[key]);
+		}
+		else
+			target[key] = source[key];
+	}
+}
+
+export async function loadGameSettings()
+{
+	try
+	{
+		const response = await fetch("/config/settings.json");
+		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		const loadedSettings = await response.json();
+		mergeSettings(GAME_SETTINGS, loadedSettings);
+		console.log("Loaded and merged game settings:", GAME_SETTINGS);
+	}
+	catch (error)
+	{
+		console.error("Failed to load game settings:", error);
+	}
+}
+
+await loadGameSettings();
+export default { DEBUG, GAME_SETTINGS };
+
+

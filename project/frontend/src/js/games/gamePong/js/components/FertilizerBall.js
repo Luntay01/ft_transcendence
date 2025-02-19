@@ -1,5 +1,84 @@
 import { GAME_SETTINGS } from '../config.js';
 
+
+class FertilizerBall
+{
+	constructor()
+	{
+		const { scale } = GAME_SETTINGS.ballPhysics;
+		this.model = null;
+		this.loader = new THREE.GLTFLoader();
+		this.velocity = new THREE.Vector3(); // will be set from server
+		this.targetPosition = new THREE.Vector3();
+		this.lastServerUpdate = performance.now();
+		this.lerpFactor = 0.1; // controls interpolation smoothness
+		this.scale = scale;
+		this.rotationAxis = new THREE.Vector3(0, 1, 0);
+	}
+	async loadModel(path)
+	{
+		const gltf = await this.loader.loadAsync(path);
+		this.model = gltf.scene;
+		this.model.scale.set(this.scale, this.scale, this.scale);
+		this.model.visible = false;
+		return this.model;
+	}
+	addBall(position, velocity)
+	{
+		if (!this.model)
+		{
+			console.warn("ball model not loaded yet. delaying spawn...");
+			setTimeout(() => this.addBall(position, velocity), 100);
+			return;
+		}
+		console.log("adding Ball at position:", position);
+		this.model.visible = true;
+		this.model.position.set(position.x, position.y, position.z);
+		this.velocity.set(velocity.x, velocity.y, velocity.z);
+		this.active = true;
+	}
+
+	deactivate()
+	{
+		if (this.model)
+		{
+			this.model.visible = false;
+			this.active = false;
+		}
+	}
+
+	update(deltaTime)
+	{
+		if (!this.model) return;
+		const lerpSpeed = GAME_SETTINGS.ballPhysics.lerpSpeed || 0.1;
+		this.model.position.lerp(this.targetPosition, 0.5);
+		//this.velocity.y = 0;//dont for that you changed this
+		const ballMesh = this.model.children[0];
+		if (this.velocity.length() > 0)
+		{
+			this.rotationAxis.set(this.velocity.z, 0, -this.velocity.x).normalize();
+			const rotationAngle = this.velocity.length() * deltaTime;
+			ballMesh.rotateOnAxis(this.rotationAxis, rotationAngle);
+		}
+	}
+
+	updateFromServer(data)
+	{
+		if (!this.model) return;
+		if (!this.model.position) { console.warn("Model position not available."); return; }
+	
+		this.targetPosition.set(data.position.x, data.position.y, data.position.z);
+		this.velocity.set(data.velocity.x, data.velocity.y, data.velocity.z);
+	
+		//console.log(`🎯 Updated Ball Position: X=${data.position.x}, Y=${data.position.y}, Z=${data.position.z}`);
+		//console.log(`💨 Updated Ball Velocity: X=${data.velocity.x}, Y=${data.velocity.y}, Z=${data.velocity.z}`);
+	}
+}
+
+export default FertilizerBall;
+
+
+/*
 class FertilizerBall
 {
 	constructor()
@@ -92,11 +171,6 @@ class FertilizerBall
 			this.velocity.setLength(maxSpeed);
 	}
 
-	/**
-	 * Handle collision with another object
-	 * @param {Object} object - The object the ball collided with.
-	 * @param {THREE.Vector3} objectVelocity - Velocity of the object (optional).
-	 */
 	handleCollision(object, objectVelocity = new THREE.Vector3(0, 0, 0))
 	{
 		if (this.lastCollidedObject === object)
@@ -121,3 +195,5 @@ class FertilizerBall
 }
 
 export default FertilizerBall;
+
+*/

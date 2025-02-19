@@ -1,3 +1,4 @@
+import { GAME_SETTINGS } from '../config.js';
 
 class FlowerPot
 {
@@ -9,6 +10,13 @@ class FlowerPot
 		this.loader = new THREE.GLTFLoader();
 		this.lastDirection = 'neutral';
 		this.currentState = 'neutral';
+		this.speed = GAME_SETTINGS.playerConfig.speedMultiplier * 0.1;
+		this.isMoving = false;
+		this.direction = 'neutral';
+		this.position = null;
+		this.lastSentPosition = null;
+		this.movementAxis = null;
+		this.movementMultiplier = null;
 	}
 
 	async loadModel(path)
@@ -62,13 +70,32 @@ class FlowerPot
 	update(delta)
 	{
 		if (this.mixer) this.mixer.update(delta);
+		if (this.isMoving && this.direction !== "neutral")
+			this.move();
 	}
 
-	updateState(direction, isKeyHeld)
+	move()
 	{
-		if (isKeyHeld)
+		if (this.direction === "neutral") return;
+		const boundaries = GAME_SETTINGS.playerConfig.bounds[this.position];
+		if (!boundaries)
 		{
-			const tiltAnimation = direction === 'left' ? 'Tilt_left' : 'Tilt_right';
+			console.error(`invalid boundaries for position: ${this.position}`);
+			return;
+		}
+		this.model.position[this.movementAxis] += this.speed * this.movementMultiplier * (this.direction === "left" ? -1 : 1);
+		const minBound = this.movementAxis === "x" ? boundaries.minX : boundaries.minZ;
+		const maxBound = this.movementAxis === "x" ? boundaries.maxX : boundaries.maxZ;
+		this.model.position[this.movementAxis] = THREE.MathUtils.clamp(this.model.position[this.movementAxis], minBound, maxBound);
+	}
+
+	updateState(direction = this.direction, isMoving = this.isMoving)
+	{
+		this.direction = direction;
+		this.isMoving = isMoving;
+		if (this.isMoving)
+		{
+			const tiltAnimation = this.direction === 'left' ? 'Tilt_left' : 'Tilt_right';
 			if (this.currentState !== tiltAnimation)
 				this.playAnimation(tiltAnimation);
 		}

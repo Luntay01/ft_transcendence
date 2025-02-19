@@ -116,4 +116,7 @@ project/
    # NOTE: secret will expire on 22 Jan 2025
    CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
    CLIENT_SECRET=< client secret (*contact developers to get value) >
+
+   # Websocket/frontend shared volume path
+   CONFIG_PATH=/config/settings.json
    ```

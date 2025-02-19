@@ -1,7 +1,21 @@
 // Function to handle route changes based on URL fragments
-function handleRoute() {
-    const hash = window.location.hash.replace('#', '');
-    loadView(hash || 'welcome'); // Default to 'welcome' if no hash is provided
+
+let currentView = '';// track the current view
+function handleRoute()
+{
+    const newView = window.location.hash.replace('#', '') || 'welcome';
+    if (currentView === 'gamePong' && newView !== 'gamePong')
+        disconnectWebSocket();
+    else if (currentView === 'matchmaking' && newView !== 'gamePong')
+        disconnectWebSocket();
+    currentView = newView;
+    loadView(newView);
+}
+function disconnectWebSocket()
+{
+    const ws = WebSocketService.getInstance();
+    if (ws.isConnected())
+        ws.disconnect();
 }
 
 // Load the correct view when the page loads or the URL changes
@@ -79,6 +93,11 @@ async function loadView(view)
             if (view == 'home') {
                 const { setupHome } = await import('./home.js');
                 setupHome();
+            }
+            else if (view === 'matchmaking') {
+                await import('./WebSocketService.js');
+                const { setupMatchmaking } = await import('./matchmaking.js');
+                setupMatchmaking();
             }
             else if (view === 'gamePong') {
                 const { initPong } = await import('./games/gamePong/js/main.js');

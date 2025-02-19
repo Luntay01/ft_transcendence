@@ -10,17 +10,17 @@ import { GAME_SETTINGS } from '../config.js';
  * @param {Array} objects - Array to store objects for updates.
  */
 
-export default async function setupGameElements(scene, objects)
+export default async function setupGameElements(scene, objects, ballPool)
 {
-	const { modelPaths, grass, playerConfig } = GAME_SETTINGS;
+	const { modelPaths, gardenBeds, grass, playerConfig } = GAME_SETTINGS;
+	const gardenBedPositions = gardenBeds.positions;
 	// load garden beds
-	for (let i = 0; i < 4; i++)
+	for (const pos of gardenBedPositions)
 	{
 		const gardenBed = new GardenBed();
 		await gardenBed.loadModel(modelPaths.gardenBed);
-		//gardenBed.position.set((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));//TODO: remove hardcorded gardenBed offset use GAMESETTINGS instead using player bounds plus model offset
-		gardenBed.setPosition((i % 2 === 0 ? -10 : 10), 0, (i < 2 ? -10 : 10));
-		scene.add(gardenBed.model);;
+		gardenBed.setPosition(pos.x, pos.y, pos.z);
+		scene.add(gardenBed.model);
 		objects.push(gardenBed);
 	}
 
@@ -31,10 +31,14 @@ export default async function setupGameElements(scene, objects)
 	scene.add(grassField);
 	objects.push(grassInstance);
 
-	// add ball
-	const fertilizerBall = new FertilizerBall();
-	const ball = await fertilizerBall.loadModel(modelPaths.fertilizerBall);
-	fertilizerBall.setPosition(0, 0, 0);
-	scene.add(ball);
-	objects.push(fertilizerBall);
+	// create and add FertilizerBalls to the ballPool
+	for (let i = 0; i < 5; i++)
+	{  // preload 5 balls (adjust as needed)
+		const fertilizerBall = new FertilizerBall();
+		await fertilizerBall.loadModel(modelPaths.fertilizerBall);
+		fertilizerBall.deactivate();
+		scene.add(fertilizerBall.model);
+		ballPool.push(fertilizerBall);  // sdd to the pool
+	}
+
 }
