@@ -15,8 +15,9 @@ export function setupSignupForm() {
             });
             const data = await response.json();
             if (response.ok) {
-                alert('Signup successful! Please login.');
-                window.location.hash = 'login';
+                localStorage.setItem('email', email);
+                alert('Verification code is sent to your email! Please verify your email.');
+                window.location.hash = 'verify';
             } else {
                 alert(data.error || 'Signup failed');
             }
