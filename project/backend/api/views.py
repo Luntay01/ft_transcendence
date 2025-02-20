@@ -94,6 +94,7 @@ class OauthCodeView(views.APIView):
                 'oauth_user_id': content['id'],
                 'password': access_token,
                 'username': content['login'],
+                'is_verified': True,
             }
             userializer = UserSerializer(data=data, partial=True)
             if not (userializer.is_valid()):
@@ -117,14 +118,14 @@ class TokenObtainPairView(jwt_views.TokenObtainPairView):
         provider = request.data['provider']
 
         if (provider == 'Pong'):
-            user = User.objects.filter(email=request.data['email'], provider=provider)
+            user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
         elif (provider == '42Oauth'):
-            user = User.objects.filter(oauth_user_id=request.data['oauth_user_id'], provider=provider)
+            user = User.objects.filter(oauth_user_id=request.data['oauth_user_id'], provider=provider, is_verified=True)
         else:
             return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         if (user.count() != 1):
-            return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
         
         data = request.data
         _mutable = data._mutable

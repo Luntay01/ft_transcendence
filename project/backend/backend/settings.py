@@ -82,6 +82,18 @@ LOGGING = {
 	},
 }
 
+# Email verification
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_PROJECT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT")
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+OTP_INTERVAL = 24 * 60 * 60
 
 # Application definition
 
