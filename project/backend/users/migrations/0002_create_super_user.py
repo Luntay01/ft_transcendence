@@ -20,7 +20,8 @@ class Migration(migrations.Migration):
             username=DJANGO_SUPERUSER_USERNAME,
             email=DJANGO_SUPERUSER_EMAIL,
             password=DJANGO_SUPERUSER_PASSWORD,
-            first_name=DJANGO_SUPERUSER_FIRST_NAME)
+            first_name=DJANGO_SUPERUSER_FIRST_NAME,
+            is_verified=True)
 
         superuser.save()
 

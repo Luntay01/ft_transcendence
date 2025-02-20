@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
                     username=var_name,
                     first_name=var_name,
                     email=var_email,
-                    password=var_pass)
+                    password=var_pass,
+                    is_verified=True)
 
                 user.save()
 

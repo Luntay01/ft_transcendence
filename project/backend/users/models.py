@@ -22,6 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 	username = models.CharField(max_length=256, unique=True)
 	picture = models.ImageField(upload_to='images/', default='images/default.png')
 
+	otp_secret = models.CharField(max_length=256, null=True)
+	is_verified = models.BooleanField(default=False)
 	first_name = models.CharField(max_length=128)
 	last_name = models.CharField(max_length=128)
 	trophies = models.IntegerField(default=0)
