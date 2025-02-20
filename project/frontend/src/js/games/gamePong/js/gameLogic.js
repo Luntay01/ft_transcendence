@@ -112,14 +112,18 @@ class GameLogic
 			ball.velocity.setLength(minimumSpeed);
 	}
 
-	updatePlayerScore(playerIndex, newScore)
+	updatePlayerScore(playerId, newScore)
 	{
-		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length)
+		const playerIndex = this.players.findIndex(player => String(player.playerId) === String(playerId));
+		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length) {
+			console.warn(`🚨 Failed to update score: Invalid playerIndex (${playerIndex}) for playerId (${playerId})`);
 			return;
+		}
 		const { context, texture } = this.scoreSprites[playerIndex];
 		updateScoreText(context, newScore);
 		texture.needsUpdate = true;
 	}
+
 }
 
 export default GameLogic;

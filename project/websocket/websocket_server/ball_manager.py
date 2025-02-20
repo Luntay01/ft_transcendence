@@ -5,8 +5,9 @@ from .redis_utils import publish_to_redis
 from .config import GAME_SETTINGS, logger
 
 class BallManager:
-	
-	def __init__(self, room_id, player_positions):
+
+	def __init__(self, game, room_id, player_positions):
+		self.game = game
 		self.room_id = room_id
 		self.balls = []
 		self.player_positions = player_positions
@@ -52,6 +53,31 @@ class BallManager:
 		self._check_boundary_collisions(ball)
 		self._check_player_collisions(ball)
 		self._check_garden_bed_collisions(ball)
+		self._check_goal_collisions(ball)
+	
+	def _check_goal_collisions(self, ball):
+		if not self.game.countdown_finished:
+			return
+		for zone_name, zone in self.game.goal_zones.items():
+			player_id = zone["playerId"]
+			if not player_id:
+				continue
+			if (zone["minX"] <= ball["position"]["x"] <= zone["maxX"] and
+				zone["minZ"] <= ball["position"]["z"] <= zone["maxZ"]):
+				self.game.player_lives[player_id] -= 1
+				logger.info(f"💀 Player {player_id} lost a life! Remaining: {self.game.player_lives[player_id]}")
+				self.balls.remove(ball)
+				event_message = {
+					"event": "ball_despawn",
+					"room_id": self.game.room_id,
+					"ball_id": ball["id"],
+					"player_id": player_id,
+					"remaining_lives": self.game.player_lives[player_id]
+				}
+				asyncio.create_task(publish_to_redis("ball_despawn", event_message))
+				if self.game.player_lives[player_id] <= 0:
+					self.game._eliminate_player(player_id)
+				return
 
 	def _check_boundary_collisions(self, ball):
 		bounds = GAME_SETTINGS["ballPhysics"]["bounds"]

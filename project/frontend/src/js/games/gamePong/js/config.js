@@ -141,6 +141,12 @@ export const GAME_SETTINGS = {
 	},
 	scoring: {
 		startingScore: null,
+		goalZones: {
+			bottom: { minX: null, maxX: null, minZ: null, maxZ: null, playerId: null },
+			top: { minX: null, maxX: null, minZ: null, maxZ: null, playerId: null },
+			left: { minX: null, maxX: null, minZ: null, maxZ: null, playerId: null },
+			right: { minX: null, maxX: null, minZ: null, maxZ: null, playerId: null }
+		},
 		spriteConfig: {
 			radius: null,
 			textSize: null,

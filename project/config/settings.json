@@ -38,6 +38,12 @@
     },
     "scoring": {
         "startingScore": 15,
+        "goalZones": {
+            "bottom": { "minX": -11, "maxX": 11, "minZ": 13, "maxZ": 15, "playerId": null },
+            "top": { "minX": -11, "maxX": 11, "minZ": -15, "maxZ": -13, "playerId": null },
+            "left": { "minX": -15, "maxX": -13, "minZ": -11, "maxZ": 11, "playerId": null },
+            "right": { "minX": 13, "maxX": 15, "minZ": -11, "maxZ": 11, "playerId": null }
+        },
         "spriteConfig": {
             "radius": 40,
             "textSize": 100,

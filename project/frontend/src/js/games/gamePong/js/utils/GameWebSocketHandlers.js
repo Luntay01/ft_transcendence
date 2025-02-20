@@ -53,6 +53,13 @@ export function setupGameWebSocketHandlers(gameLogic)
 		}
 	});
 
+	wsService.registerEvent("ball_despawn", (message) => {
+		const ball = gameLogic.ballMap[message.ball_id];
+		if (ball)
+			ball.deactivate();
+		gameLogic.updatePlayerScore(message.player_id, message.remaining_lives);
+	});
+
 	wsService.registerEvent('start_game_countdown', (message) => {
 		console.log(`⏳ Countdown: ${message.countdown}`);
 	});
