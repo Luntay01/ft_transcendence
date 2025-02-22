@@ -1,63 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Pong Chat</title>
 	<link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@400;700&family=Berkshire+Swash:wght@400;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="../styles/chatbox.css">
 </head>
-<body>
-	<div class="center-container">
-		<div class="chat-container">
-			<div class="chat-box" id="chat-box">
 
-			</div>
-			<div class="chat-input-container">
-				<input type="text" id="chat-input" class="chat-input" placeholder="Type a message:">
-				<button id="send-button" class="send-button">Send</button>
-			</div>
-			<div class="center-container">
-				<a href="history.html" target ="_blank" class="btn-secondary">Chat History</a>
-			</div>
+<div class="center-container">
+	<div class="chat-container">
+		<div class="chat-box" id="chat-box">
+
+		</div>
+		<div class="chat-input-container">
+			<input type="text" id="chat-input" class="chat-input" placeholder="Type a message:">
+			<button id="send-button" class="send-button">Send</button>
+		</div>
+		<div class="center-container">
+			<a href="history.html" target ="_blank" class="btn-secondary">Chat History</a>
 		</div>
 	</div>
-	<script>
-		const chatBox = document.getElementById('chat-box');
-		const chatInput = document.getElementById('chat-input');
-		const sendButton = document.getElementById('send-button');
-
-		function loadChatHistory(){
-			const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-			history.forEach(message => addMessage(message));
-		}
-		function addMessage(message){
-			const messageElement = document.createElement('div');
-			messageElement.className = 'chat-message';
-			messageElement.innerText = message;
-			chatBox.appendChild(messageElement);
-			chatBox.scrollTop = chatBox.scrollHeight;
-		}
-		function storeMessage(message){
-			const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-			history.push(message);
-			localStorage.setItem('chatHistory', JSON.stringify(history));
-		}
-		sendButton.addEventListener('click', () => {
-			const msg = chatInput.value.trim();
-			if(msg){
-				addMessage(msg);
-				storeMessage(msg);
-				chatInput.value = '';
-			}
-		});
-
-		chatInput.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter'){
-				sendButton.click();
-			}
-		});
-		loadChatHistory();
-	</script>
-</body>
-</html>
+</div>
