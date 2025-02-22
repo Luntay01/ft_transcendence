@@ -15,16 +15,28 @@ class BallManager:
 	
 	def spawn_ball(self):
 		asyncio.create_task(self._delayed_spawn())
-	
+
 	async def _delayed_spawn(self):
 		await asyncio.sleep(1.5)
+		spawn_positions = GAME_SETTINGS["ballSpawnPoints"]
+		corner_name, spawn_point = random.choice(list(spawn_positions.items()))
 		ball_id = str(len(self.balls) + 1)
-		initial_position = {"x": 0, "y": 0, "z": 0}
-		initial_velocity = GAME_SETTINGS["ballPhysics"]["initialVelocity"]
+		initial_position = { "x": spawn_point["x"], "y": spawn_point["y"], "z": spawn_point["z"] }
+		target_x = random.uniform(-1, 1) 
+		target_z = random.uniform(-1, 1)
+		target_position = { "x": target_x, "y": 0, "z": target_z }  # y=0 is play level
+		direction_x = target_x - spawn_point["x"]
+		direction_z = target_z - spawn_point["z"]
+		magnitude = (direction_x**2 + direction_z**2) ** 0.5
+		velocity = {
+			"x": (direction_x / magnitude) * GAME_SETTINGS["ballPhysics"]["initialVelocity"]["x"],
+			"y": -1.0,
+			"z": (direction_z / magnitude) * GAME_SETTINGS["ballPhysics"]["initialVelocity"]["z"]
+		}
 		ball = {
 			"id": ball_id,
 			"position": initial_position,
-			"velocity": initial_velocity,
+			"velocity": velocity,
 			"last_position": initial_position.copy()
 		}
 		self.balls.append(ball)
@@ -33,11 +45,25 @@ class BallManager:
 			"room_id": self.room_id,
 			"ball_id": ball_id,
 			"position": initial_position,
-			"velocity": initial_velocity
+			"velocity": velocity
 		}
 		await publish_to_redis("ball_spawn", ball_spawn_event)
-		logger.info(f"Ball {ball_id} spawned in room {self.room_id}. Published to Redis.")
-	
+		logger.info(f"🎾 Ball {ball_id} spawned from {corner_name} → Target {target_position} in room {self.room_id}.")
+
+	def _try_spawn_new_ball(self):
+		active_players = sum(1 for lives in self.game.player_lives.values() if lives > 0)
+		max_active_balls = GAME_SETTINGS["ballPhysics"]["maxBalls"]
+		if len(self.balls) >= max_active_balls or active_players < 2:
+			logger.info(f"🛑 No new ball spawned. Active Balls: {len(self.balls)}, Players Alive: {active_players}")
+			return
+		logger.info(f"⚡ Spawning new ball. Active Balls: {len(self.balls)}, Players Alive: {active_players}")
+		self.spawn_ball()
+
+	def despawn_ball(self, ball):
+		if ball in self.balls:
+			self.balls.remove(ball)
+		self._try_spawn_new_ball()
+
 	def update_balls(self, delta_time):
 		for ball in self.balls:
 			self._update_ball_position(ball, delta_time)
@@ -48,8 +74,13 @@ class BallManager:
 		ball["last_position"] = ball["position"].copy()
 		ball["position"]["x"] += ball["velocity"]["x"] * delta_time
 		ball["position"]["z"] += ball["velocity"]["z"] * delta_time
+		ball["position"]["y"] += ball["velocity"]["y"] * delta_time
+		if ball["position"]["y"] < 0:
+			ball["position"]["y"] = 0
 	
 	def _check_collisions(self, ball):
+		if ball["position"]["y"] > 0:
+			return
 		self._check_boundary_collisions(ball)
 		self._check_player_collisions(ball)
 		self._check_garden_bed_collisions(ball)
@@ -66,7 +97,7 @@ class BallManager:
 				zone["minZ"] <= ball["position"]["z"] <= zone["maxZ"]):
 				self.game.player_lives[player_id] -= 1
 				logger.info(f"💀 Player {player_id} lost a life! Remaining: {self.game.player_lives[player_id]}")
-				self.balls.remove(ball)
+				self.despawn_ball(ball)
 				event_message = {
 					"event": "ball_despawn",
 					"room_id": self.game.room_id,
@@ -76,11 +107,12 @@ class BallManager:
 				}
 				asyncio.create_task(publish_to_redis("ball_despawn", event_message))
 				if self.game.player_lives[player_id] <= 0:
-					self.game._eliminate_player(player_id)
+					asyncio.create_task(self.game._eliminate_player(player_id))
 				return
 
 	def _check_boundary_collisions(self, ball):
-		bounds = GAME_SETTINGS["ballPhysics"]["bounds"]
+		bounds = self.game.current_bounds  # ✅ Use dynamically updated bounds
+		logger.debug(f"🔍 Checking ball boundary collisions. Current Bounds: {bounds}")
 		if not (bounds["minX"] <= ball["position"]["x"] <= bounds["maxX"]):
 			ball["velocity"]["x"] *= -1
 		if not (bounds["minZ"] <= ball["position"]["z"] <= bounds["maxZ"]):

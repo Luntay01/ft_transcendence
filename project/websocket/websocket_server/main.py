@@ -76,7 +76,7 @@ async def handle_event(event, room_id, data):
 
 async def redis_listener():
 	pubsub = redis_client.pubsub()
-	pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn", "start_game_countdown", "ball_despawn")
+	pubsub.subscribe("start_game", "update_position", "ball_update", "ball_spawn", "start_game_countdown", "ball_despawn", "player_eliminated", "game_over")
 	while True:
 		message = pubsub.get_message(ignore_subscribe_messages=True)
 		if message and message["type"] == "message":

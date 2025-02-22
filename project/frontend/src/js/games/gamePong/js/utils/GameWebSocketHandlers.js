@@ -69,8 +69,17 @@ export function setupGameWebSocketHandlers(gameLogic)
 		gameLogic.updateScore(message.scores);
 	});
 
-	wsService.registerEvent('game_end', (message) => {
+	wsService.registerEvent("player_eliminated", (message) => {
+		console.log(`Player ${message.player_id} eliminated! Removing flowerpot...`);
+		const player = gameLogic.playerMap[message.player_id];
+		if (player) {
+			player.flowerPot.deactivate();
+			delete gameLogic.playerMap[message.player_id];
+		}
+	});
+
+	wsService.registerEvent('game_over', (message) => {
 		console.log("Game End Event:", message);
-		gameLogic.endGame(message.winner);
+		//gameLogic.endGame(message.winner);
 	});
 }
