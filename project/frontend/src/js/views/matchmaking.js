@@ -10,7 +10,12 @@
  */
 
 let roomStatusInterval = null;
-export function setupMatchmaking()
+
+export async function load() {
+    setupMatchmaking();
+}
+
+function setupMatchmaking()
 {
     const statusMessage = document.getElementById('statusMessage');
     const roomData = { players: [] };

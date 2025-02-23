@@ -50,7 +50,7 @@ router.add(
     false,
     'Signup',
     [
-        './views/signup.js'
+        './views/signup.js',
     ]
 );
 
@@ -60,7 +60,7 @@ router.add(
     false,
     'Login',
     [
-        './views/login.js'
+        './views/login.js',
     ]
 );
 
@@ -70,10 +70,53 @@ router.add(
     true,
     'Profile',
     [
-        './views/profile.js'
+        './views/profile.js',
     ]
 );
 
-// const auth = new Auth()
+router.add(
+    '#gamePong',
+    '/views/gamePong.html',
+    true,
+    'Play Pong',
+    [
+        './views/gamePong.js',
+    ]
+)
+
+router.add(
+    '#game_matchmaking',
+    '/views/game_matchmaking.html',
+    true,
+    'Find Local Match',
+    [
+        // './views/WebSocketService.js',
+        './views/matchmaking.js',
+    ]
+)
+
+router.add(
+    '#leaderboard',
+    '/views/leaderboard.html',
+    true,
+    'Leaderboard',
+    []
+)
+
+router.add(
+    '#friends',
+    '/views/friends.html',
+    true,
+    'Friends',
+    []
+)
+
+router.add(
+    '#match_history',
+    '/views/match_history.html',
+    true,
+    'Match History',
+    []
+)
 
 
