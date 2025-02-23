@@ -9,7 +9,7 @@ class Router {
         window.addEventListener('load', () => {this.handleRoute()});
         window.addEventListener('hashchange', () => {this.handleRoute()});
         if (!view) {
-           view = '';
+           view = '/';
         }
         this.previousView = null;
         this.currentView = view;
@@ -33,12 +33,12 @@ class Router {
     }
     
     handleRoute() {
-        const newView = window.location.hash || '';
+        const newView = window.location.hash;
         // if (this.currentView === 'gamePong' && newView !== 'gamePong')
         //     disconnectWebSocket();
         // else if (this.currentView === 'matchmaking' && newView !== 'gamePong')
         //     disconnectWebSocket();
-        if (this.currentView == this.previousView) {
+        if (newView === this.currentView) {
             return ;
         }
         this.previousView = this.currentView;
@@ -100,8 +100,8 @@ class Router {
         // Check if valid route
         if (!this.routes.has(this.currentView))
         {
-            console.log('Page not found. Back to top page.'); //TODO: display message to notify page not found
-            Router.navigateTo('');
+            console.log(`Page ${this.currentView} not found.`); //TODO: display message to notify page not found
+            Router.navigateTo('#404');
             return;
         }
         const route = this.routes.get(this.currentView);
@@ -140,19 +140,7 @@ class Router {
             // // After loading the view, set up the appropriate form handlers
             // if (this.currentView == 'welcome') {
             //     return ;
-            // } else if (this.currentView === 'login') {
-            //     const { setupLoginForm } = await import('./login.js');
-            //     setupLoginForm();
-            // } else if (this.currentView === 'signup') {
-            //     const { setupSignupForm } = await import('./signup.js');
-            //     setupSignupForm();
             // } else {
-            //     // const isTokenValid = await Auth.silentRefresh();
-            //     // if (!isTokenValid) {
-            //     //     console.log("Token is invalid or expired. Please login again."); //TODO: display message to notify token invalid
-            //     //     Router.navigateTo('login');
-            //     //     return;
-            //     // }
             //     if (view == 'home') {
             //         const { setupHome } = await import('./home.js');
             //         setupHome();
@@ -165,10 +153,6 @@ class Router {
             //     else if (view === 'gamePong') {
             //         const { initPong } = await import('./games/gamePong/js/main.js');
             //         initPong();
-            //     }
-            //     else if (view === 'profile') {
-            //         const { setupProfile } = await import('./profile.js');
-            //         setupProfile();
             //     }
             // }
         } catch (error) {
