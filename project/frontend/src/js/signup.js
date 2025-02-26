@@ -17,7 +17,7 @@ export function setupSignupForm() {
             if (response.ok) {
                 localStorage.setItem('email', email);
                 alert('Verification code is sent to your email! Please verify your email.');
-                window.location.hash = 'verify';
+                navigateTo('codeverify');
             } else {
                 alert(data.error || 'Signup failed');
             }

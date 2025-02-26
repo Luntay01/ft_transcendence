@@ -97,9 +97,9 @@ async function loadView(view)
         } else if (view === 'signup') {
             const { setupSignupForm } = await import('./signup.js');
             setupSignupForm();
-        } else if (view === 'verify') {
-            const { setupVerifyForm } = await import('./verify.js');
-            setupVerifyForm();
+        } else if (view === 'codeverify') {
+            const { setupCodeVerifyForm } = await import('./codeverify.js');
+            setupCodeVerifyForm();
         } else {
             const isTokenValid = await silentRefresh();
             if (!isTokenValid) {

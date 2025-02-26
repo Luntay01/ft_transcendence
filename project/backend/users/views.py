@@ -1,5 +1,4 @@
 from django.http import Http404
-from django.core.mail import EmailMessage
 from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
@@ -47,7 +46,7 @@ class UserView(views.APIView):
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
 
-class EmailVerifyView(views.APIView):
+class CodeVerifyView(views.APIView):
     permission_classes = [AllowAny]
     def post(self, request, fromat=None):
         user = User.objects.get(email=request.data['email'], provider='Pong')

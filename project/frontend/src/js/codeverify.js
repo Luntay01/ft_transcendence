@@ -1,4 +1,4 @@
-export function setupVerifyForm() {
+export function setupCodeVerifyForm() {
     const form = document.getElementById('verifyForm');
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -6,7 +6,7 @@ export function setupVerifyForm() {
         const email = localStorage.getItem('email');
 
         try {
-            const response = await fetch('http://localhost:8000/api/users/emailverify', {
+            const response = await fetch('http://localhost:8000/api/users/codeverify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, verify_code }),
@@ -22,4 +22,4 @@ export function setupVerifyForm() {
             console.error('Verification error:', error);
         }
     });
-}   
+}
