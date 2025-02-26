@@ -20,7 +20,8 @@ export async function initPong()
 	const players = JSON.parse(localStorage.getItem('players'));
 	const playerId = localStorage.getItem('player_id');
 	const username = localStorage.getItem('username');
-	if (!roomId || !players|| !playerId)
+	const gameMode = localStorage.getItem('gameMode');
+	if (!roomId || !players|| !playerId || !gameMode)
 	{
 		console.error("Missing game data. Redirecting to matchmaking...");
 		navigateTo('matchmaking');

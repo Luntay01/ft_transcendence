@@ -83,6 +83,7 @@ export function setupMatchmaking()
 	const statusMessage = document.getElementById('statusMessage');
 	const matchmakeButton = document.getElementById('matchmakeButton');
 	const roomData = { players: [] };
+    matchmakeButton.addEventListener('click', buttonHandler);
 	matchmakeButton.addEventListener('click', async () => {
 		statusMessage.textContent = "Searching for a match...";
 		try
@@ -138,6 +139,14 @@ export function setupMatchmaking()
 			statusMessage.textContent = "An error occurred. Please try again.";
 		}
 	});
+}
+
+async function buttonHandler(event) {
+    const btnNum = event.target.getAttribute("data-btnNum");
+    let gameMode = JSON.parse(localStorage.getItem('gameMode')) || [];
+    gameMode.push(btnNum);
+    localStorage.setItem('gameMode', JSON.stringify(gameMode));
+    console.log('Game mode set to:', gameMode);
 }
 
 async function fetchRoomStatus(roomId)
