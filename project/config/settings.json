@@ -57,10 +57,18 @@
         }
     },
     "mode": {
-        "localPlayMode": 0,
-        "tournMode": 1,
-        "keyboardMode": 2,
-        "1v1Mode": 3
+        "localPlayMode": {
+            "matches": 1
+        },
+        "tournMode": {
+            "matches": 4
+        },
+        "keyboardMode": {
+            "matches": 1
+        },
+        "1v1Mode": {
+            "matches": 1
+        }
     },
     "grass": {
         "rows": 80,
