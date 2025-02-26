@@ -30,6 +30,7 @@ services:
       - "8000"
     ports:
      - "8000:8000" #only if we want the port open to the browser otherwise expose
+     - "8080:8080" #to get google auth token from the browser
     depends_on:
       - postgres
       - redis

@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from django.conf import settings
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 # If modifying these SCOPES, delete the file token.json.
@@ -32,7 +33,8 @@ def get_gmail_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            raise Exception("Invalid credentials or token.json file not found")
+            flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
+            creds = flow.run_local_server(bind_addr="0.0.0.0", port=8080, open_browser=False)
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
