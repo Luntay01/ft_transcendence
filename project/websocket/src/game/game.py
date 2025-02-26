@@ -50,11 +50,11 @@ class Game:
 
 	def update(self, delta_time):
 		# TODO: still needs a lot of work on this ball pool and sync with frontend, and maybe even update predections
-		#self.elapsed_time += delta_time
-		#current_interval = int(self.elapsed_time // 10)
-		#if current_interval > self.last_spawn_interval:
-		#	self.last_spawn_interval = current_interval
-		#	self.ball_manager.spawner.try_spawn_new_ball()
+		self.elapsed_time += delta_time
+		current_interval = int(self.elapsed_time // 10)
+		if current_interval > self.last_spawn_interval:
+			self.last_spawn_interval = current_interval
+			self.ball_manager.spawner.try_spawn_new_ball()
 		self.ball_manager.update_balls(delta_time)
 
 	async def _end_game(self, winner_id):

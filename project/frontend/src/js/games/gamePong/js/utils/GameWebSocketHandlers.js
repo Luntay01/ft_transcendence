@@ -51,6 +51,11 @@ export function setupGameWebSocketHandlers(gameLogic)
 			gameLogic.ballMap[message.ball_id] = availableBall;
 			console.log(`Ball spawned and stored with ID: ${message.ball_id}`);
 		}
+		else
+		{
+			console.warn(`⚠️ No available ball in pool! Ball ID: ${message.ball_id}`);
+		}
+		console.log(`🔄 Ball Pool AFTER spawning:`, gameLogic.ballPool.map(b => b.active ? "🟢 Active" : "⚪ Inactive"));
 	});
 
 	wsService.registerEvent("ball_despawn", (message) => {

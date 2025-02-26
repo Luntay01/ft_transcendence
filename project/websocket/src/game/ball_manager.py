@@ -8,7 +8,8 @@ class BallManager:
 	def __init__(self, game, room_id, player_positions):
 		self.game = game
 		self.room_id = room_id
-		self.balls = [] 
+		self.balls = []
+		self.inactive_balls = []
 		self.player_positions = player_positions 
 		self.game_active = False
 		self.spawner = BallSpawner(self)
@@ -22,6 +23,7 @@ class BallManager:
 	def despawn_ball(self, ball):
 		if ball in self.balls:
 			self.balls.remove(ball)
+			self.inactive_balls.append(ball)
 		self.spawner.try_spawn_new_ball()
 
 	def update_balls(self, delta_time):
@@ -33,6 +35,7 @@ class BallManager:
 	def stop(self):
 		self.game_active = False
 		self.balls.clear()
+		self.inactive_balls.clear()
 
 
 
