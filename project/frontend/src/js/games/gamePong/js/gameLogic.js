@@ -69,6 +69,10 @@ class GameLogic
 		}
 		const playerCount = this.players.length;
 		this.scoreSprites = createScoreUI(this.uiScene, playerCount);
+		const startingScore = GAME_SETTINGS.scoring.startingScore;
+		this.players.forEach(player => {
+			this.updatePlayerScore(player.playerId, startingScore);
+		});
 		console.log('GameLogic: Initialization complete.');
 	}
 

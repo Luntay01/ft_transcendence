@@ -1,8 +1,54 @@
+from .ball_spawner import BallSpawner
+from .ball_physics import BallPhysics
+from .ball_collision_handler import CollisionHandler
+from .ball_publisher import BallPublisher
+import asyncio
+
+class BallManager:
+    def __init__(self, game, room_id, player_positions):
+        self.game = game
+        self.room_id = room_id
+        self.balls = []  # List of Ball objects
+        self.player_positions = player_positions  # Dictionary of player positions
+        self.game_active = False
+        self.spawner = BallSpawner(self)
+        self.physics = BallPhysics()
+        self.collisions = CollisionHandler(self)
+        self.publisher = BallPublisher(self)
+
+    def spawn_ball(self):
+        """Triggers the spawning of a new ball."""
+        self.spawner.spawn_ball()
+
+    def despawn_ball(self, ball):
+        """Removes a ball and tries to spawn a new one."""
+        if ball in self.balls:
+            self.balls.remove(ball)
+        self.spawner.try_spawn_new_ball()
+
+    def update_balls(self, delta_time):
+        """Updates all balls' positions and checks collisions."""
+        for ball in self.balls[:]:  # Use a copy to avoid issues if list changes
+            self.physics.update_ball_position(ball, delta_time)
+            self.collisions.check_collisions(ball)
+            asyncio.create_task(self.publisher.publish_ball_update(ball))
+
+    def stop(self):
+        """Stops the ball manager and clears all balls."""
+        self.game_active = False
+        self.balls.clear()
+
+
+
+
+
+
+"""
 import asyncio
 import math
 import random
-from .redis_utils import publish_to_redis
-from .config import GAME_SETTINGS, logger
+from ..network.redis_utils import publish_to_redis
+from ..config import GAME_SETTINGS, logger
 
 class BallManager:
 
@@ -111,8 +157,7 @@ class BallManager:
 				return
 
 	def _check_boundary_collisions(self, ball):
-		bounds = self.game.current_bounds  # ✅ Use dynamically updated bounds
-		logger.debug(f"🔍 Checking ball boundary collisions. Current Bounds: {bounds}")
+		bounds = self.game.current_bounds
 		if not (bounds["minX"] <= ball["position"]["x"] <= bounds["maxX"]):
 			ball["velocity"]["x"] *= -1
 		if not (bounds["minZ"] <= ball["position"]["z"] <= bounds["maxZ"]):
@@ -121,7 +166,6 @@ class BallManager:
 	def _check_player_collisions(self, ball):
 		if not self.player_positions:
 			return
-		logger.debug(f"🔎 Checking collision for Ball {ball['id']}. Total Players: {len(self.player_positions)}")
 		ball_radius = GAME_SETTINGS["collision"]["ballRadius"]
 		flower_pot_radius = GAME_SETTINGS["collision"]["flowerPotRadius"]
 		total_radius_squared = (ball_radius + flower_pot_radius) ** 2  
@@ -225,7 +269,7 @@ class BallManager:
 			scale = min_speed / speed
 			ball_velocity["x"] *= scale
 			ball_velocity["z"] *= scale
-		logger.info(f"Ball deflected. New Velocity: {ball_velocity}")
+		logger.info(f"Ball deflected. New Velocity: {ball_velocity}" )
 	
 	async def _publish_ball_update(self, ball):
 		ball_update_event = {
@@ -240,3 +284,4 @@ class BallManager:
 	def stop(self):
 		self.game_active = False
 		self.balls.clear()
+"""
