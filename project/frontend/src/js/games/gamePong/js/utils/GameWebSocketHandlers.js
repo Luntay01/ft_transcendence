@@ -29,16 +29,18 @@ export function setupGameWebSocketHandlers(gameLogic)
 			player.flowerPot.updateState(direction, isMoving);
 	});
 
- 	wsService.registerEvent('ball_update', (message) => {
-		const ball = gameLogic.ballMap[message.ball_id];
+	wsService.registerEvent('ball_updates', (message) => {
+		message.balls.forEach((ballData) => {
+			const ball = gameLogic.ballMap[ballData.ball_id];
+			if (ball)
+				ball.updateFromServer({ position: ballData.position, velocity: ballData.velocity });
+		});
+	});
 
+	wsService.registerEvent('ball_update', (message) => {
+		const ball = gameLogic.ballMap[message.ball_id];
 		if (ball)
-		{
-			ball.updateFromServer({
-				position: message.position,
-				velocity: message.velocity
-			});
-		}
+			ball.updateFromServer({ position: message.position, velocity: message.velocity });
 	});
 
 	wsService.registerEvent("ball_spawn", (message) => {

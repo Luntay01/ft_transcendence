@@ -39,6 +39,7 @@ REDIS_CHANNELS = {
 		"start_game",
 		"update_position",
 		"ball_update",
+		"ball_updates",
 		"ball_spawn",
 		"start_game_countdown",
 		"ball_despawn",

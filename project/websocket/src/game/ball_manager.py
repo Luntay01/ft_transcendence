@@ -30,7 +30,8 @@ class BallManager:
 		for ball in self.balls[:]:
 			self.physics.update_ball_position(ball, delta_time)
 			self.collisions.check_collisions(ball)
-			asyncio.create_task(self.publisher.publish_ball_update(ball))
+			#asyncio.create_task(self.publisher.publish_ball_update(ball))
+			asyncio.create_task(self.publisher.publish_all_ball_updates())
 
 	def stop(self):
 		self.game_active = False
