@@ -1,7 +1,7 @@
 import json
 from ..config import redis_client, logger
 
-""" ✅ Manages saving and retrieving game state from Redis. """
+""" Manages saving and retrieving game state from Redis. """
 class GameStateManager:
 	_instance = None
 

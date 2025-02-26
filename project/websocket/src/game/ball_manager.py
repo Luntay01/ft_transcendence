@@ -5,38 +5,34 @@ from .ball_publisher import BallPublisher
 import asyncio
 
 class BallManager:
-    def __init__(self, game, room_id, player_positions):
-        self.game = game
-        self.room_id = room_id
-        self.balls = []  # List of Ball objects
-        self.player_positions = player_positions  # Dictionary of player positions
-        self.game_active = False
-        self.spawner = BallSpawner(self)
-        self.physics = BallPhysics()
-        self.collisions = CollisionHandler(self)
-        self.publisher = BallPublisher(self)
+	def __init__(self, game, room_id, player_positions):
+		self.game = game
+		self.room_id = room_id
+		self.balls = [] 
+		self.player_positions = player_positions 
+		self.game_active = False
+		self.spawner = BallSpawner(self)
+		self.physics = BallPhysics()
+		self.collisions = CollisionHandler(self)
+		self.publisher = BallPublisher(self)
 
-    def spawn_ball(self):
-        """Triggers the spawning of a new ball."""
-        self.spawner.spawn_ball()
+	def spawn_ball(self):
+		self.spawner.spawn_ball()
 
-    def despawn_ball(self, ball):
-        """Removes a ball and tries to spawn a new one."""
-        if ball in self.balls:
-            self.balls.remove(ball)
-        self.spawner.try_spawn_new_ball()
+	def despawn_ball(self, ball):
+		if ball in self.balls:
+			self.balls.remove(ball)
+		self.spawner.try_spawn_new_ball()
 
-    def update_balls(self, delta_time):
-        """Updates all balls' positions and checks collisions."""
-        for ball in self.balls[:]:  # Use a copy to avoid issues if list changes
-            self.physics.update_ball_position(ball, delta_time)
-            self.collisions.check_collisions(ball)
-            asyncio.create_task(self.publisher.publish_ball_update(ball))
+	def update_balls(self, delta_time):
+		for ball in self.balls[:]:
+			self.physics.update_ball_position(ball, delta_time)
+			self.collisions.check_collisions(ball)
+			asyncio.create_task(self.publisher.publish_ball_update(ball))
 
-    def stop(self):
-        """Stops the ball manager and clears all balls."""
-        self.game_active = False
-        self.balls.clear()
+	def stop(self):
+		self.game_active = False
+		self.balls.clear()
 
 
 

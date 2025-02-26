@@ -23,7 +23,7 @@ async def eliminate_player(game, player_id):
 	await publish_game_event("player_eliminated", game.room_id, {"player_id": player_id})
 	game.player_positions.pop(player_id, None)
 """
-
+#need to check
 async def eliminate_player(self, player_id):
 	for zone_name, zone in self.goal_zones.items():
 		if zone["playerId"] == player_id:
