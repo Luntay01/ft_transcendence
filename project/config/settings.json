@@ -56,6 +56,12 @@
             "colors": ["#C8643A", "#A0A0A0", "#5B92D8", "#6A206E"]
         }
     },
+    "mode": {
+        "localPlayMode": 0,
+        "tournMode": 1,
+        "keyboardMode": 2,
+        "1v1Mode": 3
+    },
     "grass": {
         "rows": 80,
         "columns": 80,
