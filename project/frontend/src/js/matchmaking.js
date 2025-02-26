@@ -143,9 +143,8 @@ export function setupMatchmaking()
 
 async function buttonHandler(event) {
     const btnNum = event.target.getAttribute("data-btnNum");
-    let gameMode = JSON.parse(localStorage.getItem('gameMode')) || [];
-    gameMode.push(btnNum);
-    localStorage.setItem('gameMode', JSON.stringify(gameMode));
+    localStorage.setItem('gameMode', JSON.stringify([btnNum]));
+    const gameMode = JSON.parse(localStorage.getItem('gameMode'));
     console.log('Game mode set to:', gameMode);
 }
 
