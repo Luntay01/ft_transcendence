@@ -9,6 +9,7 @@
         "bounds": { "minX": -15, "maxX": 15, "minZ": -15, "maxZ": 15 },
         "scale": 0.9,
         "maxSpeed": 20,
+        "minBallSpeed": 1.5,
         "rotationMultiplier": 1.0,
         "maxBalls": 5
     },
@@ -45,10 +46,13 @@
         "dampingFactor": 1.01,
         "minimumSpeed": 1.0,
         "influenceFactor": 0.5,
-        "ejectForce": 5.0
+        "ejectForce": 5.0,
+        "restitution": 0.8,
+        "separationBias": 0.05,
+        "collisionDetectionInterval": 0.02
     },
     "scoring": {
-        "startingScore": 1,
+        "startingScore": 10,
         "goalZones": {
             "bottom": { "minX": -11, "maxX": 11, "minZ": 13, "maxZ": 15, "playerId": null },
             "top": { "minX": -11, "maxX": 11, "minZ": -15, "maxZ": -13, "playerId": null },

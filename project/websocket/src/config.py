@@ -38,7 +38,7 @@ REDIS_CHANNELS = {
 	"game_events": [
 		"start_game",
 		"update_position",
-		"ball_update",
+		"ball_update",# we maybe remove this 
 		"ball_updates",
 		"ball_spawn",
 		"start_game_countdown",

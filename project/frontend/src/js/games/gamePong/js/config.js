@@ -112,7 +112,9 @@ export const GAME_SETTINGS = {
 		bounds: null,
 		scale: null,
 		maxSpeed: null,
+		minBallSpeed: null,
 		rotationMultiplier: null,
+		maxBalls: null,
 	},
 	playerConfig: {
 		positions: {

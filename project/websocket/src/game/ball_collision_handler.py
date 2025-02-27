@@ -12,11 +12,63 @@ class CollisionHandler:
 
 	def check_collisions(self, ball):
 		if ball.position.y > 0:
-			return  # Only check collisions when ball is at y=0
+			return
 		self._check_boundary_collisions(ball)
 		self._check_player_collisions(ball)
 		self._check_garden_bed_collisions(ball)
 		self._check_goal_collisions(ball)
+		self._check_ball_collisions(ball)
+
+	def _check_ball_collisions(self, ball):
+		balls = self.ball_manager.balls
+		ball_radius = GAME_SETTINGS["collision"]["ballRadius"]
+		total_radius_squared = (2 * ball_radius) ** 2 
+		for other_ball in balls:
+			if ball is other_ball:
+				continue
+			dx = other_ball.position.x - ball.position.x
+			dz = other_ball.position.z - ball.position.z
+			distance_squared = dx**2 + dz**2
+
+			if distance_squared < total_radius_squared:
+				self._resolve_ball_collision(ball, other_ball)
+
+	def _resolve_ball_collision(self, ball1, ball2):
+		dx = ball2.position.x - ball1.position.x
+		dz = ball2.position.z - ball1.position.z
+		distance = math.sqrt(dx**2 + dz**2)
+		if distance == 0:
+			return
+		nx = dx / distance
+		nz = dz / distance
+		dvx = ball2.velocity.x - ball1.velocity.x
+		dvz = ball2.velocity.z - ball1.velocity.z
+		velocity_along_normal = dvx * nx + dvz * nz
+		if velocity_along_normal > 0:
+			return
+		restitution = GAME_SETTINGS["collision"]["restitution"]
+		impulse = (-(1 + restitution) * velocity_along_normal) / 2
+		max_impulse = 5.0
+		impulse = max(-max_impulse, min(impulse, max_impulse))
+		ball1.velocity.x -= impulse * nx
+		ball1.velocity.z -= impulse * nz
+		ball2.velocity.x += impulse * nx
+		ball2.velocity.z += impulse * nz
+		overlap = (2 * GAME_SETTINGS["collision"]["ballRadius"]) - distance
+		separation_bias = GAME_SETTINGS["collision"]["separationBias"]
+		if overlap > 0:
+			correction = (overlap + separation_bias) / 2
+			ball1.position.x -= correction * nx
+			ball1.position.z -= correction * nz
+			ball2.position.x += correction * nx
+			ball2.position.z += correction * nz
+		min_speed = GAME_SETTINGS["ballPhysics"]["minBallSpeed"]
+		for ball in (ball1, ball2):
+			speed = math.sqrt(ball.velocity.x**2 + ball.velocity.z**2)
+			if speed < min_speed:
+				scale = min_speed / (speed + 1e-6)
+				ball.velocity.x *= scale
+				ball.velocity.z *= scale
 
 	def _check_boundary_collisions(self, ball):
 		bounds = self.game.current_bounds
@@ -41,14 +93,14 @@ class CollisionHandler:
 					self._eject_ball_from_collider(ball, player)
 				else:
 					if ball.last_collision_id == player_id:
-						continue  # Avoid repeated deflections
+						continue
 					self._handle_ball_deflection(ball, player)
 			else:
 				if ball.last_collision_id == player_id:
-					ball.last_collision_id = None  # Reset collision ID if no longer colliding
+					ball.last_collision_id = None
 
 	def _eject_ball_from_collider(self, ball, player_position):
-		center_x, center_z = 0, 0  # Assuming center of play area
+		center_x, center_z = 0, 0
 		to_center_x = center_x - ball.position.x
 		to_center_z = center_z - ball.position.z
 		to_center_length = math.sqrt(to_center_x ** 2 + to_center_z ** 2)
