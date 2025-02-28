@@ -45,8 +45,8 @@ It acts as a bridge between players by ensuring real-time communication through 
 - `redis_listener()`: listens for game events from redis and forwards them to Websocket clients
 - `notify_players(room_id, message)`: Sends messages to all players in a room
 - `broadcast_to_room(room_id, message, exclude=None)`: broadcatss a message to all players except the sender
-- `register_player(websocket, room_id, player_id, username)`: registers a player to the room and informs others
-- `unregister_player(websocket, room_id, player_id)`: handles player disconnection cleanup
+- `register_player(websocket, room_id, player_id, username, gameMode)`: registers a player to the room and informs others
+- `unregister_player(websocket, room_id, player_id, gameMode)`: handles player disconnection cleanup
 - `start_game(room_id)`: triggers game start when a room is full
 
 """

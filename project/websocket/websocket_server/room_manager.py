@@ -8,7 +8,7 @@ connected_players = {}  # {room_id: [websocket1, websocket2, ...]}
 """
 register a player in the specified room
 """
-async def register_player(websocket, room_id, player_id, username):
+async def register_player(websocket, room_id, player_id, username, gameMode):
 	if not username:
 		logger.warning(f"Player {player_id} has no username. Rejecting connection.")
 		await websocket.close()
@@ -29,9 +29,10 @@ async def register_player(websocket, room_id, player_id, username):
 			"websocket": websocket,
 			"player_id": player_id,
 			"username": username,
+			"gameMode": gameMode,
 		})
 		logger.info(f"Player {player_id} ({username}) joined room {room_id}.")
-		await notify_players(room_id, {"event": "player_joined", "room_id": room_id, "player_id": player_id, "username": username})
+		await notify_players(room_id, {"event": "player_joined", "room_id": room_id, "player_id": player_id, "username": username, "gameMode": gameMode,})
 
 	#if len(connected_players[room_id]) == MAX_PLAYERS_PER_ROOM:
 	#    from .main import start_game
@@ -41,7 +42,7 @@ async def register_player(websocket, room_id, player_id, username):
 """
 unregister a player and clean up the room if empty, needs more work
 """
-async def unregister_player(websocket, room_id, player_id):
+async def unregister_player(websocket, room_id, player_id, gameMode):
 	if room_id in connected_players:
 		player_to_remove = None
 		for player in connected_players[room_id]:
@@ -57,8 +58,9 @@ async def unregister_player(websocket, room_id, player_id):
 			player_state = {
 				"player_id": player_id,
 				"room_id": room_id,
+				"gameMode": gameMode,
 				"username": player_to_remove["username"]
 			}
 			redis_client.set(f"player_state:{player_id}", json.dumps(player_state))
-			leave_event = {"event": "player_left", "room_id": room_id, "player_id": player_id}
+			leave_event = {"event": "player_left", "room_id": room_id, "player_id": player_id, "gameMode": gameMode}
 			await notify_players(room_id, leave_event)

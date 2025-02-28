@@ -99,12 +99,16 @@ export function setupMatchmaking()
 		    	const username = localStorage.getItem('username');
 		    	if (!username)
 		    		console.error("Username not found");
-		    	const initialRoomData = await findMatch(playerId);
+                const gameMode = localStorage.getItem('gameMode');
+                if(!gameMode)
+                    console.error("GameMode not found");
+
+		    	const initialRoomData = await findMatch(playerId, gameMode);
 		    	const roomId = initialRoomData.room_id;
 		    	roomData.players = initialRoomData.players;
 		    	updateStatusMessage(roomId, roomData.players);
 		    	const ws = WebSocketService.getInstance(); // singleton WebSocket instance
-		    	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);
+		    	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}&gameMode=${gameMode}`);
 		    	//ws.connect(`ws://${window.location.host}/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);// window.location.host does not work need to debug
 		    	ws.registerEvent('start_game', (message) => {
 			    	console.log("Start game event received:", message);
@@ -146,8 +150,8 @@ export function setupMatchmaking()
 
 async function buttonHandler(event) {
     const btnNum = event.target.getAttribute("data-btnNum");
-    localStorage.setItem('gameMode', JSON.stringify([btnNum]));
-    const gameMode = JSON.parse(localStorage.getItem('gameMode'));
+    localStorage.setItem('gameMode', btnNum);
+    const gameMode = localStorage.getItem('gameMode');
     console.log('Game mode set to:', gameMode);
 }
 
@@ -197,12 +201,12 @@ function updateStatusMessage(roomId, players)
 	statusMessage.textContent = `Joined Room ${roomId} with players: ${playerNames}`;
 }
 
-async function findMatch(playerId)
+async function findMatch(playerId, gameMode)
 {
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId }),
+		body: new URLSearchParams({ player_id: playerId, gameMode: gameMode }),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');

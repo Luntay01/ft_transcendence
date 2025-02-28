@@ -7,6 +7,7 @@ class Room(models.Model):
 	is_full		= models.BooleanField(default=False)
 	players		= models.ManyToManyField(User, related_name='rooms')
 	max_players	= models.IntegerField(default=4)
+	gameMode	= models.CharField(max_length=50, default='default')
 	created_at	= models.DateTimeField(auto_now_add=True)
 	objects		= RoomManager()
 
@@ -29,4 +30,5 @@ class Room(models.Model):
 	def clear_room(self) -> None:
 		self.players.clear()
 		self.is_full = False
+		self.gameMode = 'default'
 		self.save()

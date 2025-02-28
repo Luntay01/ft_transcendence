@@ -34,21 +34,31 @@ Returns:
 def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
+	gameMode = request.POST.get('gameMode')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
+	if not gameMode:
+		logger.error("Missing gameMode in request")
+		return HttpResponseBadRequest("gameMode is required")
 	try:
 		player = User.objects.get(id=player_id)
 	except User.DoesNotExist:
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
 	room = Room.objects.available_rooms().first() or Room.objects.create_room()
+
+
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
-	if room.is_full:
+	if room.is_full or room.gameMode != gameMode:
+		if room.gameMode != gameMode:
+			logger.info(f"Room {room.id} does not match the requested gameMode. Creating new room.")
+        	room.gameMode = gameMode
+        	room.save()
 		start_game_payload = {
 			"event": "start_game",
 			"room_id": room.id, 
