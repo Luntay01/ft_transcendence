@@ -158,7 +158,7 @@ class CollisionHandler:
 			if (zone["minX"] <= ball.position.x <= zone["maxX"] and
 				zone["minZ"] <= ball.position.z <= zone["maxZ"]):
 				self.game.player_lives[player_id] -= 1
-				logger.info(f"💀 Player {player_id} lost a life! Remaining: {self.game.player_lives[player_id]}")
+				logger.info(f"Player {player_id} lost a life! Remaining: {self.game.player_lives[player_id]}")
 				self.ball_manager.despawn_ball(ball)
 				event_message = {
 					"event": "ball_despawn",

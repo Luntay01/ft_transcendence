@@ -44,20 +44,13 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent("ball_spawn", (message) => {
-
 		const availableBall = gameLogic.ballPool.find(ball => !ball.active);
-
 		if (availableBall)
 		{
 			availableBall.addBall(message.position, message.velocity);
 			gameLogic.ballMap[message.ball_id] = availableBall;
 			console.log(`Ball spawned and stored with ID: ${message.ball_id}`);
 		}
-		else
-		{
-			console.warn(`⚠️ No available ball in pool! Ball ID: ${message.ball_id}`);
-		}
-		console.log(`🔄 Ball Pool AFTER spawning:`, gameLogic.ballPool.map(b => b.active ? "🟢 Active" : "⚪ Inactive"));
 	});
 
 	wsService.registerEvent("ball_despawn", (message) => {
@@ -68,7 +61,7 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent('start_game_countdown', (message) => {
-		console.log(`⏳ Countdown: ${message.countdown}`);
+		console.log(`Countdown: ${message.countdown}`);
 	});
 
 	wsService.registerEvent('score_update', (message) => {
@@ -83,10 +76,11 @@ export function setupGameWebSocketHandlers(gameLogic)
 			player.flowerPot.deactivate();
 			delete gameLogic.playerMap[message.player_id];
 		}
-	});
-
-	wsService.registerEvent('game_over', (message) => {
-		console.log("Game End Event:", message);
-		//gameLogic.endGame(message.winner);
+		const remainingPlayers = Object.keys(gameLogic.playerMap).length;
+		if (remainingPlayers === 1) {
+			const winnerId = Object.keys(gameLogic.playerMap)[0]; // Get remaining player ID
+			console.log(`Only one player remains. Declaring winner: ${winnerId}`);
+			gameLogic.endGame(winnerId);
+		}
 	});
 }

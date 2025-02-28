@@ -108,6 +108,10 @@ async function loadView(view)
                 const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
             }
+            else if (view === 'game_end') {
+                const { setupEndGameScreen } = await import('./game_end.js');
+                setupEndGameScreen();
+            }
             else if (view === 'profile') {
                 const { setupProfile } = await import('./profile.js');
                 setupProfile();

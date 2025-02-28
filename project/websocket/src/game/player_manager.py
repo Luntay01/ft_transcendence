@@ -28,7 +28,7 @@ async def eliminate_player(self, player_id):
 	for zone_name, zone in self.goal_zones.items():
 		if zone["playerId"] == player_id:
 			zone["playerId"] = None  
-			logger.info(f"🚫 Removed Player {player_id}'s goal zone.")
+			logger.info(f"Removed Player {player_id}'s goal zone.")
 			if zone_name == "bottom":
 				self.current_bounds["maxZ"] = 10
 			elif zone_name == "top":

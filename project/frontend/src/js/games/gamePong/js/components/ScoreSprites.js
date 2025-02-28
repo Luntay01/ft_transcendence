@@ -56,7 +56,7 @@ export function updateScoreText(context, score)
 */
 export function updateScoreText(context, score)
 {
-    console.log(`🎯 Updating score text to: ${score}`);
+    console.log(`Updating score text to: ${score}`);
     const { font, color, canvasSize } = GAME_SETTINGS.scoring.spriteConfig.textConfig;
     context.clearRect(0, 0, canvasSize, canvasSize);
     context.fillStyle = color;

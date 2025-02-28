@@ -6,9 +6,10 @@ from .game_events import start_countdown  # ✅ Moved countdown logic
 from .player_manager import eliminate_player  # ✅ Moved player elimination logic
 
 class Game:
-	def __init__(self, room_id, players):
+	def __init__(self, room_id, players, game_manager):
 		self.room_id = room_id
 		self.players = players
+		self.game_manager = game_manager
 		self.is_active = False
 		self.countdown_finished = False
 		self.elapsed_time = 0
@@ -17,7 +18,7 @@ class Game:
 		self.ball_manager = BallManager(self, room_id, self.player_positions)
 		self.player_lives = {str(player["player_id"]): GAME_SETTINGS["scoring"]["startingScore"] for player in players}
 		self.goal_zones = self._assign_goal_zones()
-		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"]
+		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"].copy()
 		self.countdown_task = None
 
 	def update_player_position(self, player_id, position):
@@ -59,12 +60,18 @@ class Game:
 
 	async def _end_game(self, winner_id):
 		logger.info(f"Game over. Winner: Player {winner_id}")
-		await publish_game_event("game_over", self.room_id, {"winner_id": winner_id})
+		#await publish_game_event("game_over", self.room_id, {"winner_id": winner_id})
 		self.is_active = False
 		self.countdown_finished = False
 		self.player_lives.clear()
 		self.goal_zones.clear()
+		self.ball_manager.stop()
 		self.ball_manager.balls.clear()
+		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"]
+
+		self.game_manager.cleanup_game(self.room_id)
+
+		logger.info(f"Game state cleaned up for Room {self.room_id}.")
 
 	def restore_state(self, state):
 		self.is_active = state.get("is_active", False)
