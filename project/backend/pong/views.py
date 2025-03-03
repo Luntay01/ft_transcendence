@@ -56,7 +56,7 @@ def matchmaking(request):
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
 	if room.is_full or room.gameMode != gameMode:
 		if room.gameMode != gameMode:
-			logger.info(f"Room {room.id} does not match the requested gameMode. Creating new room.")
+			logger.error(f"Room {room.id} does not match the requested gameMode. Creating new room.")
 			room.update_gameMode(gameMode)
 		start_game_payload = {
 			"event": "start_game",

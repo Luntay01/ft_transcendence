@@ -22,13 +22,13 @@ async def handler(websocket, path):
 #grabs room for the room id passed, if exits it iterates through the dictionary to find the rooms existing game mode,
 #if they match it returns the existing one and if not it returns null to tell the handler to setup a different room for that gamemode
 	def get_gameMode(room_id):
-   		room = connected_players.get(room_id, [])
-    	if room:
-        	for player in room:
-            	gameMode = player.get("gameMode")
-            	if gameMode:
-            	    return gameMode
-    	return None
+		room = connected_players.get(room_id, [])
+		if room:
+			for player in room:
+				gameMode = player.get("gameMode")
+				if gameMode:
+					return gameMode
+		return None
 	try:
 		room_id, player_id, username, gameMode = parse_connection_params(path)
 		existingGameMode = get_gameMode(room_id)

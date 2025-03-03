@@ -18,7 +18,7 @@ class Room(models.Model):
 			self.players.add(player)
 			self._update_full_status()
 	def update_gameMode(self, game_mode):
-		if not game_mode == null
+		if not game_mode == null:
 			self.gameMode = game_mode
 		self.save()	
 	def remove_player(self, player: User) -> None:
