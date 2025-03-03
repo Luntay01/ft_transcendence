@@ -3,10 +3,17 @@ import redis
 import logging
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now,  make_aware
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Room
+from .models.match import MatchResult
 from users.models import User
+from django.http import JsonResponse
+from .models import MatchResult
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+from dateutil import parser
 
 logger = logging.getLogger(__name__)
 redis_client = redis.StrictRedis(host='redis', port=6379, decode_responses=True)
@@ -60,18 +67,82 @@ def matchmaking(request):
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)
 
-
 @api_view(['GET'])
 def room_status(request, room_id):
-    try:
-        room = Room.objects.get(id=room_id)
-        data = {
-            "room_id": room.id,
-            "players": [
-                {"player_id": player.id, "username": player.username}
-                for player in room.players.all()
-            ],
-        }
-        return Response(data, status=200)
-    except Room.DoesNotExist:
-        return Response({"error": "Room not found"}, status=404)
+	try:
+		room = Room.objects.get(id=room_id)
+		data = {
+			"room_id": room.id,
+			"players": [
+				{"player_id": player.id, "username": player.username}
+				for player in room.players.all()
+			],
+		}
+		return Response(data, status=200)
+	except Room.DoesNotExist:
+		return Response({"error": "Room not found"}, status=404)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def submit_match_result(request):
+	if request.method != "POST":
+		return Response({"error": "Metod Not Allowed Use POST instead."}, status=405)
+	data = request.data
+	room_id = data.get("room_id")
+	winner_id = data.get("winner_id")
+	player_results = data.get("players")
+	elimination_order = data.get("elimination_order", [])
+	if isinstance(elimination_order, str):
+		try:
+			elimination_order = json.loads(elimination_order)
+		except json.JSONDecodeError:
+			return Response({"error": "Invalid elimination_order format"}, status=400)
+	if not room_id or not winner_id or not player_results:
+		return Response({"error": "Missing required data"}, status=400)
+	try:
+		room = Room.objects.get(id=room_id)
+		winner = User.objects.get(id=winner_id)
+	except (Room.DoesNotExist, User.DoesNotExist):
+		return Response({"error": "Invalid room or winner"}, status=400)
+	match = MatchResult.objects.create(
+		room=room,
+		winner=winner,
+		start_time=make_aware(parser.parse(data.get("start_time", now().isoformat()))),
+		end_time=now(),
+		elimination_order=elimination_order
+	)
+	placement_rewards = [50, 20, 0, -10]
+	for index, player_id in enumerate(reversed(elimination_order)):
+		try:
+			player = User.objects.get(id=player_id)
+			match.players.add(player)
+			change = placement_rewards[min(index, len(placement_rewards) - 1)]
+			player.trophies = max(0, player.trophies + change)
+			player.save()
+			logger.info(f"Updated {player.username}'s trophies by {change}. New total: {player.trophies}")
+		except User.DoesNotExist:
+			return Response({"error": f"Player {player_id} does not exist"}, status=400)
+	match.save()
+	return Response({"message": "Match result stored successfully", "match_id": match.id}, status=201)
+
+@api_view(['GET'])
+def get_match_results(request, winner_id):
+	try:
+		match = MatchResult.objects.filter(winner__id=winner_id).order_by('-end_time').first()
+		if not match:
+			return JsonResponse({"error": "no match found for this player"}, status=404)
+		players = match.players.all().values("id", "username", "trophies")
+		response_data = {
+			"room_id": match.room.id,
+			"winner": {
+				"id": match.winner.id,
+				"username": match.winner.username,
+				"trophies": match.winner.trophies,
+			},
+			"players": list(players),
+			"elimination_order": match.elimination_order,
+		}
+		return JsonResponse(response_data, safe=False)
+	except MatchResult.DoesNotExist:
+		return JsonResponse({"error": "Match not found"}, status=404)

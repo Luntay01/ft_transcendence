@@ -1,9 +1,11 @@
 from .ball_manager import BallManager
 from ..config import logger, GAME_SETTINGS
 import asyncio
-from ..network.redis_utils import publish_game_event  # ✅ New helper function
-from .game_events import start_countdown  # ✅ Moved countdown logic
-from .player_manager import eliminate_player  # ✅ Moved player elimination logic
+import aiohttp #TODO:Might be better to replace this and just publish to redis and then have the backend subscribed to the event
+from datetime import datetime, timezone
+#from ..network.redis_utils import publish_game_event
+from .game_events import start_countdown
+#from .player_manager import eliminate_player
 
 class Game:
 	def __init__(self, room_id, players, game_manager):
@@ -15,6 +17,8 @@ class Game:
 		self.elapsed_time = 0
 		self.last_spawn_interval = 0
 		self.player_positions = {}
+		self.elimination_order = []
+		self.start_time = datetime.utcnow() #TODO:need to chnage this to like self.start_time = datetime.now(timezone.utc) but has to sync with backend
 		self.ball_manager = BallManager(self, room_id, self.player_positions)
 		self.player_lives = {str(player["player_id"]): GAME_SETTINGS["scoring"]["startingScore"] for player in players}
 		self.goal_zones = self._assign_goal_zones()
@@ -60,17 +64,35 @@ class Game:
 
 	async def _end_game(self, winner_id):
 		logger.info(f"Game over. Winner: Player {winner_id}")
-		#await publish_game_event("game_over", self.room_id, {"winner_id": winner_id})
-		self.is_active = False
+		rankings = {player_id: index + 1 for index, player_id in enumerate(reversed(self.elimination_order))}
+		player_results = [
+			{
+				"player_id": player["player_id"],
+				"username": player["username"],
+				"score": self.player_lives[player["player_id"]],
+				"placement": rankings.get(player["player_id"], None)
+			}
+			for player in self.players
+		]
+		match_data = {
+			"room_id": self.room_id,
+			"winner_id": winner_id,
+			"players": player_results,
+			"start_time": self.start_time.isoformat(),
+			"elimination_order": self.elimination_order
+		}
+		async with aiohttp.ClientSession() as session:
+			async with session.post("http://nginx/api/pong/match_results/", json=match_data) as response:
+				response_text = await response.text()
+				logger.info(f"Match results response: {response.status} - {response_text}")
 		self.countdown_finished = False
 		self.player_lives.clear()
 		self.goal_zones.clear()
 		self.ball_manager.stop()
 		self.ball_manager.balls.clear()
 		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"]
-
 		self.game_manager.cleanup_game(self.room_id)
-
+		self.elimination_order = []
 		logger.info(f"Game state cleaned up for Room {self.room_id}.")
 
 	def restore_state(self, state):
