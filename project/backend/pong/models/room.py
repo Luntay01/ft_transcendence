@@ -17,6 +17,10 @@ class Room(models.Model):
 		if self.has_space():
 			self.players.add(player)
 			self._update_full_status()
+	def update_gameMode(self, game_mode):
+		if not game_mode == null
+			self.gameMode = game_mode
+		self.save()	
 	def remove_player(self, player: User) -> None:
 		if self.players.filter(id=player.id).exists():
 			self.players.remove(player)
