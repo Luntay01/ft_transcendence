@@ -80,6 +80,7 @@ async def redis_listener():
 	while True:
 		message = pubsub.get_message(ignore_subscribe_messages=True)
 		if message and message["type"] == "message":
+			logger.debug(f"redis_listener forwarding to websocket, message: {message}")
 			data = json.loads(message["data"])
 			room_id = str(data.get("room_id"))
 			event = data.get("event")

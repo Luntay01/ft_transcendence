@@ -42,11 +42,27 @@ def matchmaking(request):
 		logger.error("Missing gameMode in request")
 		return HttpResponseBadRequest("gameMode is required")
 	try:
+		gameMode = int(gameMode)
+		# TODO: check if gamemode is in the range of possible game modes, if not, bad boy
+	except ValueError:
+		logger.error("gameMode {gameMode} is not a valid game mode (not numeric or outside)")
+		return HttpResponseBadRequest("gameMode is required to be numeric")
+	try:
 		player = User.objects.get(id=player_id)
 	except User.DoesNotExist:
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
 	room = Room.objects.available_rooms().first() or Room.objects.create_room()
+
+# # create a new room with the specified gamemode
+	# room = None
+	# for next in Room.objects.available_rooms():
+	# 	if next.gameMode == gameMode:
+	# 		room = next
+	# 		break
+	# if room == None:
+	# 	room = Room.objects.create_root()
+	# 	room.update_gameMode(gameMode)
 
 
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
@@ -54,16 +70,17 @@ def matchmaking(request):
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
-	if room.is_full or room.gameMode != gameMode:
-		if room.gameMode != gameMode:
-			logger.error(f"Room {room.id} does not match the requested gameMode. Creating new room.")
-			room.update_gameMode(gameMode)
+	if room.gameMode == -1:
+		logger.debug(f"Room {room.id} does not match the requested gameMode {gameMode}. Creating new room.")
+		room.update_gameMode(gameMode)
+	logger.debug(f"Player connected to room: {room.id} on gamemode: {room.gameMode} max_players: {room.max_players} is_full: {room.is_full}")
+	if room.is_full:
 		start_game_payload = {
 			"event": "start_game",
 			"room_id": room.id, 
 			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
 		}
-		#logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
+		logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
 		redis_client.publish("start_game", json.dumps(start_game_payload))
 	response_payload = { 'room_id': room.id, 'is_full': room.is_full, 'players': [{"player_id": player.id, "username": player.username} for player in room.players.all()], }
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")

@@ -16,6 +16,8 @@ async def handler(websocket, path):
 		username = query_params.get("username", [None])[0]
 		gameMode = query_params.get("gameMode",[None])[0]
 
+		# TODO: maybe nicer error raise?
+		gameMode = int(gameMode)
 		if not room_id or not player_id or not username or not gameMode:
 			raise ValueError("Missing room_id, player_id, username or gameMode")
 		return room_id, player_id, username, gameMode
@@ -30,12 +32,13 @@ async def handler(websocket, path):
 					return gameMode
 		return None
 	try:
+
 		room_id, player_id, username, gameMode = parse_connection_params(path)
 		existingGameMode = get_gameMode(room_id)
 		if player_id in [p["player_id"] for p in connected_players.get(room_id, [])]:
 			logger.info(f"Player {player_id} is reconnecting to Room {room_id}")
 		#setup of new room if gamemodes dont match and not reconnecting to old match
-		elif existingGameMode != gameMode:
+		else:
 			await register_player(websocket, room_id, player_id, username, gameMode)
 		async for message in websocket:
 			data = json.loads(message)

@@ -17,7 +17,7 @@ async def notify_players(room_id, message):
 		ws = player["websocket"]
 		if ws.open:
 			await ws.send(json.dumps(message))
-			#logger.debug(f"Sent data to WebSocket: {message}")
+			logger.debug(f"Sent data to WebSocket: {message}")
 
 """
 broadcast a message to all players in the room, excluding the sender
