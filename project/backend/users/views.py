@@ -3,6 +3,7 @@ from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from api.utils import get_tokens_for_user
 from .serializers import UserSerializer
 from .models import User
 from .gmail_service import get_gmail_service, send_email
@@ -50,13 +51,12 @@ class CodeVerifyView(views.APIView):
     permission_classes = [AllowAny]
     def post(self, request, fromat=None):
         user = User.objects.get(email=request.data['email'], provider='Pong')
-        if user.is_verified:
-            return Response({'message': 'Email has been already verified'}, status.HTTP_200_OK)
         verify_code = request.data['verify_code']
         if verify_otp(user, verify_code):
             user.is_verified = True
             user.save()
-            return Response({'message': 'Email verified'}, status.HTTP_200_OK)
+            tokens = get_tokens_for_user(user)
+            return Response(tokens, status.HTTP_200_OK)
         return Response({'error': 'Invalid OTP'}, status.HTTP_401_UNAUTHORIZED)
 
 class MeView(views.APIView):

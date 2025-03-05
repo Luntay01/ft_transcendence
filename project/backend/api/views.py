@@ -10,18 +10,17 @@ def ping(request):
 from .serializers import OauthCodeSerializer
 from rest_framework import views, status
 from rest_framework_simplejwt import views as jwt_views
-from rest_framework_simplejwt import exceptions as jwt_exp
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from users.otp import generate_otp
+from users.gmail_service import get_gmail_service, send_email
 
 from users.models import User
 from users.serializers import UserSerializer
 import requests
 import logging
 import os
+from .utils import get_tokens_for_user
 
 class OauthCodeView(views.APIView):
     permission_classes = [AllowAny]
@@ -102,47 +101,33 @@ class OauthCodeView(views.APIView):
             userializer.save()
 
         # return jwt token
-        post_data = {
-            'provider': '42Oauth',
-            'oauth_user_id': content['id'],
-            'password': access_token,
-        }
-        # The following must be localhost:8000/api/token/ (trailing slash important), as we want the backend to communicate directly with it self
-        response = requests.post("http://localhost:8000/api/token/", data=post_data)
-        return Response(response.json(), status.HTTP_200_OK)
-    
-class TokenObtainPairView(jwt_views.TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
+        user = User.objects.get(provider='42Oauth', oauth_user_id=content['id'])
+        tokens = get_tokens_for_user(user)
+        return Response(tokens, status.HTTP_200_OK)
+
+class LoginView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, format=None):
         if not ('provider' in request.data.keys()):
             return Response({'error': 'Auth provider is not provided'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         provider = request.data['provider']
 
-        if (provider == 'Pong'):
-            user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
-        elif (provider == '42Oauth'):
-            user = User.objects.filter(oauth_user_id=request.data['oauth_user_id'], provider=provider, is_verified=True)
-        else:
+        if (provider != 'Pong'):
             return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
 
         if (user.count() != 1):
             return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        data = request.data
-        _mutable = data._mutable
-        data._mutable = True
-        data['id'] = user.get().id
-        data._mutable = _mutable
-        serializer = self.get_serializer(data=data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except jwt_exp.TokenError as e:
-            raise jwt_exp.InvalidToken(e.args[0])
-        
-         # including the user ID in the response
-        token_response = serializer.validated_data
-        user_instance = user.get()
-        token_response['id'] = user_instance.id  # Add the user ID
-        token_response['username'] = user_instance.username  # Add the username
-
-        return Response(token_response, status=status.HTTP_200_OK)
+        if user.get().mfa == 'Email':
+            verify_code = generate_otp(user.get())
+            service = get_gmail_service()
+            subject = "Verify Email"
+            message = f'This is one-time password for login.\nVerify it within 24 hours.\n\n{verify_code}'
+            send_email(service, user.get().email, subject, message)
+            return Response({'message': 'Email has been sent' }, status=status.HTTP_200_OK)
+        elif user.get().mfa == 'Authenticator':
+            # TODO: implement authenticator
+            return Response({'error': 'Not implemented'}, status.HTTP_501_NOT_IMPLEMENTED)
+        else:
+            return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
