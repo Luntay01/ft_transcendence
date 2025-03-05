@@ -5,8 +5,8 @@ import setupGameElements		from './utils/setupGameElements.js';
 import handleCollisions			from './utils/handleCollisions.js';
 import { setupGameWebSocketHandlers } from './utils/GameWebSocketHandlers.js';
 import { createScoreUI, updateScoreText } from './components/ScoreSprites.js';
-import { GAME_SETTINGS }		from './config.js';
 
+const GAME_SETTINGS = window.GAME_SETTINGS;
 const wsService = WebSocketService.getInstance();
 
 class GameLogic

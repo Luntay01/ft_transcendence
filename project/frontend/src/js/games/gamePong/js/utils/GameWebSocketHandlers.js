@@ -1,5 +1,5 @@
 //import WebSocketService from '../../../../WebSocketService.js';
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 import FertilizerBall from '../components/FertilizerBall.js';
 
 /**

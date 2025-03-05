@@ -1,4 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 import mockUsers from "./mockUsers.js";
 import FlowerPot from '../components/FlowerPot.js';
 

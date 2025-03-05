@@ -2,7 +2,7 @@ import GardenBed from '../components/GardenBed.js';
 import Grass from '../components/Grass.js';
 import FertilizerBall from '../components/FertilizerBall.js';
 import ModelLoader from '../utils/ModelLoader.js';
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 
 /**
  * Loads and sets up game elements like garden beds, grass, and the ball.

@@ -1,4 +1,5 @@
-import { DEBUG, GAME_SETTINGS } from '../config.js';
+const DEBUG = window.GAME_SETTINGS.DEBUG;
+const GAME_SETTINGS = window.GAME_SETTINGS;
 import ColliderManager from '../components/ColliderManager.js';
 import FertilizerBall from '../components/FertilizerBall.js'
 import GardenBed from '../components/GardenBed.js';

@@ -1,4 +1,6 @@
 // Function to handle route changes based on URL fragments
+import { loadGameSettings } from './games/gamePong/js/config.js';
+
 
 let currentView = '';// track the current view
 function handleRoute()
@@ -33,13 +35,19 @@ function disconnectWebSocket()
 }
 
 // Load the correct view when the page loads or the URL changes
-window.addEventListener('load', handleRoute);
-window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', async () => {
+    await loadGameSettings();
+    handleRoute();
+});
 
+//window.addEventListener('load', handleRoute);
+window.addEventListener('hashchange', handleRoute);
 function navigateTo(view)
 {
-    window.location.hash = view;  // This changes the URL hash, triggering the route handling
+	window.location.hash = view;  // This changes the URL hash, triggering the route handling
 }
+window.navigateTo = navigateTo;
+
 
 async function silentRefresh()
 {
