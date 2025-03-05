@@ -4,18 +4,32 @@ let currentView = '';// track the current view
 function handleRoute()
 {
     const newView = window.location.hash.replace('#', '') || 'welcome';
+
+    // Prevent going back to matchmaking from the game screen
+    if (currentView === 'gamePong' && newView === 'game_matchmaking')
+    {
+        console.warn("Skipping matchmaking when exiting game. Redirecting to home.");
+        navigateTo('home');
+        return;
+    }
     if (currentView === 'gamePong' && newView !== 'gamePong')
+    {
+        console.log("Exiting game, disconnecting WebSocket...");
         disconnectWebSocket();
-    else if (currentView === 'matchmaking' && newView !== 'gamePong')
-        disconnectWebSocket();
+    }
     currentView = newView;
     loadView(newView);
 }
+
 function disconnectWebSocket()
 {
     const ws = WebSocketService.getInstance();
     if (ws.isConnected())
+    {
+        console.log("Disconnecting WebSocket...");
+        ws.shouldReconnect = false; // Prevent automatic reconnection
         ws.disconnect();
+    }
 }
 
 // Load the correct view when the page loads or the URL changes
@@ -102,6 +116,10 @@ async function loadView(view)
             else if (view === 'gamePong') {
                 const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
+            }
+            else if (view === 'game_end') {
+                const { setupEndGameScreen } = await import('./game_end.js');
+                setupEndGameScreen();
             }
             else if (view === 'profile') {
                 const { setupProfile } = await import('./profile.js');

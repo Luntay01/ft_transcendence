@@ -1,13 +1,21 @@
-from .room_manager import register_player, unregister_player, connected_players
-from .redis_utils import broadcast_to_room, notify_players
-from .config import logger, MAX_PLAYERS_PER_ROOM
 import json
+from urllib.parse import urlparse, parse_qs
 
-"""
-handle WebSocket connections and manage player-room interactions
+from ..network.room_manager import register_player, unregister_player, connected_players
+from ..network.redis_utils import broadcast_to_room, notify_players
+from ..config import logger, MAX_PLAYERS_PER_ROOM
+from ..game.game_manager import game_manager
+
+"""		Handles a new WebSocket connection.
+- Extracts player and room details from the connection URL.
+- Registers the player if they are not already in the room.
+- Listens for incoming messages and processes them.
+- Handles player disconnection cleanup.
+Args:
+	websocket (WebSocketServerProtocol): The WebSocket connection.
+	path (str): The request path containing query parameters.
 """
 async def handler(websocket, path):
-	from urllib.parse import urlparse, parse_qs
 	def parse_connection_params(path):
 		parsed_path = urlparse(path)
 		query_params = parse_qs(parsed_path.query)
@@ -33,10 +41,15 @@ async def handler(websocket, path):
 	finally:
 		await unregister_player(websocket, room_id, player_id)
 
-
+"""		Processes an incoming event from a WebSocket message.
+- Handles player reconnection.
+- Updates player positions.
+- Broadcasts unhandled events to the entire room.
+Args:
+	data (dict): The parsed WebSocket message data.
+	websocket (WebSocketServerProtocol): The sender WebSocket connection.
+"""
 async def process_incoming_event(data, websocket):
-	from .game_manager import GameManager
-	game_manager = GameManager()
 	event = data.get("event")
 	room_id = data.get("room_id")
 	player_id = data.get("player_id")

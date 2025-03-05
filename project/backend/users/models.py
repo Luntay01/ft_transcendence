@@ -24,6 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	first_name = models.CharField(max_length=128)
 	last_name = models.CharField(max_length=128)
+	trophies = models.IntegerField(default=0)
 
 	is_staff = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)
@@ -39,4 +40,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 		unique_together = ('provider', 'email')
 
 	def __str__(self):
-		return str(self.id)
+		return f"{self.username} (Trophies: {self.trophies})"

@@ -41,7 +41,7 @@ export function createScoreUI(scene, playerCount) {
 	}
 	return scoreSprites;
 }
-
+/*
 export function updateScoreText(context, score)
 {
 	const { font, color, canvasSize } = GAME_SETTINGS.scoring.spriteConfig.textConfig;
@@ -52,4 +52,17 @@ export function updateScoreText(context, score)
 	context.textBaseline = 'middle';
 	// Draw the updated score
 	context.fillText(score.toString(), canvasSize / 2, canvasSize / 2);
+}
+*/
+export function updateScoreText(context, score)
+{
+    console.log(`Updating score text to: ${score}`);
+    const { font, color, canvasSize } = GAME_SETTINGS.scoring.spriteConfig.textConfig;
+    context.clearRect(0, 0, canvasSize, canvasSize);
+    context.fillStyle = color;
+    context.font = font;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    // Draw the updated score
+    context.fillText(score.toString(), canvasSize / 2, canvasSize / 2);
 }

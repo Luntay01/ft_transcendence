@@ -1,12 +1,18 @@
+from .state import connected_players
 from .redis_utils import notify_players
-from .config import logger, MAX_PLAYERS_PER_ROOM, redis_client
+from ..config import logger, MAX_PLAYERS_PER_ROOM, redis_client
 import json
 
-
-connected_players = {}  # {room_id: [websocket1, websocket2, ...]}
-
-"""
-register a player in the specified room
+"""		Registers a player in the specified room.
+- Ensures the player has a username.
+- Checks if the player is reconnecting or joining for the first time.
+- Updates WebSocket reference if reconnecting.
+- Notifies other players in the room about the new player.
+Args:
+	websocket (WebSocketServerProtocol): The player's WebSocket connection.
+	room_id (str): The ID of the room.
+	player_id (str): The player's unique identifier.
+	username (str): The player's username.
 """
 async def register_player(websocket, room_id, player_id, username):
 	if not username:
@@ -33,13 +39,15 @@ async def register_player(websocket, room_id, player_id, username):
 		logger.info(f"Player {player_id} ({username}) joined room {room_id}.")
 		await notify_players(room_id, {"event": "player_joined", "room_id": room_id, "player_id": player_id, "username": username})
 
-	#if len(connected_players[room_id]) == MAX_PLAYERS_PER_ROOM:
-	#    from .main import start_game
-	#    asyncio.create_task(start_game(room_id))
 
-
-"""
-unregister a player and clean up the room if empty, needs more work
+"""		Unregisters a player when they disconnect.
+- Removes the player from the room if they have disconnected.
+- Stores their last known state in Redis for potential reconnection.
+- Notifies other players that they have left.
+Args:
+	websocket (WebSocketServerProtocol): The player's WebSocket connection.
+	room_id (str): The ID of the room.
+	player_id (str): The player's unique identifier.
 """
 async def unregister_player(websocket, room_id, player_id):
 	if room_id in connected_players:
