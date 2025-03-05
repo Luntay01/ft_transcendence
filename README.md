@@ -71,7 +71,6 @@ project/
 ### Token
 | Method | Path | Usage | 
 | ---- | ---- | --- |
-| POST | /api/token | get jwt using email and password|
 | POST | /api/token/refresh | refresh jwt usign refresh token |
 | POST | /api/token/verify | verify acccess token or refresh token |
 | POST | /api/oauth| get jwt using authentication code in Oauth |
