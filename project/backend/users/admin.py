@@ -21,16 +21,16 @@ class UserAdmin(UserAdmin):
     form = UserChangeForm
     model = User
     list_display = (
-        "id", "email", "provider", "oauth_user_id", "username", "picture", "is_verified",
+        "id", "email", "provider", "oauth_user_id", "username", "picture", "is_verified", "mfa",
         "first_name", "last_name", "birth_day", "is_staff", "is_active",
         )
     list_filter = (
-        "id", "email", "provider", "oauth_user_id", "username", "picture", "is_verified",
+        "id", "email", "provider", "oauth_user_id", "username", "picture", "is_verified", "mfa",
         "first_name", "last_name", "birth_day", "is_staff", "is_active"
         )
     fieldsets = (
         (None, {"fields": (
-            "email", "provider", "oauth_user_id", "password", "username", "picture", "is_verified",
+            "email", "provider", "oauth_user_id", "password", "username", "picture", "is_verified", "mfa",
             "first_name", "last_name", "birth_day"
             )}),
         ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
@@ -39,7 +39,7 @@ class UserAdmin(UserAdmin):
         (None, {
             "classes": ("wide",),
             "fields": (
-                "email", "provider", "oauth_user_id", "password1", "password2", "username", "is_verified",
+                "email", "provider", "oauth_user_id", "password1", "password2", "username", "is_verified", "mfa",
                 "first_name", "last_name", "birth_day", "is_staff",
                 "is_active", "groups", "user_permissions"
             )}

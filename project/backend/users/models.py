@@ -24,6 +24,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	otp_secret = models.CharField(max_length=256, null=True)
 	is_verified = models.BooleanField(default=False)
+	MFA = {
+		'Email': 'Email',
+		'Authenticator': 'Authenticator',
+	}
+	mfa = models.CharField(max_length=20, choices=MFA, default='Email')
 	first_name = models.CharField(max_length=128)
 	last_name = models.CharField(max_length=128)
 	trophies = models.IntegerField(default=0)
