@@ -14,7 +14,7 @@ window.addEventListener('load', handleRoute);
 async function handler(code, state) {
 	if (!code || !state) return false;
 
-	const response = await fetch("http://localhost:8000/api/oauth/", {
+	const response = await fetch("/api/oauth/", {
         method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		body: new URLSearchParams({ code, state }),
@@ -24,7 +24,7 @@ async function handler(code, state) {
 	if (response.ok) {
 		localStorage.setItem('access', data.access);
 		localStorage.setItem('refresh', data.refresh);
-		window.location.href = 'http://localhost:3000/#home';
+		window.location.href = '/#home';
 	}
 	return true;
 }

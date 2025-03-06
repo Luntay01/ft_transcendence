@@ -1,3 +1,4 @@
+import { getWebsocketURI } from './utility.js'
 
 /*
  * - retrieves the player's ID from localStorage
@@ -34,7 +35,7 @@ export function setupMatchmaking()
             updateStatusMessage(roomId, roomData.players);
             
             const ws = WebSocketService.getInstance(); // singleton WebSocket instance
-            ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);
+            ws.connect(getWebsocketURI(`/ws/connect?room_id=${roomId}&player_id=${playerId}&username=${username}`));
             
             ws.registerEvent('start_game', (message) => {
                 console.log("Start game event received:", message);
