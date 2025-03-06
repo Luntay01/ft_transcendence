@@ -112,10 +112,39 @@ project/
    DJANGO_DEBUG=1
 
    # 42 Oauth Authorization App
-   # NOTE: secret will expire on 22 Jan 2025
-   CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
-   CLIENT_SECRET=< client secret (*contact developers to get value) >
+   # NOTE: secret is updated every 4 weeks
+   42_CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
+   42_CLIENT_SECRET=< client secret (*contact developers to get value) >
 
    # Websocket/frontend shared volume path
    CONFIG_PATH=/config/settings.json
+
+   # Google Oauth Authorization App for sending email
+   EMAIL_HOST_USER=< email address >
+   EMAIL_HOST_PASSWORD=< password >
+   GOOGLE_CLIENT_ID="915114078666-vlcii0ubsopadru4nln3hap592v3v2q7.apps.googleusercontent.com"
+   GOOGLE_PROJECT_ID="my-project-1511163788942"
+   GOOGLE_CLIENT_SECRET=< client secret (*contact developers to get value) >
+
+   # Test User (optional)
+   DJANGO_TEST_NAME_1=test1
+   DJANGO_TEST_EMAIL_1=test1@example.com
+   DJANGO_TEST_PASSWORD_1=test1
+
+   DJANGO_TEST_NAME_2=test2
+   DJANGO_TEST_EMAIL_2=test2@example.com
+   DJANGO_TEST_PASSWORD_2=test2
+
+   DJANGO_TEST_NAME_3=test3
+   DJANGO_TEST_EMAIL_3=test3@example.com
+   DJANGO_TEST_PASSWORD_3=test3
    ```
+
+# Email Setup
+1. Make sure to add environment variables in `.env` for Google Oauth.
+
+2. Get credential token by accessing the url displayed in console and login with `EMAIL_HOST_USER` user.
+   ![alt text](./pictures/google_oauth_url_sample.png)
+   *url is displayed when app makes an attempts to send an email
+   <br>
+   *token expires a week after creation
