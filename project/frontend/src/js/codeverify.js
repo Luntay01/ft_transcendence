@@ -1,4 +1,11 @@
 export function setupCodeVerifyForm() {
+    if (localStorage.getItem('qrcode')) {
+        let img = document.createElement('img');
+        img.src = 'data:image/png;base64,' + localStorage.getItem('qrcode');
+        img.alt = 'QR Code';
+        img.width = 200;
+        document.getElementById('qrcode').appendChild(img);
+    }
     const form = document.getElementById('verifyForm');
     form.addEventListener('submit', async (event) => {
         event.preventDefault();

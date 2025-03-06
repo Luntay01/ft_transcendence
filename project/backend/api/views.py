@@ -20,7 +20,7 @@ from users.serializers import UserSerializer
 import requests
 import logging
 import os
-from .utils import get_tokens_for_user
+from .utils import get_tokens_for_user, get_image_b64, get_auth_url
 
 class OauthCodeView(views.APIView):
     permission_classes = [AllowAny]
@@ -125,9 +125,9 @@ class LoginView(views.APIView):
             subject = "Verify Email"
             message = f'This is one-time password for login.\nVerify it within 24 hours.\n\n{verify_code}'
             send_email(service, user.get().email, subject, message)
-            return Response({'message': 'Email has been sent' }, status=status.HTTP_200_OK)
+            return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
         elif user.get().mfa == 'Authenticator':
-            # TODO: implement authenticator
-            return Response({'error': 'Not implemented'}, status.HTTP_501_NOT_IMPLEMENTED)
+            image = get_image_b64(get_auth_url(user.get()))
+            return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
