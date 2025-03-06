@@ -5,11 +5,22 @@
         "format": "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
     },
     "ballPhysics": {
-        "initialVelocity": { "x": 1.5, "y": 0, "z": 1.2 },
+        "initialVelocity": { "x": 3, "y": 0, "z": 3 },
         "bounds": { "minX": -15, "maxX": 15, "minZ": -15, "maxZ": 15 },
         "scale": 0.9,
         "maxSpeed": 20,
-        "rotationMultiplier": 1.0
+        "minBallSpeed": 1.5,
+        "rotationMultiplier": 1.0,
+        "maxBalls": 5
+    },
+    "ballSpawnPoints": {
+        "topLeft": { "x": -14, "y": 4, "z": -14 },
+        "topRight": { "x": 14, "y": 4, "z": -14 },
+        "bottomLeft": { "x": -14, "y": 4, "z": 14 },
+        "bottomRight": { "x": 14, "y": 4, "z": 14 }
+    },
+    "ballSpawn": {
+          "delay": 1.5
     },
     "playerConfig": {
         "positions": {
@@ -34,10 +45,20 @@
         "reboundFactor": 1.1,
         "dampingFactor": 1.01,
         "minimumSpeed": 1.0,
-        "ejectForce": 5.0
+        "influenceFactor": 0.5,
+        "ejectForce": 5.0,
+        "restitution": 0.8,
+        "separationBias": 0.05,
+        "collisionDetectionInterval": 0.02
     },
     "scoring": {
-        "startingScore": 15,
+        "startingScore": 1,
+        "goalZones": {
+            "bottom": { "minX": -11, "maxX": 11, "minZ": 13, "maxZ": 15, "playerId": null },
+            "top": { "minX": -11, "maxX": 11, "minZ": -15, "maxZ": -13, "playerId": null },
+            "left": { "minX": -15, "maxX": -13, "minZ": -11, "maxZ": 11, "playerId": null },
+            "right": { "minX": 13, "maxX": 15, "minZ": -11, "maxZ": 11, "playerId": null }
+        },
         "spriteConfig": {
             "radius": 40,
             "textSize": 100,

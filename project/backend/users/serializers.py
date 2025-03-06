@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'password', 'username', 'picture', 
-            'first_name', 'last_name', 'birth_day', 'provider', 'oauth_user_id',
+            'first_name', 'last_name', 'birth_day', 'provider', 'oauth_user_id', 'trophies',
             ]
         extra_kwargs = {
             'id': {
@@ -30,6 +30,8 @@ class UserSerializer(serializers.ModelSerializer):
             'oauth_user_id': {
                 'required': False,
             },
+            'trophies': {
+                'read_only': True},
         }
     
     # override to hash password

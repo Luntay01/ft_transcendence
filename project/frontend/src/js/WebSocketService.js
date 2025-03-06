@@ -72,7 +72,7 @@ class WebSocketService
 				this.send("reconnect", { player_id: playerId, room_id: roomId });
 			}
 		};
-
+/*
 		this.ws.onmessage = (event) => {
 			const message = JSON.parse(event.data);
 			const eventType = typeof message.event === "string" ? message.event : message.event.event;
@@ -81,6 +81,37 @@ class WebSocketService
 				return;
 			}
 			handlers.forEach((handler) => handler(message));
+		};
+*/
+		this.ws.onmessage = (event) => {
+			try {
+				const message = JSON.parse(event.data);
+				const eventType = typeof message.event === "string" ? message.event : message.event?.event;
+				if (eventType === "player_reconnected" && this.isReconnecting) {
+					console.log("Ignoring player_reconnected event during reconnection...");
+					return;
+				}
+				const handlers = this.eventHandlers.get(eventType) || [];
+				if (!Array.isArray(handlers)) {
+					console.warn(`Event handlers for '${eventType}' is not an array! Resetting.`);
+					this.eventHandlers.set(eventType, []);
+					return;
+				}
+				handlers.forEach((handler) => {
+					try
+					{
+						handler(message);
+					}
+					catch (error)
+					{
+						console.error(`Error in handler for event '${eventType}':`, error);
+					}
+				});
+			}
+			catch (error)
+			{
+				console.error("Error processing WebSocket message:", error);
+			}
 		};
 
 		this.ws.onclose = (event) => {
@@ -145,6 +176,12 @@ class WebSocketService
 			this.ws.send(JSON.stringify({ event, ...data }));
 		else
 			console.error("WebSocket is not connected.");
+	}
+
+	unregisterAllEvents()
+	{
+		console.log("Unregistering all WebSocket event handlers...");
+		//this.eventHandlers = {};
 	}
 }
 

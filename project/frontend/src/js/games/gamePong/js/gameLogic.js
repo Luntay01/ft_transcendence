@@ -71,6 +71,10 @@ class GameLogic
 		}
 		const playerCount = this.players.length;
 		this.scoreSprites = createScoreUI(this.uiScene, playerCount);
+		const startingScore = GAME_SETTINGS.scoring.startingScore;
+		this.players.forEach(player => {
+			this.updatePlayerScore(player.playerId, startingScore);
+		});
 		console.log('GameLogic: Initialization complete.');
 	}
 
@@ -114,14 +118,63 @@ class GameLogic
 			ball.velocity.setLength(minimumSpeed);
 	}
 
-	updatePlayerScore(playerIndex, newScore)
+	updatePlayerScore(playerId, newScore)
 	{
-		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length)
+		const playerIndex = this.players.findIndex(player => String(player.playerId) === String(playerId));
+		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length) {
+			console.warn(`Failed to update score: Invalid playerIndex (${playerIndex}) for playerId (${playerId})`);
 			return;
+		}
 		const { context, texture } = this.scoreSprites[playerIndex];
 		updateScoreText(context, newScore);
 		texture.needsUpdate = true;
 	}
+
+
+	cleanup()
+	{
+		console.log("Cleaning up game state...");
+		//if (this.animationFrame) {
+		//	cancelAnimationFrame(this.animationFrame);
+		//	this.animationFrame = null;
+		//}
+		const ws = WebSocketService.getInstance();
+		if (ws.isConnected()) {
+			ws.disconnect();
+		}
+		ws.unregisterAllEvents();
+		this.ballPool.forEach(ball => ball.deactivate());
+		this.ballMap = {};
+		this.objects.forEach(obj => this.scene.remove(obj));
+		this.objects = [];
+		this.uiScene.children.forEach(obj => this.uiScene.remove(obj));
+		this.players = [];
+		this.playerMap = {};
+		localStorage.removeItem('roomId');
+		localStorage.removeItem('players');
+		console.log("Cleanup complete.");
+	}
+
+
+	endGame(winnerId)
+	{
+		const winner = this.playerMap[winnerId]; // Get the winner object
+		if (winner)
+		{
+			localStorage.setItem("gameWinner", winnerId);
+			localStorage.setItem("gameWinnerName", winner.name); // Store `name` instead of `username`
+		}
+		else
+		{
+			console.warn("Winner not found in playerMap. Defaulting to ID only.");
+			localStorage.setItem("gameWinner", winnerId);
+		}
+	
+		this.cleanup();
+		navigateTo('game_end');
+	}
+	
+
 }
 
 export default GameLogic;

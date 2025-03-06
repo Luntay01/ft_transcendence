@@ -17,6 +17,7 @@ class FlowerPot
 		this.lastSentPosition = null;
 		this.movementAxis = null;
 		this.movementMultiplier = null;
+		this.isActive = true;
 	}
 
 	async loadModel(path)
@@ -35,6 +36,13 @@ class FlowerPot
 		});
 		this.playAnimation('Neutural');
 		return this.model;
+	}
+
+	deactivate() {
+		if (this.model) {
+			this.model.visible = false;
+		}
+		this.isActive = false;
 	}
 
 	playAnimation(actionName, postAnimationNeutral = false, speed = 1.0)

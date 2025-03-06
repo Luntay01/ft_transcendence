@@ -29,22 +29,22 @@ export function setupGameWebSocketHandlers(gameLogic)
 			player.flowerPot.updateState(direction, isMoving);
 	});
 
- 	wsService.registerEvent('ball_update', (message) => {
-		const ball = gameLogic.ballMap[message.ball_id];
+	wsService.registerEvent('ball_updates', (message) => {
+		message.balls.forEach((ballData) => {
+			const ball = gameLogic.ballMap[ballData.ball_id];
+			if (ball)
+				ball.updateFromServer({ position: ballData.position, velocity: ballData.velocity });
+		});
+	});
 
+	wsService.registerEvent('ball_update', (message) => {
+		const ball = gameLogic.ballMap[message.ball_id];
 		if (ball)
-		{
-			ball.updateFromServer({
-				position: message.position,
-				velocity: message.velocity
-			});
-		}
+			ball.updateFromServer({ position: message.position, velocity: message.velocity });
 	});
 
 	wsService.registerEvent("ball_spawn", (message) => {
-
 		const availableBall = gameLogic.ballPool.find(ball => !ball.active);
-
 		if (availableBall)
 		{
 			availableBall.addBall(message.position, message.velocity);
@@ -53,8 +53,15 @@ export function setupGameWebSocketHandlers(gameLogic)
 		}
 	});
 
+	wsService.registerEvent("ball_despawn", (message) => {
+		const ball = gameLogic.ballMap[message.ball_id];
+		if (ball)
+			ball.deactivate();
+		gameLogic.updatePlayerScore(message.player_id, message.remaining_lives);
+	});
+
 	wsService.registerEvent('start_game_countdown', (message) => {
-		console.log(`⏳ Countdown: ${message.countdown}`);
+		console.log(`Countdown: ${message.countdown}`);
 	});
 
 	wsService.registerEvent('score_update', (message) => {
@@ -62,8 +69,18 @@ export function setupGameWebSocketHandlers(gameLogic)
 		gameLogic.updateScore(message.scores);
 	});
 
-	wsService.registerEvent('game_end', (message) => {
-		console.log("Game End Event:", message);
-		gameLogic.endGame(message.winner);
+	wsService.registerEvent("player_eliminated", (message) => {
+		console.log(`Player ${message.player_id} eliminated! Removing flowerpot...`);
+		const player = gameLogic.playerMap[message.player_id];
+		if (player) {
+			player.flowerPot.deactivate();
+			delete gameLogic.playerMap[message.player_id];
+		}
+		const remainingPlayers = Object.keys(gameLogic.playerMap).length;
+		if (remainingPlayers === 1) {
+			const winnerId = Object.keys(gameLogic.playerMap)[0]; // Get remaining player ID
+			console.log(`Only one player remains. Declaring winner: ${winnerId}`);
+			gameLogic.endGame(winnerId);
+		}
 	});
 }

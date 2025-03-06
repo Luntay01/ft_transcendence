@@ -1,5 +1,71 @@
-from .config import logger
+from ..config import logger, update_logger
 from .game import Game
+from .game_state_manager import game_state_manager
+
+""" 
+	Manages game creation, updates, and overall game state. 
+	This class ensures all game sessions are properly managed and updated in real-time.
+"""
+class GameManager:
+	_instance = None
+
+	def __new__(cls, *args, **kwargs):
+		if cls._instance is None:
+			cls._instance = super().__new__(cls)
+			cls._instance.__initialized = False
+		return cls._instance
+
+	def __init__(self):
+		if self.__initialized:
+			return
+		self.__initialized = True
+		self.games = {}
+
+	def create_game(self, room_id, players):
+		room_id = str(room_id)
+		if room_id not in self.games:
+			self.games[room_id] = Game(room_id, players, self)
+			logger.info(f"Created game for Room {room_id}.")
+			saved_state = game_state_manager.load_game_state(room_id)
+			if saved_state and saved_state.get("is_active", False):
+				logger.info(f"Restoring previous game state for Room {room_id}.")
+				self.games[room_id].restore_state(saved_state)
+		else:
+			logger.warning(f"Game for Room {room_id} already exists.")
+
+	def start_game(self, room_id):
+		room_id = str(room_id)
+		logger.info(f"Starting game for Room {room_id}...")
+		game = self.games.get(room_id)
+		if game:
+			game.start()
+			logger.info(f"Game started in Room {room_id}.")
+		else:
+			logger.error(f"No game found for Room {room_id} to start.")
+
+	def update_games(self, delta_time):
+		for game in self.games.values():
+			game.update(delta_time)
+
+	def cleanup_game(self, room_id):
+		if room_id in self.games:
+			self.games[room_id].ball_manager.stop()
+			del self.games[room_id]
+			logger.info(f"Game state for Room {room_id} removed.")
+			game_state_manager.clear_game_state(room_id)
+
+game_manager = GameManager()
+
+
+
+
+
+
+
+"""
+from ..config import logger, redis_client
+from .game import Game
+from ..network.room_manager import connected_players
 import time
 
 class GameManager:
@@ -34,7 +100,6 @@ class GameManager:
 			logger.error(f"no game found for room {room_id} to start.")
 
 	def update_games(self, delta_time):
-		from .room_manager import connected_players
 		inactive_rooms = []
 		current_time = time.time()
 		for room_id, game in self.games.items():
@@ -56,7 +121,6 @@ class GameManager:
 			self.cleanup_game(room_id)
 
 	def cleanup_game(self, room_id):
-		from .config import redis_client
 		if room_id in self.games:
 			self.games[room_id].ball_manager.stop()
 			del self.games[room_id]
@@ -66,3 +130,6 @@ class GameManager:
 		if room_id in self.room_cleanup_timers:
 			del self.room_cleanup_timers[room_id]
 			logger.info(f"Cleanup timer for Room {room_id} removed.")
+
+game_manager = GameManager()
+"""

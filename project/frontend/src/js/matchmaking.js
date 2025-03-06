@@ -1,4 +1,3 @@
-//import WebSocketService from './WebSocketService.js';
 
 /*
  * - retrieves the player's ID from localStorage
@@ -8,9 +7,9 @@
  * - listens for WebSocket events like `start_game` and navigates to the game screen
  * - handles errors and updates the UI accordingly
  */
-
 let roomStatusInterval = null;
 /*
+
 export function setupMatchmaking()
 {
     const statusMessage = document.getElementById('statusMessage');
@@ -213,3 +212,4 @@ async function findMatch(playerId, gameMode)
 	const data = await response.json();
 	return data;
 }
+
