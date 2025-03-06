@@ -1,3 +1,5 @@
+import { loadGameSettings } from './games/gamePong/js/config.js';
+
 export async function setupHome() {
 	const userinfo = document.getElementById('userinfo');
 	const access = localStorage.getItem('access');
@@ -32,3 +34,23 @@ export async function setupHome() {
 		console.error('Fail to fetch user information:', error);
 	}
 }
+
+function updateGameMode(mode)
+{
+	localStorage.setItem("gameMode", mode);
+	window.GAME_SETTINGS.gameMode = mode;
+	console.log(`Game mode updated to: ${mode}`);
+	const buttons = document.querySelectorAll(".btn-group button");
+	buttons.forEach(button => button.classList.remove("active"));
+	const selectedButton = document.getElementById(`btn-${mode}`);
+	if (selectedButton)
+		selectedButton.classList.add("active");
+	console.log(`Game mode set to: ${mode}`, window.GAME_SETTINGS);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+	const mode = localStorage.getItem("gameMode") || "4-player";
+	updateGameMode(mode);
+});
+
+window.updateGameMode = updateGameMode;

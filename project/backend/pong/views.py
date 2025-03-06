@@ -41,6 +41,7 @@ Returns:
 def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
+	game_mode = request.POST.get('gameMode', '4-player')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
@@ -49,7 +50,10 @@ def matchmaking(request):
 	except User.DoesNotExist:
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
-	room = Room.objects.available_rooms().first() or Room.objects.create_room()
+	max_players = 2 if game_mode == "2-player" else 4
+	room = Room.objects.available_rooms(max_players).first()
+	if not room:
+		room = Room.objects.create_room(max_players=max_players)
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
@@ -60,10 +64,16 @@ def matchmaking(request):
 			"event": "start_game",
 			"room_id": room.id, 
 			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
+			"gameMode": game_mode,
 		}
 		#logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
 		redis_client.publish("start_game", json.dumps(start_game_payload))
-	response_payload = { 'room_id': room.id, 'is_full': room.is_full, 'players': [{"player_id": player.id, "username": player.username} for player in room.players.all()], }
+	response_payload = {
+		'room_id': room.id,
+		'is_full': room.is_full,
+		'players': [{"player_id": p.id, "username": p.username} for p in room.players.all()],
+		'gameMode': game_mode,
+	}
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)
 

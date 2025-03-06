@@ -126,7 +126,7 @@ async function findMatch(playerId)
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId }),
+		body: new URLSearchParams({ player_id: playerId, gameMode: localStorage.getItem('gameMode') || '4-player'}),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');
