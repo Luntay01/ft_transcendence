@@ -9,7 +9,6 @@
  */
 let roomStatusInterval = null;
 /*
-
 export function setupMatchmaking()
 {
     const statusMessage = document.getElementById('statusMessage');
