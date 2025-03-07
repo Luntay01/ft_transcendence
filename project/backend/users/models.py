@@ -3,6 +3,7 @@ from django.core.validators import EmailValidator
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
+import pyotp
 
 from .managers import UserManager
 # Create your models here.
@@ -22,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	username = models.CharField(max_length=256, unique=True)
 	picture = models.ImageField(upload_to='images/', default='images/default.png')
 
-	otp_secret = models.CharField(max_length=256, null=True)
+	otp_secret = models.CharField(max_length=256, default=pyotp.random_base32)
 	is_verified = models.BooleanField(default=False)
 	MFA = {
 		'Email': 'Email',
