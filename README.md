@@ -116,8 +116,8 @@ project/
 
    # 42 Oauth Authorization App
    # NOTE: secret is updated every 4 weeks
-   42_CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
-   42_CLIENT_SECRET=< client secret (*contact developers to get value) >
+   CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
+   CLIENT_SECRET=< client secret (*contact developers to get value) >
 
    # Websocket/frontend shared volume path
    CONFIG_PATH=/config/settings.json
