@@ -68,14 +68,17 @@ project/
 - **Docker** for containerization
 
 ## API endpoint
-### Token
+### Application Service
 | Method | Path | Usage | 
 | ---- | ---- | --- |
+| POST | /api/codeverify | verify code in MFA |
+| POST | /api/login | login by email and password |
+| POST | /api/signup | signup a user and send verification mail |
+| POST | /api/oauth| get jwt using authentication code in Oauth |
 | POST | /api/token/refresh | refresh jwt usign refresh token |
 | POST | /api/token/verify | verify acccess token or refresh token |
-| POST | /api/oauth| get jwt using authentication code in Oauth |
 
-### User
+### User Model
 | Method | Path | Loigin required | Usage | 
 | ----  | ---- | ---- | --- |
 | GET   | /api/users/ | Y | list all users' data |

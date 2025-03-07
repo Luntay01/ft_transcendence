@@ -30,6 +30,7 @@ def get_gmail_service():
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
+        #TODO: run local server when cred expired
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:

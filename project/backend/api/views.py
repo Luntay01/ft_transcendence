@@ -9,18 +9,72 @@ def ping(request):
 
 from .serializers import OauthCodeSerializer
 from rest_framework import views, status
-from rest_framework_simplejwt import views as jwt_views
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from users.otp import generate_otp
-from users.gmail_service import get_gmail_service, send_email
+from .otp import generate_otp, verify_otp
+from .gmail_service import get_gmail_service, send_email
+from .utils import get_tokens_for_user, get_image_b64, get_auth_url
 
 from users.models import User
 from users.serializers import UserSerializer
+from users.views import UserView
 import requests
 import logging
 import os
-from .utils import get_tokens_for_user, get_image_b64, get_auth_url
+
+class CodeVerifyView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, fromat=None):
+        user = User.objects.get(email=request.data['email'], provider='Pong')
+        verify_code = request.data['verify_code']
+        if verify_otp(user, verify_code):
+            user.is_verified = True
+            user.save()
+            tokens = get_tokens_for_user(user)
+            return Response(tokens, status.HTTP_200_OK)
+        return Response({'error': 'Invalid OTP'}, status.HTTP_401_UNAUTHORIZED)
+
+class LoginView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, format=None):
+        if not ('provider' in request.data.keys()):
+            return Response({'error': 'Auth provider is not provided'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        provider = request.data['provider']
+
+        if (provider != 'Pong'):
+            return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
+
+        if (user.count() != 1):
+            return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if user.get().mfa == 'Email':
+            verify_code = generate_otp(user.get())
+            service = get_gmail_service()
+            subject = "Verify Email"
+            message = f'This is one-time password for login.\nVerify it within 24 hours.\n\n{verify_code}'
+            send_email(service, user.get().email, subject, message)
+            return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
+        elif user.get().mfa == 'Authenticator':
+            image = get_image_b64(get_auth_url(user.get()))
+            return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SignupView(views.APIView):
+    permission_classes = [AllowAny]
+    def verify_email(self, address):
+        service = get_gmail_service()
+        subject = "Verify Email"
+        user = User.objects.get(email=address, provider='Pong')
+        message = f'This is one-time password.\nVerify it within 24 hours.\n\n{generate_otp(user)}'
+        send_email(service, address, subject, message)
+        return
+    
+    def post(self, request, format=None):
+        UserView().post(request)
+        self.verify_email(request.data['email'])
+        return Response({'message': 'Verification email has been sent'}, status.HTTP_201_CREATED)
 
 class OauthCodeView(views.APIView):
     permission_classes = [AllowAny]
@@ -104,30 +158,3 @@ class OauthCodeView(views.APIView):
         user = User.objects.get(provider='42Oauth', oauth_user_id=content['id'])
         tokens = get_tokens_for_user(user)
         return Response(tokens, status.HTTP_200_OK)
-
-class LoginView(views.APIView):
-    permission_classes = [AllowAny]
-    def post(self, request, format=None):
-        if not ('provider' in request.data.keys()):
-            return Response({'error': 'Auth provider is not provided'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        provider = request.data['provider']
-
-        if (provider != 'Pong'):
-            return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
-
-        if (user.count() != 1):
-            return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        if user.get().mfa == 'Email':
-            verify_code = generate_otp(user.get())
-            service = get_gmail_service()
-            subject = "Verify Email"
-            message = f'This is one-time password for login.\nVerify it within 24 hours.\n\n{verify_code}'
-            send_email(service, user.get().email, subject, message)
-            return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
-        elif user.get().mfa == 'Authenticator':
-            image = get_image_b64(get_auth_url(user.get()))
-            return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)

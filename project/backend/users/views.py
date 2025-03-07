@@ -3,25 +3,14 @@ from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.utils import get_tokens_for_user
 from .serializers import UserSerializer
 from .models import User
-from .gmail_service import get_gmail_service, send_email
-from .otp import generate_otp, verify_otp
 
 class UserView(views.APIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [AllowAny()]
         return [IsAuthenticated()]
-    
-    def verify_email(self, address):
-        service = get_gmail_service()
-        subject = "Verify Email"
-        user = User.objects.get(email=address, provider='Pong')
-        message = f'This is one-time password.\nVerify it within 24 hours.\n\n{generate_otp(user)}'
-        send_email(service, address, subject, message)
-        return
     
     def get(self, request, format=None):
         users = User.objects.all()
@@ -35,8 +24,6 @@ class UserView(views.APIView):
         if not (serializer.is_valid()):
             return Response({'error', 'Data is invalid. Failed to create user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
         serializer.save()
-        # send verification mail
-        self.verify_email(serializer.data['email'])
         return Response(serializer.data, status.HTTP_201_CREATED)
 
     def patch(self, request):
@@ -46,18 +33,6 @@ class UserView(views.APIView):
             return Response({'error': 'Data is invalid. Failded to update user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
-
-class CodeVerifyView(views.APIView):
-    permission_classes = [AllowAny]
-    def post(self, request, fromat=None):
-        user = User.objects.get(email=request.data['email'], provider='Pong')
-        verify_code = request.data['verify_code']
-        if verify_otp(user, verify_code):
-            user.is_verified = True
-            user.save()
-            tokens = get_tokens_for_user(user)
-            return Response(tokens, status.HTTP_200_OK)
-        return Response({'error': 'Invalid OTP'}, status.HTTP_401_UNAUTHORIZED)
 
 class MeView(views.APIView):
     def get(self, request, format=None):
