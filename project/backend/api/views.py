@@ -67,7 +67,7 @@ class SignupView(views.APIView):
         service = get_gmail_service()
         subject = "Verify Email"
         user = User.objects.get(email=address, provider='Pong')
-        message = f'This is one-time password.\nVerify it within 24 hours.\n\n{generate_otp(user)}'
+        message = f'This is one-time password.\nPlease verify it within 5 minutes.\n\n{generate_otp(user)}'
         send_email(service, address, subject, message)
         return
     
