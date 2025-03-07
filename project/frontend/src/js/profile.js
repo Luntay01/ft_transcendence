@@ -13,7 +13,7 @@ export async function setupProfile() {
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
-			let src = `/${img}`;
+			let src = `${img}`;
 			let width = '250px';
 			let height = '250px';
 			usernameInfo.innerHTML = 

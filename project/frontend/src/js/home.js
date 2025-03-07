@@ -12,7 +12,7 @@ export async function setupHome() {
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
-			let src = `/${img}`;
+			let src = `${img}`;
 			let width = '50px';
 			let height = '50px';
 			userinfo.innerHTML = 
