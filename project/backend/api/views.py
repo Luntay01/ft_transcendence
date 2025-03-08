@@ -29,6 +29,7 @@ class OauthCodeView(views.APIView):
     def post(self, request):
         CLIENT_ID = os.environ.get('CLIENT_ID')
         CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+        HOST_URI = os.environ.get('HOST_PROTOCOL') + '://' + os.environ.get('HOST_DOMAIN') + ':' + os.environ.get('HOST_PORT')
         serializer = OauthCodeSerializer(data=request.data)
         if not (serializer.is_valid()):
             return Response(status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -41,7 +42,7 @@ class OauthCodeView(views.APIView):
             'code': code,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
-            'redirect_uri': 'http://localhost:3000/callback',
+            'redirect_uri': HOST_URI + '/callback', 
             'state': state,
             }
         response = requests.post("https://api.intra.42.fr/oauth/token/", data=post_data)
@@ -81,6 +82,7 @@ class OauthCodeView(views.APIView):
             'oauth_user_id': content['id'],
             'password': access_token,
         }
+        # The following must be localhost:8000/api/token/ (trailing slash important), as we want the backend to communicate directly with it self
         response = requests.post("http://localhost:8000/api/token/", data=post_data)
         return Response(response.json(), status.HTTP_200_OK)
     
