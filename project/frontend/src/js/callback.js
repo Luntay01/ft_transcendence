@@ -26,5 +26,9 @@ async function handler(code, state) {
 		localStorage.setItem('refresh', data.refresh);
 		window.location.href = '/#home';
 	}
+	else
+	{
+		console.error(data);
+	}
 	return true;
 }
