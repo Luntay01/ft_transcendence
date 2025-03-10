@@ -16,6 +16,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
 from users.serializers import UserSerializer
@@ -41,11 +42,13 @@ class OauthCodeView(views.APIView):
             'code': code,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
-            'redirect_uri': 'http://localhost:3000/callback',
+            'redirect_uri': 'http://localhost/',
             'state': state,
             }
         response = requests.post("https://api.intra.42.fr/oauth/token/", data=post_data)
 
+        if (not response.ok):
+            return Response(response.json(), status.HTTP_500_INTERNAL_SERVER_ERROR)
         access_token = response.json()['access_token']
         headers = {'Authorization': f'Bearer {access_token}'}
         response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
@@ -75,15 +78,18 @@ class OauthCodeView(views.APIView):
                 logging.warning("input is not valid")
             userializer.save()
 
+        user: User = User.objects.get(username=content['login'])
+
         # return jwt token
-        post_data = {
-            'provider': '42Oauth',
-            'oauth_user_id': content['id'],
-            'password': access_token,
+        refresh = RefreshToken.for_user(user)
+        token_response = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'id': user.id,
+            'username': user.username
         }
-        response = requests.post("http://localhost:8000/api/token/", data=post_data)
-        return Response(response.json(), status.HTTP_200_OK)
-    
+        return JsonResponse(token_response)
+
 class TokenObtainPairView(jwt_views.TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         if not ('provider' in request.data.keys()):

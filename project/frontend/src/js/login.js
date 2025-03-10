@@ -19,7 +19,7 @@ export function setupLoginForm() {
         const provider = 'Pong';
 
         try {
-            const response = await fetch('http://localhost:8000/api/token/', {
+            const response = await fetch('/api/token/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email, password, provider }),
@@ -50,8 +50,9 @@ export function setupLoginForm() {
     oauthForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const clientId = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38";
-        const redirectUrl = encodeURI("http://localhost:3000/callback");
+        const redirectUrl = encodeURI("http://localhost/");
         const state = generateState(20);
+        localStorage.setItem('auth_request_state', state);
         const url = `https://api.intra.42.fr/oauth/authorize?` + 
             `client_id=${clientId}&` +
             `redirect_uri=${redirectUrl}&` +
