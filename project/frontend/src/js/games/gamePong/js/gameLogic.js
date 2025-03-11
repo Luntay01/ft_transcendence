@@ -27,7 +27,7 @@ class GameLogic
 		this.players = [];
 		this.playerMap = {};
 		this.currentPlayer = null;
-		this.gameMode = localStorage.getItem('gameMode');
+		this.game_type = localStorage.getItem('game_type');
 
 		this.uiScene = new THREE.Scene();
 		this.uiCamera = new THREE.OrthographicCamera(
@@ -44,7 +44,7 @@ class GameLogic
 
 	async init()
 	{
-		console.log('Game mode init:', this.gameMode);
+		console.log('Game type init:', this.game_type);
 		console.log('GameLogic: Initializing...');
 		setupLighting(this.scene);
 		await setupGameElements(this.scene, this.objects, this.ballPool);

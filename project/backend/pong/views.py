@@ -41,19 +41,19 @@ Returns:
 def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
-	gameMode = request.POST.get('gameMode')
+	game_type = request.POST.get('game_type')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
-	if not gameMode:
-		logger.error("Missing gameMode in request")
-		return HttpResponseBadRequest("gameMode is required")
+	if not game_type:
+		logger.error("Missing game_type in request")
+		return HttpResponseBadRequest("game_type is required")
 	try:
-		gameMode = int(gameMode)
-		# TODO: check if gamemode is in the range of possible game modes, if not, bad boy
+		game_type = int(game_type)
+		# TODO: check if game_type is in the range of possible game modes, if not, bad boy
 	except ValueError:
-		logger.error("gameMode {gameMode} is not a valid game mode (not numeric or outside)")
-		return HttpResponseBadRequest("gameMode is required to be numeric")
+		logger.error("game_type {game_type} is not a valid game type (not numeric or outside)")
+		return HttpResponseBadRequest("game_type is required to be numeric")
 	try:
 		player = User.objects.get(id=player_id)
 	except User.DoesNotExist:
@@ -61,15 +61,15 @@ def matchmaking(request):
 		return JsonResponse({"error": "User does not exist"}, status=404)
 	room = Room.objects.available_rooms().first() or Room.objects.create_room()
 
-# # create a new room with the specified gamemode
+# # create a new room with the specified game_type
 	# room = None
 	# for next in Room.objects.available_rooms():
-	# 	if next.gameMode == gameMode:
+	# 	if next.game_type == game_type:
 	# 		room = next
 	# 		break
 	# if room == None:
 	# 	room = Room.objects.create_root()
-	# 	room.update_gameMode(gameMode)
+	# 	room.update_game_type(game_type)
 
 
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
@@ -77,10 +77,10 @@ def matchmaking(request):
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
-	if room.gameMode == -1:
-		logger.debug(f"Room {room.id} does not match the requested gameMode {gameMode}. Creating new room.")
-		room.update_gameMode(gameMode)
-	logger.debug(f"Player connected to room: {room.id} on gamemode: {room.gameMode} max_players: {room.max_players} is_full: {room.is_full}")
+	if room.game_type == -1:
+		logger.debug(f"Room {room.id} does not match the requested game_type {game_type}. Creating new room.")
+		room.update_game_type(game_type)
+	logger.debug(f"Player connected to room: {room.id} on game_type: {room.game_type} max_players: {room.max_players} is_full: {room.is_full}")
 	if room.is_full:
 		start_game_payload = {
 			"event": "start_game",

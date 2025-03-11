@@ -7,7 +7,7 @@ class Room(models.Model):
 	is_full		= models.BooleanField(default=False)
 	players		= models.ManyToManyField(User, related_name='rooms')
 	max_players	= models.IntegerField(default=4)
-	gameMode	= models.IntegerField(default=-1)
+	game_type	= models.IntegerField(default=-1)
 	created_at	= models.DateTimeField(auto_now_add=True)
 	objects		= RoomManager()
 
@@ -17,10 +17,10 @@ class Room(models.Model):
 		if self.has_space():
 			self.players.add(player)
 			self._update_full_status()
-	def update_gameMode(self, game_mode):
+	def update_game_type(self, game_mode):
 		if not game_mode == None:
-			self.gameMode = game_mode
-			if self.gameMode == 3:
+			self.game_type = game_mode
+			if self.game_type == 3:
 				self.max_players = 2
 			self._update_full_status()
 	def remove_player(self, player: User) -> None:
@@ -36,5 +36,5 @@ class Room(models.Model):
 	def clear_room(self) -> None:
 		self.players.clear()
 		self.is_full = False
-		self.gameMode = -1
+		self.game_type = -1
 		self.save()

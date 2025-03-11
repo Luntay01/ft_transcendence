@@ -14,7 +14,7 @@ Args:
 	player_id (str): The player's unique identifier.
 	username (str): The player's username.
 """
-async def register_player(websocket, room_id, player_id, username, gameMode):
+async def register_player(websocket, room_id, player_id, username, game_type):
 	if not username:
 		logger.warning(f"Player {player_id} has no username. Rejecting connection.")
 		await websocket.close()
@@ -35,10 +35,10 @@ async def register_player(websocket, room_id, player_id, username, gameMode):
 			"websocket": websocket,
 			"player_id": player_id,
 			"username": username,
-			"gameMode": gameMode,
+			"game_type": game_type,
 		})
 		logger.info(f"Player {player_id} ({username}) joined room {room_id}.")
-		await notify_players(room_id, {"event": "player_joined", "room_id": room_id, "player_id": player_id, "username": username, "gameMode": gameMode,})
+		await notify_players(room_id, {"event": "player_joined", "room_id": room_id, "player_id": player_id, "username": username, "game_type": game_type,})
 
 
 """		Unregisters a player when they disconnect.
@@ -50,7 +50,7 @@ Args:
 	room_id (str): The ID of the room.
 	player_id (str): The player's unique identifier.
 """
-async def unregister_player(websocket, room_id, player_id, gameMode):
+async def unregister_player(websocket, room_id, player_id, game_type):
 	if room_id in connected_players:
 		player_to_remove = None
 		for player in connected_players[room_id]:
@@ -66,9 +66,9 @@ async def unregister_player(websocket, room_id, player_id, gameMode):
 			player_state = {
 				"player_id": player_id,
 				"room_id": room_id,
-				"gameMode": gameMode,
+				"game_type": game_type,
 				"username": player_to_remove["username"]
 			}
 			redis_client.set(f"player_state:{player_id}", json.dumps(player_state))
-			leave_event = {"event": "player_left", "room_id": room_id, "player_id": player_id, "gameMode": gameMode}
+			leave_event = {"event": "player_left", "room_id": room_id, "player_id": player_id, "game_type": game_type}
 			await notify_players(room_id, leave_event)

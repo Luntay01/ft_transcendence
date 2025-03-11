@@ -97,16 +97,16 @@ export function setupMatchmaking()
 		    	const username = localStorage.getItem('username');
 		    	if (!username)
 		    		console.error("Username not found");
-                const gameMode = localStorage.getItem('gameMode');
-                if(!gameMode)
-                    console.error("GameMode not found");
+                const game_type = localStorage.getItem('game_type');
+                if(!game_type)
+                    console.error("game_type not found");
 
-		    	const initialRoomData = await findMatch(playerId, gameMode);
+		    	const initialRoomData = await findMatch(playerId, game_type);
 		    	const roomId = initialRoomData.room_id;
 		    	roomData.players = initialRoomData.players;
 		    	updateStatusMessage(roomId, roomData.players);
 		    	const ws = WebSocketService.getInstance(); // singleton WebSocket instance
-		    	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}&gameMode=${gameMode}`);
+		    	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}&game_type=${game_type}`);
 		    	//ws.connect(`ws://${window.location.host}/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);// window.location.host does not work need to debug
 		    	ws.registerEvent('start_game', (message) => {
 			    	console.log("Start game event received:", message);
@@ -148,9 +148,9 @@ export function setupMatchmaking()
 
 async function buttonHandler(event) {
     const btnNum = event.target.getAttribute("data-btnNum");
-    localStorage.setItem('gameMode', btnNum);
-    const gameMode = localStorage.getItem('gameMode');
-    console.log('Game mode set to:', gameMode);
+    localStorage.setItem('game_type', btnNum);
+    const game_type = localStorage.getItem('game_type');
+    console.log('Game mode set to:', game_type);
 }
 
 async function fetchRoomStatus(roomId)
@@ -199,12 +199,12 @@ function updateStatusMessage(roomId, players)
 	statusMessage.textContent = `Joined Room ${roomId} with players: ${playerNames}`;
 }
 
-async function findMatch(playerId, gameMode)
+async function findMatch(playerId, game_type)
 {
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId, gameMode: gameMode }),
+		body: new URLSearchParams({ player_id: playerId, game_type: game_type }),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');
