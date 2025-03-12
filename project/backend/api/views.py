@@ -52,7 +52,7 @@ class LoginView(views.APIView):
             verify_code = generate_otp(user.get())
             service = get_gmail_service()
             subject = "Verify Email"
-            message = f'This is one-time password for login.\nVerify it within 24 hours.\n\n{verify_code}'
+            message = f'This is one-time password for login.\nVerify it within 5 minutes.\n\n{verify_code}'
             send_email(service, user.get().email, subject, message)
             return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
         elif user.get().mfa == 'Authenticator':
@@ -67,7 +67,7 @@ class SignupView(views.APIView):
         service = get_gmail_service()
         subject = "Verify Email"
         user = User.objects.get(email=address, provider='Pong')
-        message = f'This is one-time password.\nPlease verify it within 5 minutes.\n\n{generate_otp(user)}'
+        message = f'This is one-time password for signup.\nPlease verify it within 5 minutes.\n\n{generate_otp(user)}'
         send_email(service, address, subject, message)
         return
     
