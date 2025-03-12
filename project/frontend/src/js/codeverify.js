@@ -14,7 +14,7 @@ export function setupCodeVerifyForm() {
 
         try {
             const provider = 'Pong';
-            const response = await fetch('http://localhost:8000/api/codeverify/', {
+            const response = await fetch('/api/codeverify/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email, verify_code, provider }),
