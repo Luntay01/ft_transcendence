@@ -37,9 +37,13 @@ class OauthCodeView(views.APIView):
         HOST_DEFAULT_PORT = "443" if HOST_PROTOCOL == 'https' else "80"
         HOST_PORT = os.environ.get('HOST_PORT', HOST_DEFAULT_PORT)
         HOST_DOMAIN = os.environ.get('HOST_DOMAIN', 'localhost')
-        # Construct the host uri eg https://domain:443, this will be used as a return address from OAuth2
-        HOST_URI = HOST_PROTOCOL + '://' + HOST_DOMAIN + ':' + HOST_PORT
-        
+        # Construct the host uri eg this will be used as a return address from OAuth2
+        # Don't use domain:port if we're using default ports (42 doesn't like it?) 
+        if HOST_PORT == "80" or HOST_PORT == "443": 
+            HOST_URI = HOST_PROTOCOL + '://' + HOST_DOMAIN
+        else:
+            HOST_URI = HOST_PROTOCOL + '://' + HOST_DOMAIN + ':' + HOST_PORT
+
         serializer = OauthCodeSerializer(data=request.data)
         if not (serializer.is_valid()):
             return Response(status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -47,18 +51,19 @@ class OauthCodeView(views.APIView):
         logging.warning('code: ' + code)    #debug
         state = serializer.validated_data['state']
         logging.warning('state: ' + state)    #debug
+        REDIRECT_URL = HOST_URI + '/callback'
         post_data = {
             'grant_type': 'authorization_code',
             'code': code,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
-            'redirect_uri': HOST_URI + '/callback', 
+            'redirect_uri': REDIRECT_URL, 
             'state': state,
             }
         response = requests.post("https://api.intra.42.fr/oauth/token/", data=post_data)
         if response.ok == False:
             logging.error('Unable to Authorise User (OAuth2):' + response.text)
-            logging.debug('A likely reason why OAuth2 failed is invalid redirect, '
+            logging.debug(f'A likely reason why OAuth2 failed is invalid redirect ({REDIRECT_URL}), '
             'perhaps the environment has the wrong HOST_DOMAIN/HOST_PORT/HOST_PROTOCOL configuration, '
             'or the OAuth2 service does not allow the redirection for the specified redirect URL')
             return Response({
