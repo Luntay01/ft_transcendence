@@ -17,7 +17,9 @@ import FertilizerBall from '../components/FertilizerBall.js';
 export function setupGameWebSocketHandlers(gameLogic)
 {
 	const wsService = WebSocketService.getInstance();
+	const currentRoomId = localStorage.getItem('roomId');
 	wsService.registerEvent('player_move', (message) => {
+		if (message.room_id !== currentRoomId) return;
 		const { player_id, direction, isMoving } = message;
 		const player = gameLogic.playerMap[player_id];
 		if (!player)
@@ -30,6 +32,7 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent('ball_updates', (message) => {
+		if (message.room_id !== currentRoomId) return;
 		message.balls.forEach((ballData) => {
 			const ball = gameLogic.ballMap[ballData.ball_id];
 			if (ball)
@@ -38,12 +41,14 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent('ball_update', (message) => {
+		if (message.room_id !== currentRoomId) return;
 		const ball = gameLogic.ballMap[message.ball_id];
 		if (ball)
 			ball.updateFromServer({ position: message.position, velocity: message.velocity });
 	});
 
 	wsService.registerEvent("ball_spawn", (message) => {
+		if (message.room_id !== currentRoomId) return;
 		const availableBall = gameLogic.ballPool.find(ball => !ball.active);
 		if (availableBall)
 		{
@@ -54,6 +59,7 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent("ball_despawn", (message) => {
+		if (message.room_id !== currentRoomId) return;
 		const ball = gameLogic.ballMap[message.ball_id];
 		if (ball)
 			ball.deactivate();
@@ -61,15 +67,18 @@ export function setupGameWebSocketHandlers(gameLogic)
 	});
 
 	wsService.registerEvent('start_game_countdown', (message) => {
+		if (message.room_id !== currentRoomId) return;
 		console.log(`Countdown: ${message.countdown}`);
 	});
 
 	wsService.registerEvent('score_update', (message) => {
+		if (message.room_id !== currentRoomId) return;
 		console.log("Score Update Event:", message);
 		gameLogic.updateScore(message.scores);
 	});
 
 	wsService.registerEvent("player_eliminated", (message) => {
+		if (message.room_id !== currentRoomId) return;
 		console.log(`Player ${message.player_id} eliminated! Removing flowerpot...`);
 		const player = gameLogic.playerMap[message.player_id];
 		if (player) {
