@@ -113,11 +113,6 @@ async function loadView(view)
 				const { setupMatchmaking } = await import('./matchmaking.js');
 				setupMatchmaking();
 			}
-            else if (view === 'matchmaking') {
-                await import('./WebSocketService.js');
-                const { setupMatchmaking } = await import('./matchmaking.js');
-                setupMatchmaking();
-            }
             else if (view === 'gamePong') {
                 const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
