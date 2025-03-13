@@ -88,6 +88,7 @@ def matchmaking(request):
 			"room_id": room.id, 
 			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
 			"gameMode": game_mode,
+			"game_type" : game_type,
 		}
 		logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
 		redis_client.publish("start_game", json.dumps(start_game_payload))
@@ -96,6 +97,7 @@ def matchmaking(request):
 		'is_full': room.is_full,
 		'players': [{"player_id": p.id, "username": p.username} for p in room.players.all()],
 		'gameMode': game_mode,
+		'game_type': game_type,
 	}
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)

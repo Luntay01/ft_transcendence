@@ -17,11 +17,9 @@ class Room(models.Model):
 		if self.has_space():
 			self.players.add(player)
 			self._update_full_status()
-	def update_game_type(self, game_mode):
-		if not game_mode == None:
-			self.game_type = game_mode
-			if self.game_type == 3:
-				self.max_players = 2
+	def update_game_type(self, game_type):
+		if not game_type == None:
+			self.game_type = game_type
 			self._update_full_status()
 	def remove_player(self, player: User) -> None:
 		if self.players.filter(id=player.id).exists():
