@@ -41,8 +41,8 @@ Returns:
 def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
-	game_type = request.POST.get('game_type')
 	game_mode = request.POST.get('gameMode', '4-player')
+	game_type = request.POST.get('game_type')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
