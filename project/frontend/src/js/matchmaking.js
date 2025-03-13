@@ -40,6 +40,7 @@ export function setupMatchmaking()
                 console.log("Start game event received:", message);
                 localStorage.setItem('roomId', message.room_id);
                 localStorage.setItem('players', JSON.stringify(message.players));
+                localStorage.setItem('gameMode', message.gameMode);
                 if (roomStatusInterval)
                 {
                     clearInterval(roomStatusInterval);

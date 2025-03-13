@@ -60,14 +60,22 @@ def matchmaking(request):
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
 	if room.is_full:
+		goal_zones = ["bottom", "top"] if game_mode == "2-player" else ["bottom", "top", "left", "right"]
+		players_with_goals = []
+		for idx, player in enumerate(room.players.all()):
+			players_with_goals.append({
+				"player_id": player.id,
+				"username": player.username,
+				"goal_zone": goal_zones[idx]  # explicitly assign goal zones here
+			})
 		start_game_payload = {
 			"event": "start_game",
 			"room_id": room.id, 
-			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
+			"players": players_with_goals,
 			"gameMode": game_mode,
 		}
-		#logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
 		redis_client.publish("start_game", json.dumps(start_game_payload))
+
 	response_payload = {
 		'room_id': room.id,
 		'is_full': room.is_full,

@@ -23,7 +23,11 @@ class Game:
 		self.start_time = datetime.utcnow() #TODO:need to chnage this to like self.start_time = datetime.now(timezone.utc) but has to sync with backend
 		self.ball_manager = BallManager(self, room_id, self.player_positions)
 		self.player_lives = {str(player["player_id"]): GAME_SETTINGS["scoring"]["startingScore"] for player in players}
-		self.goal_zones = copy.deepcopy(self._assign_goal_zones())
+		if self.game_mode == "2-player":
+			self.goal_keys = ["bottom", "top"]
+		else:
+			self.goal_keys = list(GAME_SETTINGS["scoring"]["goalZones"].keys())
+		self.goal_zones = self._assign_goal_zones_from_players()
 		self.current_bounds = copy.deepcopy(GAME_SETTINGS["ballPhysics"]["bounds"])
 		if self.game_mode == "2-player":
 			self.current_bounds["minX"] = -10
@@ -57,7 +61,6 @@ class Game:
 		self.countdown_finished = True
 		self.ball_manager.spawn_ball()
 
-
 	def update(self, delta_time):
 		# TODO: still needs a lot of work on this ball pool and sync with frontend, and maybe even update predections
 		self.elapsed_time += delta_time
@@ -69,35 +72,30 @@ class Game:
 
 	async def _end_game(self, winner_id):
 		logger.info(f"Game over. Winner: Player {winner_id}")
-		rankings = {player_id: index + 1 for index, player_id in enumerate(reversed(self.elimination_order))}
+		winner_id = int(winner_id)
+		elimination_order_int = [int(pid) for pid in self.elimination_order]
+		rankings = {player_id: index + 1 for index, player_id in enumerate(reversed(elimination_order_int))}
 		player_results = [
 			{
-				"player_id": player["player_id"],
+				"player_id": int(player["player_id"]),
 				"username": player["username"],
-				"score": self.player_lives[player["player_id"]],
-				"placement": rankings.get(player["player_id"], None)
+				"score": self.player_lives[str(player["player_id"])],
+				"placement": rankings.get(int(player["player_id"]), None)
 			}
 			for player in self.players
 		]
 		match_data = {
-			"room_id": self.room_id,
+			"room_id": int(self.room_id),
 			"winner_id": winner_id,
 			"players": player_results,
 			"start_time": self.start_time.isoformat(),
-			"elimination_order": self.elimination_order
+			"elimination_order": elimination_order_int
 		}
 		async with aiohttp.ClientSession() as session:
 			async with session.post("http://nginx/api/pong/match_results/", json=match_data) as response:
 				response_text = await response.text()
 				logger.info(f"Match results response: {response.status} - {response_text}")
-		self.countdown_finished = False
-		self.player_lives.clear()
-		self.goal_zones.clear()
-		self.ball_manager.stop()
-		self.ball_manager.balls.clear()
-		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"]
 		self.game_manager.cleanup_game(self.room_id)
-		self.elimination_order = []
 		logger.info(f"Game state cleaned up for Room {self.room_id}.")
 
 	def restore_state(self, state):
@@ -107,26 +105,15 @@ class Game:
 		self.player_positions = copy.deepcopy(state.get("player_positions", {}))
 		self.player_lives = copy.deepcopy(state.get("player_lives", {}))
 		self.goal_zones = copy.deepcopy(state.get("goal_zones", self._assign_goal_zones()))
-		self.goal_zones = state.get("goal_zones", self._assign_goal_zones())
 		self.current_bounds = copy.deepcopy(state.get("current_bounds", GAME_SETTINGS["ballPhysics"]["bounds"]))
 		logger.info(f"Game state restored for Room {self.room_id}.")
 
-	#def _assign_goal_zones(self):
-	#	goal_keys = list(GAME_SETTINGS["scoring"]["goalZones"].keys())
-	#	assigned_zones = GAME_SETTINGS["scoring"]["goalZones"].copy()
-	#	for idx, player in enumerate(self.players):
-	#		if idx < len(goal_keys):
-	#			assigned_zones[goal_keys[idx]]["playerId"] = str(player["player_id"])
-	#	return assigned_zones
-
-	def _assign_goal_zones(self):
-		goal_keys = list(GAME_SETTINGS["scoring"]["goalZones"].keys())
+	def _assign_goal_zones_from_players(self):
 		assigned_zones = copy.deepcopy(GAME_SETTINGS["scoring"]["goalZones"])
-		if self.game_mode == "2-player":
-			goal_keys = ["bottom", "top"]
-		for idx, player in enumerate(self.players):
-			if idx < len(goal_keys):
-				assigned_zones[goal_keys[idx]]["playerId"] = str(player["player_id"])
+		for player in self.players:
+			player_id = str(player["player_id"])
+			zone_key = player["goal_zone"]
+			assigned_zones[zone_key]["playerId"] = player_id
 		return assigned_zones
 
 
