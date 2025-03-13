@@ -30,6 +30,21 @@ class OauthCodeView(views.APIView):
     def post(self, request):
         CLIENT_ID = os.environ.get('CLIENT_ID')
         CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+        
+        # Fallback to default port depending on protocol
+        # Defaults to https which intern defaults to 443
+
+        HOST_PROTOCOL = os.environ.get('HOST_PROTOCOL', 'https')
+        HOST_DEFAULT_PORT = "443" if HOST_PROTOCOL == 'https' else "80"
+        HOST_PORT = os.environ.get('HOST_PORT', HOST_DEFAULT_PORT)
+        HOST_DOMAIN = os.environ.get('HOST_DOMAIN', 'localhost')
+        # Construct the host uri eg this will be used as a return address from OAuth2
+        # Don't use domain:port if we're using default ports (42 doesn't like it?) 
+        if HOST_PORT == "80" or HOST_PORT == "443": 
+            HOST_URI = HOST_PROTOCOL + '://' + HOST_DOMAIN
+        else:
+            HOST_URI = HOST_PROTOCOL + '://' + HOST_DOMAIN + ':' + HOST_PORT
+
         serializer = OauthCodeSerializer(data=request.data)
         if not (serializer.is_valid()):
             return Response(status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -37,18 +52,26 @@ class OauthCodeView(views.APIView):
         logging.warning('code: ' + code)    #debug
         state = serializer.validated_data['state']
         logging.warning('state: ' + state)    #debug
+        REDIRECT_URL = HOST_URI
         post_data = {
             'grant_type': 'authorization_code',
             'code': code,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
-            'redirect_uri': 'http://localhost/',
+            'redirect_uri': REDIRECT_URL, 
             'state': state,
             }
         response = requests.post("https://api.intra.42.fr/oauth/token/", data=post_data)
-
-        if (not response.ok):
-            return Response(response.json(), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if response.ok == False:
+            logging.error('Unable to Authorise User (OAuth2):' + response.text)
+            logging.debug(f'A likely reason why OAuth2 failed is invalid redirect ({REDIRECT_URL}), '
+            'perhaps the environment has the wrong HOST_DOMAIN/HOST_PORT/HOST_PROTOCOL configuration, '
+            'or the OAuth2 service does not allow the redirection for the specified redirect URL')
+            return Response({
+                'error': 'oauth_service_error',
+                'message': 'The external oauth service failed.',
+                'response': response.text
+            }, status.HTTP_503_SERVICE_UNAVAILABLE)
         access_token = response.json()['access_token']
         headers = {'Authorization': f'Bearer {access_token}'}
         response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
