@@ -27,8 +27,12 @@ export function setupMatchmaking()
             const username = localStorage.getItem('username');
             if (!username)
                 console.error("Username not found");
+            const game_type = localStorage.getItem('game_type');
+            if(!game_type)
+                console.error("game_type not found");
+
             
-            const initialRoomData = await findMatch(playerId);
+            const initialRoomData = await findMatch(playerId, game_type);
             const roomId = initialRoomData.room_id;
             roomData.players = initialRoomData.players;
             updateStatusMessage(roomId, roomData.players);
@@ -73,77 +77,6 @@ export function setupMatchmaking()
             statusMessage.textContent = "An error occurred. Please try again.";
         }
     })();
-}
-
-//using old system with button to join so we dont automatically create a room when pressing back from game screen
-export function setupMatchmaking()
-{
-	const statusMessage = document.getElementById('statusMessage');
-	const matchmakeButtons = document.querySelectorAll('.matchmakeButton');
-	const roomData = { players: [] };
-
-    matchmakeButtons.forEach(button => {
-        button.addEventListener('click', buttonHandler);
-	    button.addEventListener('click', async () => {
-	    	statusMessage.textContent = "Searching for a match...";
-	    	try
-	    	{
-		    	const playerId = localStorage.getItem('player_id');
-		    	if (!playerId)
-		    	{
-		    		statusMessage.textContent = "Error: Player ID not found. Please log in again.";
-		    		return;
-		    	}
-		    	const username = localStorage.getItem('username');
-		    	if (!username)
-		    		console.error("Username not found");
-                const game_type = localStorage.getItem('game_type');
-                if(!game_type)
-                    console.error("game_type not found");
-
-		    	const initialRoomData = await findMatch(playerId, game_type);
-		    	const roomId = initialRoomData.room_id;
-		    	roomData.players = initialRoomData.players;
-		    	updateStatusMessage(roomId, roomData.players);
-		    	const ws = WebSocketService.getInstance(); // singleton WebSocket instance
-		    	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}&game_type=${game_type}`);
-		    	//ws.connect(`ws://${window.location.host}/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);// window.location.host does not work need to debug
-		    	ws.registerEvent('start_game', (message) => {
-			    	console.log("Start game event received:", message);
-			    	localStorage.setItem('roomId', message.room_id);
-			    	localStorage.setItem('players', JSON.stringify(message.players));
-			    	if (roomStatusInterval)
-			    	{
-				    	clearInterval(roomStatusInterval);
-				    	roomStatusInterval = null;
-			    	}
-			    	navigateTo('gamePong');
-			    });
-		    	ws.registerEvent('player_joined', (message) => {
-			    	console.log("Player joined event received:", message);
-			    	const existingPlayer = roomData.players.find(player => player.id === message.player_id);
-			    	if (!existingPlayer)
-			    	{
-				    	roomData.players.push({ id: message.player_id, username: message.player_username }); // Add the new player
-			    		updateStatusMessage(roomId, roomData.players); // Update the displayed list
-		    		}
-		    	});
-		    	roomStatusInterval = setInterval(async () => {
-			    	const updatedRoomData = await fetchRoomStatus(roomId);
-		    		if (updatedRoomData)
-		    		{
-		    			roomData.players = updatedRoomData.players;
-		    			updateStatusMessage(roomId, roomData.players);
-		    		}
-		    	}, 5000); // Fetch every 5 seconds
-		    }
-		    catch (error)
-		    {
-		    	console.error('Error during matchmaking:', error);
-		    	statusMessage.textContent = "An error occurred. Please try again.";
-		    }
-        });    
-	});
 }
 
 async function fetchRoomStatus(roomId)
