@@ -1,6 +1,7 @@
 export async function setupHome() {
 	const userinfo = document.getElementById('userinfo');
 	const access = localStorage.getItem('access');
+	const matchmakeButtons = document.querySelectorAll('.matchmakeButton');
 	try {
 		const response = await fetch('http://localhost:8000/api/users/me', {
 			method: 'GET',
@@ -27,8 +28,17 @@ export async function setupHome() {
 			<p> Service Provider: ${provider} </p>
 			</div>
 			`
+			matchmakeButtons.forEach(button => {
+				button.addEventListener('click', buttonHandler);
+			});
 		}
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
+	}
+	async function buttonHandler(event) {
+		const btnNum = event.target.getAttribute("data-btnNum");
+		localStorage.setItem('game_type', btnNum);
+		const game_type = localStorage.getItem('game_type');
+		console.log('Game type set to:', game_type);
 	}
 }

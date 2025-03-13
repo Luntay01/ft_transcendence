@@ -146,13 +146,6 @@ export function setupMatchmaking()
 	});
 }
 
-async function buttonHandler(event) {
-    const btnNum = event.target.getAttribute("data-btnNum");
-    localStorage.setItem('game_type', btnNum);
-    const game_type = localStorage.getItem('game_type');
-    console.log('Game mode set to:', game_type);
-}
-
 async function fetchRoomStatus(roomId)
 {
     try {
