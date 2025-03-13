@@ -1,6 +1,7 @@
 from .ball_manager import BallManager
 from ..config import logger, GAME_SETTINGS
 import asyncio
+import copy
 import aiohttp #TODO:Might be better to replace this and just publish to redis and then have the backend subscribed to the event
 from datetime import datetime, timezone
 #from ..network.redis_utils import publish_game_event
@@ -8,7 +9,7 @@ from .game_events import start_countdown
 #from .player_manager import eliminate_player
 
 class Game:
-	def __init__(self, room_id, players, game_manager):
+	def __init__(self, room_id, players, game_manager, game_mode):
 		self.room_id = room_id
 		self.players = players
 		self.game_manager = game_manager
@@ -16,13 +17,17 @@ class Game:
 		self.countdown_finished = False
 		self.elapsed_time = 0
 		self.last_spawn_interval = 0
+		self.game_mode = game_mode
 		self.player_positions = {}
 		self.elimination_order = []
 		self.start_time = datetime.utcnow() #TODO:need to chnage this to like self.start_time = datetime.now(timezone.utc) but has to sync with backend
 		self.ball_manager = BallManager(self, room_id, self.player_positions)
 		self.player_lives = {str(player["player_id"]): GAME_SETTINGS["scoring"]["startingScore"] for player in players}
-		self.goal_zones = self._assign_goal_zones()
-		self.current_bounds = GAME_SETTINGS["ballPhysics"]["bounds"].copy()
+		self.goal_zones = copy.deepcopy(self._assign_goal_zones())
+		self.current_bounds = copy.deepcopy(GAME_SETTINGS["ballPhysics"]["bounds"])
+		if self.game_mode == "2-player":
+			self.current_bounds["minX"] = -10
+			self.current_bounds["maxX"] = 10
 		self.countdown_task = None
 
 	def update_player_position(self, player_id, position):
@@ -99,16 +104,26 @@ class Game:
 		self.is_active = state.get("is_active", False)
 		self.countdown_finished = state.get("countdown_finished", False)
 		self.elapsed_time = state.get("elapsed_time", 0)
-		self.last_spawn_interval = state.get("last_spawn_interval", 0)
-		self.player_positions = state.get("player_positions", {})
-		self.player_lives = state.get("player_lives", {})
+		self.player_positions = copy.deepcopy(state.get("player_positions", {}))
+		self.player_lives = copy.deepcopy(state.get("player_lives", {}))
+		self.goal_zones = copy.deepcopy(state.get("goal_zones", self._assign_goal_zones()))
 		self.goal_zones = state.get("goal_zones", self._assign_goal_zones())
-		self.current_bounds = state.get("current_bounds", GAME_SETTINGS["ballPhysics"]["bounds"])
+		self.current_bounds = copy.deepcopy(state.get("current_bounds", GAME_SETTINGS["ballPhysics"]["bounds"]))
 		logger.info(f"Game state restored for Room {self.room_id}.")
+
+	#def _assign_goal_zones(self):
+	#	goal_keys = list(GAME_SETTINGS["scoring"]["goalZones"].keys())
+	#	assigned_zones = GAME_SETTINGS["scoring"]["goalZones"].copy()
+	#	for idx, player in enumerate(self.players):
+	#		if idx < len(goal_keys):
+	#			assigned_zones[goal_keys[idx]]["playerId"] = str(player["player_id"])
+	#	return assigned_zones
 
 	def _assign_goal_zones(self):
 		goal_keys = list(GAME_SETTINGS["scoring"]["goalZones"].keys())
-		assigned_zones = GAME_SETTINGS["scoring"]["goalZones"].copy()
+		assigned_zones = copy.deepcopy(GAME_SETTINGS["scoring"]["goalZones"])
+		if self.game_mode == "2-player":
+			goal_keys = ["bottom", "top"]
 		for idx, player in enumerate(self.players):
 			if idx < len(goal_keys):
 				assigned_zones[goal_keys[idx]]["playerId"] = str(player["player_id"])

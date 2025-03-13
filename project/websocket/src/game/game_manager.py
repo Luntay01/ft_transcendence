@@ -21,10 +21,10 @@ class GameManager:
 		self.__initialized = True
 		self.games = {}
 
-	def create_game(self, room_id, players):
+	def create_game(self, room_id, players, game_mode):
 		room_id = str(room_id)
 		if room_id not in self.games:
-			self.games[room_id] = Game(room_id, players, self)
+			self.games[room_id] = Game(room_id, players, self, game_mode)
 			logger.info(f"Created game for Room {room_id}.")
 			saved_state = game_state_manager.load_game_state(room_id)
 			if saved_state and saved_state.get("is_active", False):

@@ -8,7 +8,7 @@
  * - handles errors and updates the UI accordingly
  */
 let roomStatusInterval = null;
-/*
+
 export function setupMatchmaking()
 {
     const statusMessage = document.getElementById('statusMessage');
@@ -74,7 +74,7 @@ export function setupMatchmaking()
         }
     })();
 }
-*/
+
 //using old system with button to join so we dont automatically create a room when pressing back from game screen
 export function setupMatchmaking()
 {
@@ -197,7 +197,8 @@ async function findMatch(playerId, game_type)
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId, game_type: game_type }),
+		body: new URLSearchParams({ player_id: playerId, 
+            gameMode: localStorage.getItem('gameMode') || '4-player', game_type: game_type }),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');

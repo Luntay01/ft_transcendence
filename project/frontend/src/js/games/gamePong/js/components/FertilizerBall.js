@@ -1,5 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
-
+const GAME_SETTINGS = window.GAME_SETTINGS;
 
 class FertilizerBall
 {

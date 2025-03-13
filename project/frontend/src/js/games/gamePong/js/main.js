@@ -12,7 +12,7 @@ import GameLogic from './gameLogic.js';
 
 //import WebSocketService from '../../../WebSocketService.js'
 
-//import { loadGameSettings } from './config.js';
+//const GAME_SETTINGS = window.GAME_SETTINGS;
 
 export async function initPong()
 {

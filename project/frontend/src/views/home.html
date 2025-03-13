@@ -56,6 +56,16 @@
 	<div class="row mt-2">
 		<div class="d-flex justify-content-center align-items-center">
 			<div class="col text-center">
+				<div class="btn-group" role="group" aria-label="Game Mode">
+					<button id="btn-4-player" class="btn btn-outline-primary active" onclick="updateGameMode('4-player')">4 Player</button>
+					<button id="btn-2-player" class="btn btn-outline-primary" onclick="updateGameMode('2-player')">2 Player</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row mt-2">
+		<div class="d-flex justify-content-center align-items-center">
+			<div class="col text-center">
 				<button class="matchmakeButton btn btn-secondary btn-custom border border-dark rounded glow" data-btnNum="2" onclick="navigateTo('gamePong')">Play with Keyboard!</button>
 			</div>
 			<div class="col text-center">
