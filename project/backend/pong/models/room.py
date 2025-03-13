@@ -18,7 +18,7 @@ class Room(models.Model):
 			self.players.add(player)
 			self._update_full_status()
 	def update_game_type(self, game_type):
-		if not game_type == None:
+		if game_type is not None:
 			self.game_type = game_type
 			self._update_full_status()
 	def remove_player(self, player: User) -> None:
