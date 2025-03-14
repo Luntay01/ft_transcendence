@@ -31,6 +31,7 @@ export function setupMatchmaking()
             if(!game_type)
                 console.error("game_type not found");
             const initialRoomData = await findMatch(playerId);
+            //could break here
             const roomId = initialRoomData.room_id;
             roomData.players = initialRoomData.players;
             updateStatusMessage(roomId, roomData.players);
@@ -76,7 +77,7 @@ export function setupMatchmaking()
         }
     })();
 }
-
+//if room id is fine then its in here
 async function fetchRoomStatus(roomId)
 {
     try {

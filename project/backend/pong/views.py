@@ -42,19 +42,19 @@ def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
 	game_mode = request.POST.get('gameMode', '4-player')
-	#game_type = request.POST.get('game_type')
+	game_type = request.POST.get('game_type')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
-	#if not game_type:
-	#	logger.error("Missing game_type in request")
-	#	return HttpResponseBadRequest("game_type is required")
-	#try:
-	#	game_type = int(game_type)
+	if not game_type:
+		logger.error("Missing game_type in request")
+		return HttpResponseBadRequest("game_type is required")
+	try:
+		game_type = int(game_type)
 	#	# TODO: check if game_type is in the range of possible game modes, if not, bad boy
-	#except ValueError:
-	#	logger.error("game_type {game_type} is not a valid game type (not numeric or outside)")
-	#	return HttpResponseBadRequest("game_type is required to be numeric")
+	except ValueError:
+		logger.error("game_type {game_type} is not a valid game type (not numeric or outside)")
+		return HttpResponseBadRequest("game_type is required to be numeric")
 	try:
 		player = User.objects.get(id=player_id)
 	except User.DoesNotExist:
@@ -78,9 +78,9 @@ def matchmaking(request):
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
-	#if room.game_type == -1:
-	#	logger.debug(f"Room {room.id} does not match the requested game_type {game_type}. Creating new room.")
-	#	room.update_game_type(game_type)
+	if room.game_type == -1:
+		logger.debug(f"Room {room.id} does not match the requested game_type {game_type}. Creating new room.")
+		room.update_game_type(game_type)
 	#logger.debug(f"Player connected to room: {room.id} on game_type: {room.game_type} max_players: {room.max_players} is_full: {room.is_full}")
 	if room.is_full:
 		start_game_payload = {
@@ -88,7 +88,7 @@ def matchmaking(request):
 			"room_id": room.id, 
 			"players": [{"player_id": player.id, "username": player.username} for player in room.players.all()],
 			"gameMode": game_mode,
-			#"game_type" : game_type,
+			"game_type" : game_type,
 		}
 		logger.debug(f"start_game event payload: {json.dumps(start_game_payload)}")
 		redis_client.publish("start_game", json.dumps(start_game_payload))
@@ -97,7 +97,7 @@ def matchmaking(request):
 		'is_full': room.is_full,
 		'players': [{"player_id": p.id, "username": p.username} for p in room.players.all()],
 		'gameMode': game_mode,
-		#'game_type': game_type,
+		'game_type': game_type,
 	}
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)
