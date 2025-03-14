@@ -6,15 +6,13 @@ let currentView = '';// track the current view
 function handleRoute()
 {
     const newView = window.location.hash.replace('#', '') || 'welcome';
-
     // Prevent going back to matchmaking from the game screen
-    if (currentView === 'gamePong' && newView === 'game_matchmaking')
+    if (currentView === 'gamePong' && newView === 'game_matchmaking' || currentView === 'game_end' && newView === 'gamePong')
     {
-        console.warn("Skipping matchmaking when exiting game. Redirecting to home.");
         navigateTo('home');
         return;
     }
-    if (currentView === 'gamePong' && newView !== 'gamePong')
+    if (currentView === 'gamePong' && newView !== 'gamePong'|| currentView === 'game_matchmaking' && newView !== 'gamePong')
     {
         console.log("Exiting game, disconnecting WebSocket...");
         disconnectWebSocket();

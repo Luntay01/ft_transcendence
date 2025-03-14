@@ -100,6 +100,7 @@ def room_status(request, room_id):
 	except Room.DoesNotExist:
 		return Response({"error": "Room not found"}, status=404)
 
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -118,11 +119,16 @@ def submit_match_result(request):
 			return Response({"error": "Invalid elimination_order format"}, status=400)
 	if not room_id or not winner_id or not player_results:
 		return Response({"error": "Missing required data"}, status=400)
+	room, created = Room.objects.get_or_create(id=room_id)
+	if created:
+		logger.warning(f" Room {room_id} was recreated to allow match result storage.")
 	try:
-		room = Room.objects.get(id=room_id)
 		winner = User.objects.get(id=winner_id)
-	except (Room.DoesNotExist, User.DoesNotExist):
-		return Response({"error": "Invalid room or winner"}, status=400)
+	except User.DoesNotExist:
+		logger.error(f"Error: Winner {winner_id} does not exist")
+		return Response({"error": f"Invalid winner {winner_id}"}, status=400)
+	logger.info(f"Winner: {winner.username}")
+	logger.info(f"Room ID: {room.id}")
 	match = MatchResult.objects.create(
 		room=room,
 		winner=winner,
@@ -164,3 +170,25 @@ def get_match_results(request, winner_id):
 		return JsonResponse(response_data, safe=False)
 	except MatchResult.DoesNotExist:
 		return JsonResponse({"error": "Match not found"}, status=404)
+
+@csrf_exempt
+def leave_matchmaking(request):
+	if request.method != "POST":
+		return JsonResponse({"error": "Invalid request method"}, status=405)
+	import json
+	data = json.loads(request.body.decode("utf-8"))
+	player_id = data.get("player_id")
+	if not player_id:
+		return JsonResponse({"error": "Player ID is required"}, status=400)
+	try:
+		player = User.objects.get(id=player_id)
+	except User.DoesNotExist:
+		return JsonResponse({"error": "User not found"}, status=404)
+	room = Room.objects.filter(players=player).first()
+	if not room:
+		return JsonResponse({"error": "Player is not in a matchmaking room"}, status=404)
+	room.remove_player(player)
+	room.save()
+	if room.players.count() == 0:
+		room.delete()
+	return JsonResponse({"message": f"Player {player_id} removed from matchmaking"})
