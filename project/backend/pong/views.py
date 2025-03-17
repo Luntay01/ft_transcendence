@@ -51,7 +51,8 @@ def matchmaking(request):
 		return HttpResponseBadRequest("game_type is required")
 	try:
 		game_type = int(game_type)
-	#	# TODO: check if game_type is in the range of possible game modes, if not, bad boy
+		if not (0 <= game_type < 4):
+			raise ValueError("game_type out of range")
 	except ValueError:
 		logger.error("game_type {game_type} is not a valid game type (not numeric or outside)")
 		return HttpResponseBadRequest("game_type is required to be numeric")
