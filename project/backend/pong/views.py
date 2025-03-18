@@ -61,27 +61,27 @@ def matchmaking(request):
 	except User.DoesNotExist:
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
-	# # create a new room with the specified game_type
-	# room = None
-	# for next in Room.objects.available_rooms():
-	# 	if next.game_type == game_type:
-	# 		room = next
-	# 		break
-	# if room == None:
-	# 	room = Room.objects.create_root()
-	# 	room.update_game_type(game_type)
+	# create a new room with the specified game_type
+	room = None
 	max_players = 2 if game_mode == "2-player" else 4
-	room = Room.objects.available_rooms(max_players).first()
-	if not room:
-		room = Room.objects.create_room(max_players=max_players)
+	for next in Room.objects.available_rooms(max_players):
+ 		if next.game_type == game_type:
+	 		room = next
+	 		break
+	if room is None:
+	 	room = Room.objects.create_room(max_players=max_players)
+	 	room.update_game_type(game_type)
+	#max_players = 2 if game_mode == "2-player" else 4
+	#room = Room.objects.available_rooms(max_players).first()
+	#if not room or not (game_type == room.game_type):
+	#	room = Room.objects.create_room(max_players=max_players)
+	#	room.update_game_type(game_type)
+
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
-	if room.game_type == -1:
-		logger.debug(f"Room {room.id} does not match the requested game_type {game_type}. Creating new room.")
-		room.update_game_type(game_type)
 	#logger.debug(f"Player connected to room: {room.id} on game_type: {room.game_type} max_players: {room.max_players} is_full: {room.is_full}")
 	if room.is_full:
 		start_game_payload = {
