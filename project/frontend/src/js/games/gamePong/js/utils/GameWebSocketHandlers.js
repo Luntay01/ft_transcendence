@@ -14,9 +14,9 @@ import FertilizerBall from '../components/FertilizerBall.js';
  *	- Updates the player's movement direction and state.
  *	- Ensures movement updates only happen if there is an actual change.
  */
-export function setupGameWebSocketHandlers(gameLogic)
+export async function setupGameWebSocketHandlers(gameLogic)
 {
-	const wsService = WebSocketService.getInstance();
+	const wsService = await ensureWebSocketService();
 	const currentRoomId = localStorage.getItem('roomId');
 	wsService.registerEvent('player_move', (message) => {
 		if (message.room_id !== currentRoomId) return;
@@ -31,7 +31,7 @@ export function setupGameWebSocketHandlers(gameLogic)
 			player.flowerPot.updateState(direction, isMoving);
 	});
 
-	wsService.registerEvent('ball_updates', (message) => {
+	wsService.registerEvent("ball_updates", (message) => {
 		if (message.room_id !== currentRoomId) return;
 		message.balls.forEach((ballData) => {
 			const ball = gameLogic.ballMap[ballData.ball_id];
@@ -49,12 +49,11 @@ export function setupGameWebSocketHandlers(gameLogic)
 
 	wsService.registerEvent("ball_spawn", (message) => {
 		if (message.room_id !== currentRoomId) return;
-		const availableBall = gameLogic.ballPool.find(ball => !ball.active);
-		if (availableBall)
+		let ball = gameLogic.ballPool.find(b => b.id === message.ball_id);
+		if (ball)
 		{
-			availableBall.addBall(message.position, message.velocity);
-			gameLogic.ballMap[message.ball_id] = availableBall;
-			console.log(`Ball spawned and stored with ID: ${message.ball_id}`);
+			ball.addBall(message.position, message.velocity);
+			gameLogic.ballMap[message.ball_id] = ball;
 		}
 	});
 
@@ -71,10 +70,9 @@ export function setupGameWebSocketHandlers(gameLogic)
 		console.log(`Countdown: ${message.countdown}`);
 	});
 
-	wsService.registerEvent('score_update', (message) => {
+	wsService.registerEvent('player_left', (message) => {
 		if (message.room_id !== currentRoomId) return;
-		console.log("Score Update Event:", message);
-		gameLogic.updateScore(message.scores);
+		console.log(`Player left with ID ${message.player_id}`);
 	});
 
 	wsService.registerEvent("player_eliminated", (message) => {
@@ -87,9 +85,60 @@ export function setupGameWebSocketHandlers(gameLogic)
 		}
 		const remainingPlayers = Object.keys(gameLogic.playerMap).length;
 		if (remainingPlayers === 1) {
-			const winnerId = Object.keys(gameLogic.playerMap)[0]; // Get remaining player ID
+			const winnerId = Object.keys(gameLogic.playerMap)[0];
 			console.log(`Only one player remains. Declaring winner: ${winnerId}`);
 			gameLogic.endGame(winnerId);
 		}
 	});
+
+	wsService.registerEvent("game_state", (message) => {
+		if (message.room_id !== currentRoomId) return;
+		const { balls, players, eliminated_players} = message;
+		balls.forEach((ballData) => {
+			let ball = gameLogic.ballPool.find(b => b && b.id === ballData.ball_id);
+			if (!ball)
+			{
+				ball = gameLogic.ballPool.find(b => !b.active);
+				if (ball)
+					ball.id = ballData.ball_id;
+			}
+			if (ball)
+			{
+				ball.addBall(ballData.position, ballData.velocity);
+				gameLogic.ballMap[ball.id] = ball;
+			}
+		});
+		gameLogic.ballPool.forEach(ball => {
+			if (ball && !balls.some(b => b.ball_id === ball.id))
+			{
+				ball.deactivate();
+				delete gameLogic.ballMap[ball.id];
+			}
+		});
+		eliminated_players.forEach(playerId => {
+			const player = gameLogic.playerMap[playerId];
+			if (player) {
+				player.flowerPot.deactivate();
+				delete gameLogic.playerMap[playerId];
+			}
+		});
+		players.forEach(playerData => {
+			const player = gameLogic.playerMap[playerData.player_id];
+			if (player)
+			{
+				player.flowerPot.model.position.set(playerData.position.x, 0, playerData.position.z);
+				gameLogic.updatePlayerScore(playerData.player_id, playerData.lives);
+			}
+		});
+	});
+
+}
+
+export async function ensureWebSocketService()
+{
+	if (!window.WebSocketService) {
+		console.log("Loading WebSocketService dynamically...");
+		await import('../../../../WebSocketService.js');
+	}
+	return WebSocketService.getInstance();
 }

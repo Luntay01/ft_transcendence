@@ -38,6 +38,7 @@ export default async function setupGameElements(scene, objects, ballPool)
 		await fertilizerBall.loadModel(modelPaths.fertilizerBall);
 		fertilizerBall.deactivate();
 		scene.add(fertilizerBall.model);
+		fertilizerBall.id = i+1;
 		ballPool.push(fertilizerBall);  // sdd to the pool
 	}
 

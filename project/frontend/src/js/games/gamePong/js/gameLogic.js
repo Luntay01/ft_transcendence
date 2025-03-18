@@ -3,11 +3,12 @@ import setupPlayers				from './utils/setupPlayers.js';
 import { processPlayerInput }	from "./utils/PlayerInput.js";
 import setupGameElements		from './utils/setupGameElements.js';
 import handleCollisions			from './utils/handleCollisions.js';
-import { setupGameWebSocketHandlers } from './utils/GameWebSocketHandlers.js';
+import { setupGameWebSocketHandlers, ensureWebSocketService } from './utils/GameWebSocketHandlers.js';
 import { createScoreUI, updateScoreText } from './components/ScoreSprites.js';
 
 const GAME_SETTINGS = window.GAME_SETTINGS;
-const wsService = WebSocketService.getInstance();
+let wsService = null;
+(async () => { wsService = await ensureWebSocketService(); })();
 
 class GameLogic
 {
@@ -46,8 +47,7 @@ class GameLogic
 		console.log('GameLogic: Initializing...');
 		setupLighting(this.scene);
 		await setupGameElements(this.scene, this.objects, this.ballPool);
-		console.log("⚡ Initializing Game WebSocket Handlers FIRST...");
-		setupGameWebSocketHandlers(this);
+		await setupGameWebSocketHandlers(this);
 		const players = JSON.parse(localStorage.getItem('players'))
 		this.players = await setupPlayers(this.scene, players);
 		this.playerMap = this.players.reduce((map, player) => { map[player.playerId] = player; return map; }, {});
@@ -83,7 +83,6 @@ class GameLogic
 		this.players.forEach(player => { player.flowerPot.update(delta); });
 		this.objects.forEach((obj) => { if (obj.update) obj.update(delta); });
 		this.ballPool.forEach(ball => { if (ball.active) ball.update(delta); });
-		//handleCollisions(this.objects, this.players, this.onFlowerPotHit.bind(this));
 	}
 
 	sendInitialPlayerPosition()
@@ -119,24 +118,17 @@ class GameLogic
 	updatePlayerScore(playerId, newScore)
 	{
 		const playerIndex = this.players.findIndex(player => String(player.playerId) === String(playerId));
-		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length) {
-			console.warn(`Failed to update score: Invalid playerIndex (${playerIndex}) for playerId (${playerId})`);
+		if (!this.scoreSprites || playerIndex < 0 || playerIndex >= this.scoreSprites.length)
 			return;
-		}
 		const { context, texture } = this.scoreSprites[playerIndex];
 		updateScoreText(context, newScore);
 		texture.needsUpdate = true;
 	}
 
 
-	cleanup()
+	async cleanup()
 	{
-		console.log("Cleaning up game state...");
-		//if (this.animationFrame) {
-		//	cancelAnimationFrame(this.animationFrame);
-		//	this.animationFrame = null;
-		//}
-		const ws = WebSocketService.getInstance();
+		const ws = await ensureWebSocketService();
 		if (ws.isConnected()) {
 			ws.disconnect();
 		}
@@ -150,24 +142,19 @@ class GameLogic
 		this.playerMap = {};
 		localStorage.removeItem('roomId');
 		localStorage.removeItem('players');
-		console.log("Cleanup complete.");
 	}
 
 
 	endGame(winnerId)
 	{
-		const winner = this.playerMap[winnerId]; // Get the winner object
+		const winner = this.playerMap[winnerId];
 		if (winner)
 		{
 			localStorage.setItem("gameWinner", winnerId);
-			localStorage.setItem("gameWinnerName", winner.name); // Store `name` instead of `username`
+			localStorage.setItem("gameWinnerName", winner.name);
 		}
 		else
-		{
-			console.warn("Winner not found in playerMap. Defaulting to ID only.");
 			localStorage.setItem("gameWinner", winnerId);
-		}
-	
 		this.cleanup();
 		navigateTo('game_end');
 	}

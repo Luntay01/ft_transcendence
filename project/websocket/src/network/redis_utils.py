@@ -52,5 +52,6 @@ async def broadcast_to_room(room_id, message, exclude=None):
 async def publish_game_event(event, room_id, payload):
 	payload["event"] = event
 	payload["room_id"] = room_id
-	redis_client.publish("game_events", json.dumps(payload))
-	logger.debug(f"Published {event} -> {payload}")
+	channel = event
+	redis_client.publish(channel, json.dumps(payload))
+	logger.debug(f"Published {event} -> {payload} on {channel}")

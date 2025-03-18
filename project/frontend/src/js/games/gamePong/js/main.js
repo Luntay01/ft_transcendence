@@ -11,6 +11,7 @@ import
 import GameLogic from './gameLogic.js';
 
 //import WebSocketService from '../../../WebSocketService.js'
+import { ensureWebSocketService } from './utils/GameWebSocketHandlers.js';
 
 //const GAME_SETTINGS = window.GAME_SETTINGS;
 
@@ -28,7 +29,7 @@ export async function initPong()
 	}
 	console.log(`Initializing game for Room ${roomId} with players:`, players);
 	//  reconnect WebSocket
-	const ws = WebSocketService.getInstance();
+	const ws = await ensureWebSocketService();
 	ws.connect(`ws://localhost:8765/ws?room_id=${roomId}&player_id=${playerId}&username=${username}`);
 	const container = document.getElementById('pongContainer');
 	if (!container)
