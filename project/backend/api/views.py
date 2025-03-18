@@ -76,6 +76,28 @@ class SignupView(views.APIView):
         self.verify_email(request.data['email'])
         return Response({'message': 'Verification email has been sent'}, status.HTTP_201_CREATED)
 
+class ProfileView(views.APIView):
+    def patch(self, request, format=None):
+        if 'mfa' in request.data:
+            user = request.user
+            if request.data['mfa'] == 'Email':
+                verify_code = generate_otp(user)
+                service = get_gmail_service()
+                subject = "Verify Email"
+                message = f'This is one-time password for setting MFA option.\nVerify it within 5 minutes.\n\n{verify_code}'
+                send_email(service, user.email, subject, message)
+                return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
+            elif request.data['mfa'] == 'Authenticator':
+                image = get_image_b64(get_auth_url(user))
+                return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user = UserView().patch(request)
+        if user.status_code != 200:
+            return Response({'error': 'Failed to update user'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        tokens = get_tokens_for_user(User.objects.get(id=user.data['id']))
+        return Response(tokens, status=status.HTTP_200_OK)
+
 class OauthCodeView(views.APIView):
     permission_classes = [AllowAny]
     #TODO: remove logging (import as well)

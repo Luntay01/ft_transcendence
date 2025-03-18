@@ -21,10 +21,35 @@ export function setupCodeVerifyForm() {
             });
             const data = await response.json();
             if (response.ok) {
+                if (localStorage.getItem('mfa')) {
+                    const mfa = localStorage.getItem('mfa');
+                    localStorage.removeItem('qrcode');
+                    try {
+                        const response = await fetch('/api/users/', {
+                            method: 'PATCH',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('access')}` 
+                            },
+                            body: JSON.stringify({ mfa }),
+                        })
+                        if (!response.ok) {
+                            alert('Update failed:', response.statusText);
+                            return;
+                        }
+                    } catch (error) {
+                        alert('Update error:', error);
+                    }
+                    localStorage.removeItem('mfa');
+                    alert('MFA option updated successfully!');
+                    navigateTo('profile');
+                }
+                else {
                 alert('Verification succeeded! Welcome to Pong!');
                 localStorage.setItem('access', data.access);
                 localStorage.setItem('refresh', data.refresh);
                 navigateTo('home');
+                }
             } else {
                 alert(data.error || 'Verification failed');
             }

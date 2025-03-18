@@ -46,10 +46,56 @@
             </div>
             <div class="col-md-10">
                 <div class="translucent-background">			
-		
                     <div class="topleft-background">
-                        <div>
-                            <p id="userinfo"></p>
+                        <div class="wrapper">
+                            <div class="custom-border">
+                                <div id="picture"class="img-wrapper"></div>
+                            </div>
+                            <button class="btn btn-secondary btn-custom2" onclick="navigateTo('')">Change Picture</button>
+                            <div class="wrapper" id="userDetail">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>
+                                            Username
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="username" class="col-sm-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>
+                                            Email
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="email" class="col-sm-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>
+                                            Provider
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="provider" class="col-sm-3"></div>
+                                </div>
+                                <button class="btn btn-secondary btn-custom2" onclick="setupProfileModal()" data-bs-toggle="modal" data-bs-target="#updateModal">Change Profile</button>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>
+                                            MFA
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="mfa" class="col-sm-3"></div>
+                                </div>
+                                <button class="btn btn-secondary btn-custom2" onclick="setupMfaModal()" data-bs-toggle="modal" data-bs-target="#updateMfaModal">Change MFA</button>
+                            </div>
                         </div>
 					</div>
                     <div class="right-section">
@@ -80,4 +126,52 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
 	integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 </body>
+<!-- Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalTitle">Update Profile</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <form id="profileForm" class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" class="form-control" id="usernameInput" name="username" required>
+          <label for="email">Email:</label>
+          <input type="text" class="form-control" id="emailInput" name="email" required>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="modalSave" type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateProfile()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="updateMfaModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalTitle">Select MFA option</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <form id="mfaForm" class="form-group">
+          <label for="mfa">MFA:</label>
+          <select id="mfaSelect" name="mfa" required>
+            <option value="Email">Email</option>
+            <option value="Authenticator">Authenticator</option>
+          </select>
+        </form>
+        <h6>* Verification is required</h6>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="modalSave" type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateMfa()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 </html>
