@@ -51,16 +51,20 @@ class UserSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
+        instance.provider = validated_data.get('provider', instance.provider)
+        instance.oauth_user_id = validated_data.get('oauth_user_id', instance.oauth_user_id)
         unhashed_password = validated_data.pop('password', None)
         if unhashed_password is not None:
             instance.set_password(unhashed_password)
         instance.username = validated_data.get('username', instance.username)
         instance.picture = validated_data.get('picture', instance.picture)
+        instance.otp_secret = validated_data.get('otp_secret', instance.otp_secret)
+        instance.is_verified = validated_data.get('is_verified', instance.is_verified)
+        instance.mfa = validated_data.get('mfa', instance.mfa)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.trophies = validated_data.get('trophies', instance.trophies)
         instance.birth_day = validated_data.get('birth_day', instance.birth_day)
-        instance.provider = validated_data.get('provider', instance.provider)
-        instance.oauth_user_id = validated_data.get('oauth_user_id', instance.oauth_user_id)
         instance.save()
         return instance
 
