@@ -123,12 +123,9 @@ project/
    # Websocket/frontend shared volume path
    CONFIG_PATH=/config/settings.json
 
-   # Google Oauth Authorization App for sending email
-   EMAIL_HOST_USER=< email address >
-   EMAIL_HOST_PASSWORD=< password >
-   GOOGLE_CLIENT_ID="915114078666-vlcii0ubsopadru4nln3hap592v3v2q7.apps.googleusercontent.com"
-   GOOGLE_PROJECT_ID="my-project-1511163788942"
-   GOOGLE_CLIENT_SECRET=< client secret (*contact developers to get value) >
+   # Email Settings
+   EMAIL_HOST_PASSWORD=< SendGrid API key >
+   EMAIL_ACCOUNT=no-reply@42transcendencepong.com
 
    # Test User (optional)
    DJANGO_TEST_NAME_1=test1
@@ -143,12 +140,3 @@ project/
    DJANGO_TEST_EMAIL_3=test3@example.com
    DJANGO_TEST_PASSWORD_3=test3
    ```
-
-# Email Setup
-1. Make sure to add environment variables in `.env` for Google Oauth.
-
-2. Get credential token by accessing the url displayed in console and login with `EMAIL_HOST_USER` user.
-   ![alt text](./pictures/google_oauth_url_sample.png)
-   *url is displayed when app makes an attempts to send an email
-   <br>
-   *token expires a week after creation
