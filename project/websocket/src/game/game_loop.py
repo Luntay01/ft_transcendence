@@ -28,6 +28,9 @@ Sends the full game state for each active room to all connected clients.
 """
 async def send_game_states_to_clients():
 	for room_id, game in game_manager.games.items():
+		if not game.is_active:
+			logger.info(f"Skipping game state update for paused Room {room_id}")
+			continue 
 		game_state = {
 			"event": "game_state",
 			"room_id": room_id,

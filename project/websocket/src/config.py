@@ -46,7 +46,9 @@ REDIS_CHANNELS = {
 		"player_eliminated",
 		"game_over",
 		"game_state",
-		"player_left"
+		"player_left",
+		"player_voted_out",
+		"game_resumed"
 	]
 }
 

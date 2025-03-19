@@ -18,6 +18,7 @@ export async function setupGameWebSocketHandlers(gameLogic)
 {
 	const wsService = await ensureWebSocketService();
 	const currentRoomId = localStorage.getItem('roomId');
+	const disconnectedPlayers = [];
 	wsService.registerEvent('player_move', (message) => {
 		if (message.room_id !== currentRoomId) return;
 		const { player_id, direction, isMoving } = message;
@@ -72,9 +73,81 @@ export async function setupGameWebSocketHandlers(gameLogic)
 
 	wsService.registerEvent('player_left', (message) => {
 		if (message.room_id !== currentRoomId) return;
-		console.log(`Player left with ID ${message.player_id}`);
+		const voterId = localStorage.getItem('player_id');
+		const targetPlayerId = message.player_id;
+		if (!voterId || voterId === targetPlayerId)
+			return;
+		if (!disconnectedPlayers.includes(targetPlayerId))
+			disconnectedPlayers.push(targetPlayerId);
+		updateDisconnectUI();
 	});
 
+	function updateDisconnectUI()
+	{
+		const overlay = document.getElementById("disconnectOverlay");
+		const disconnectMessage = document.getElementById("disconnectMessage");
+		const voteContainer = document.getElementById("voteKickButtons");
+		voteContainer.innerHTML = "";
+		if (disconnectedPlayers.length === 0)
+		{
+			overlay.classList.remove("show");
+			return;
+		}
+		overlay.classList.add("show");
+		disconnectMessage.textContent = `Players disconnected: ${disconnectedPlayers.length}`;
+		disconnectedPlayers.forEach((playerId) => {
+			const voteButton = document.createElement("button");
+			voteButton.className = "btn";
+			voteButton.textContent = `Vote to Kick Player ${playerId}`;
+			voteButton.onclick = () => {
+				const voteKey = `${localStorage.getItem('player_id')}:${playerId}`;
+				wsService.send("vote_kick", { 
+					room_id: currentRoomId, 
+					vote_key: voteKey
+				});
+				disconnectedPlayers.splice(disconnectedPlayers.indexOf(playerId), 1);
+				updateDisconnectUI();
+			};
+			voteContainer.appendChild(voteButton);
+		});
+	}
+
+	wsService.registerEvent("player_joined", (message) => {
+		if (message.room_id !== currentRoomId) return;
+		console.log(`Player reconnected: ${message.username} (ID: ${message.player_id})`);
+		const index = disconnectedPlayers.indexOf(message.player_id);
+		if (index !== -1)
+			disconnectedPlayers.splice(index, 1);
+		if (disconnectedPlayers.length === 0) {
+			document.getElementById("disconnectOverlay").classList.remove("show");
+		}
+		updateDisconnectUI();
+	});
+
+	wsService.registerEvent("game_paused", (message) => {
+		if (message.room_id !== currentRoomId) return;
+		console.log("Game paused due to player disconnect!");
+		document.getElementById("disconnectOverlay").classList.add("show");
+	});
+	
+	wsService.registerEvent("game_resumed", (message) => {
+		if (message.room_id !== currentRoomId) return;
+		console.log("Game resumed!");
+		if (disconnectedPlayers.length === 0)
+			document.getElementById("disconnectOverlay").classList.remove("show");
+	});
+	
+	wsService.registerEvent("player_voted_out", (message) => {
+		if (message.room_id !== currentRoomId) return;
+		console.log(`Player ${message.player_id} was voted out.`);
+		const index = disconnectedPlayers.indexOf(message.player_id);
+		if (index !== -1)
+			disconnectedPlayers.splice(index, 1);
+		if (disconnectedPlayers.length === 0)
+			document.getElementById("disconnectOverlay").classList.remove("show");
+		updateDisconnectUI();
+	});
+	
 	wsService.registerEvent("player_eliminated", (message) => {
 		if (message.room_id !== currentRoomId) return;
 		console.log(`Player ${message.player_id} eliminated! Removing flowerpot...`);
