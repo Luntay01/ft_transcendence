@@ -12,9 +12,10 @@ from rest_framework import views, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .otp import generate_otp, verify_otp
-from .gmail_service import get_gmail_service, send_email
 from .utils import get_tokens_for_user, get_image_b64, get_auth_url
 
+from django.core.mail import send_mail
+from django.conf import settings
 from users.models import User
 from users.serializers import UserSerializer
 from users.views import UserView
@@ -50,10 +51,11 @@ class LoginView(views.APIView):
 
         if user.get().mfa == 'Email':
             verify_code = generate_otp(user.get())
-            service = get_gmail_service()
             subject = "Verify Email"
             message = f'This is one-time password for login.\nVerify it within 5 minutes.\n\n{verify_code}'
-            send_email(service, user.get().email, subject, message)
+            from_mail = settings.EMAIL_ACCOUNT
+            recipient_list = [user.get().email]
+            send_mail(subject, message, from_mail, recipient_list)
             return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
         elif user.get().mfa == 'Authenticator':
             image = get_image_b64(get_auth_url(user.get()))
@@ -64,11 +66,12 @@ class LoginView(views.APIView):
 class SignupView(views.APIView):
     permission_classes = [AllowAny]
     def verify_email(self, address):
-        service = get_gmail_service()
         subject = "Verify Email"
         user = User.objects.get(email=address, provider='Pong')
         message = f'This is one-time password for signup.\nPlease verify it within 5 minutes.\n\n{generate_otp(user)}'
-        send_email(service, address, subject, message)
+        from_mail = settings.EMAIL_ACCOUNT
+        recipient_list = [address]
+        send_mail(subject, message, from_mail, recipient_list)
         return
     
     def post(self, request, format=None):
@@ -82,10 +85,11 @@ class ProfileView(views.APIView):
             user = request.user
             if request.data['mfa'] == 'Email':
                 verify_code = generate_otp(user)
-                service = get_gmail_service()
                 subject = "Verify Email"
                 message = f'This is one-time password for setting MFA option.\nVerify it within 5 minutes.\n\n{verify_code}'
-                send_email(service, user.email, subject, message)
+                from_mail = settings.EMAIL_ACCOUNT
+                recipient_list = [user.email]
+                send_mail(subject, message, from_mail, recipient_list)
                 return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
             elif request.data['mfa'] == 'Authenticator':
                 image = get_image_b64(get_auth_url(user))
