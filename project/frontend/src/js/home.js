@@ -4,7 +4,7 @@ export async function setupHome() {
 	const userinfo = document.getElementById('userinfo');
 	const access = localStorage.getItem('access');
 	try {
-		const response = await fetch('http://localhost:8000/api/users/me', {
+		const response = await fetch('/api/users/me', {
 			method: 'GET',
 			headers: { 'Authorization': `Bearer ${access}` }
 		});
@@ -14,7 +14,7 @@ export async function setupHome() {
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
-			let src = `http://localhost:8000/${img}`;
+			let src = `${img}`;
 			let width = '50px';
 			let height = '50px';
 			userinfo.innerHTML = 
