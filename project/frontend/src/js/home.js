@@ -33,24 +33,23 @@ export async function setupHome() {
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
 	}
+	const storedGameMode = localStorage.getItem("gameMode") || "4-player";
+	updateGameModeButtonHighlight(storedGameMode);
 }
 
-function updateGameMode(mode)
-{
-	localStorage.setItem("gameMode", mode);
-	window.GAME_SETTINGS.gameMode = mode;
-	console.log(`Game mode updated to: ${mode}`);
+function updateGameModeButtonHighlight(mode) {
 	const buttons = document.querySelectorAll(".btn-group button");
 	buttons.forEach(button => button.classList.remove("active"));
 	const selectedButton = document.getElementById(`btn-${mode}`);
-	if (selectedButton)
+	if (selectedButton) {
 		selectedButton.classList.add("active");
-	console.log(`Game mode set to: ${mode}`, window.GAME_SETTINGS);
+	}
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-	const mode = localStorage.getItem("gameMode") || "4-player";
-	updateGameMode(mode);
-});
-
+function updateGameMode(mode) {
+	localStorage.setItem("gameMode", mode);
+	window.GAME_SETTINGS.gameMode = mode;
+	console.log(`Game mode updated to: ${mode}`);
+	updateGameModeButtonHighlight(mode);
+}
 window.updateGameMode = updateGameMode;
