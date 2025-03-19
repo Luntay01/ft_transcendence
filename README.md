@@ -75,6 +75,7 @@ project/
 | POST | /api/login | login by email and password |
 | POST | /api/signup | signup a user and send verification mail |
 | POST | /api/oauth| get jwt using authentication code in Oauth |
+| PATCH | /api/profile| update profiles |
 | POST | /api/token/refresh | refresh jwt usign refresh token |
 | POST | /api/token/verify | verify acccess token or refresh token |
 
