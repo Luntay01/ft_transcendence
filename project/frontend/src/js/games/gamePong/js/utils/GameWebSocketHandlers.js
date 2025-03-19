@@ -82,11 +82,12 @@ export async function setupGameWebSocketHandlers(gameLogic)
 		updateDisconnectUI();
 	});
 
-	function updateDisconnectUI()
-	{
+	function updateDisconnectUI() {
 		const overlay = document.getElementById("disconnectOverlay");
 		const disconnectMessage = document.getElementById("disconnectMessage");
 		const voteContainer = document.getElementById("voteKickButtons");
+		if (!overlay || !disconnectMessage || !voteContainer)
+			return;
 		voteContainer.innerHTML = "";
 		if (disconnectedPlayers.length === 0)
 		{
@@ -116,11 +117,17 @@ export async function setupGameWebSocketHandlers(gameLogic)
 		if (message.room_id !== currentRoomId) return;
 		console.log(`Player reconnected: ${message.username} (ID: ${message.player_id})`);
 		const index = disconnectedPlayers.indexOf(message.player_id);
-		if (index !== -1)
+		if (index !== -1) {
 			disconnectedPlayers.splice(index, 1);
-		if (disconnectedPlayers.length === 0) {
-			document.getElementById("disconnectOverlay").classList.remove("show");
 		}
+		const disconnectOverlay = document.getElementById("disconnectOverlay");
+		if (disconnectOverlay)
+		{
+			if (disconnectedPlayers.length === 0)
+				disconnectOverlay.classList.remove("show");
+		}
+		else
+			console.log("disconnectOverlay element not found!");
 		updateDisconnectUI();
 	});
 
