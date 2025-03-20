@@ -36,9 +36,12 @@ function disconnectWebSocket()
 window.addEventListener('load', handleRoute);
 window.addEventListener('hashchange', handleRoute);
 
-function navigateTo(view)
+function navigateTo(view, params = new URLSearchParams())
 {
     window.location.hash = view;  // This changes the URL hash, triggering the route handling
+    if (params) {
+        window.location.search = params.toString();
+    }
 }
 
 async function silentRefresh()
