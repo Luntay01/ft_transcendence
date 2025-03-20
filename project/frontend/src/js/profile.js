@@ -97,7 +97,6 @@ async function updateProfile() {
 async function updateMfa() {
     const form = document.getElementById('mfaForm');
     const mfa = form.mfa.value;
-    localStorage.setItem('mfa', mfa);
     try { const response = await fetch('/api/profile/', {
             method: 'PATCH',
             headers: {
@@ -118,5 +117,5 @@ async function updateMfa() {
     } catch (error) {
         alert('Fail to save user information:', error);
     }
-    navigateTo('codeverify');
+    navigateTo('codeverify', new URLSearchParams({ mfa }));
 }

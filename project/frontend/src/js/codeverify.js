@@ -1,5 +1,6 @@
 export function setupCodeVerifyForm() {
-    if (localStorage.getItem('qrcode')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (localStorage.getItem('qrcode') && searchParams.has('mfa') && searchParams.get('mfa') == 'Authenticator') {
         let img = document.createElement('img');
         img.src = 'data:image/png;base64,' + localStorage.getItem('qrcode');
         img.alt = 'QR Code';
@@ -21,8 +22,8 @@ export function setupCodeVerifyForm() {
             });
             const data = await response.json();
             if (response.ok) {
-                if (localStorage.getItem('mfa')) {
-                    const mfa = localStorage.getItem('mfa');
+                if (searchParams.has('mfa')) {
+                    const mfa = searchParams.get('mfa');
                     localStorage.removeItem('qrcode');
                     try {
                         const response = await fetch('/api/users/', {
@@ -40,15 +41,14 @@ export function setupCodeVerifyForm() {
                     } catch (error) {
                         alert('Update error:', error);
                     }
-                    localStorage.removeItem('mfa');
                     alert('MFA option updated successfully!');
                     navigateTo('profile');
                 }
                 else {
-                alert('Verification succeeded! Welcome to Pong!');
-                localStorage.setItem('access', data.access);
-                localStorage.setItem('refresh', data.refresh);
-                navigateTo('home');
+                    alert('Verification succeeded! Welcome to Pong!');
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                    navigateTo('home');
                 }
             } else {
                 alert(data.error || 'Verification failed');
