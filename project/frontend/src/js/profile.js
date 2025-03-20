@@ -83,6 +83,7 @@ async function updateProfile() {
         const data = await response.json();
         if (response.ok) {
             alert('User information updated successfully!');
+            localStorage.setItem('username', data.username);
             localStorage.setItem('access', data.access);
             localStorage.setItem('refresh', data.refresh);
         } else {

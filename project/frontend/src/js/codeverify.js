@@ -22,6 +22,14 @@ export function setupCodeVerifyForm() {
             });
             const data = await response.json();
             if (response.ok) {
+				if (data.id)
+					localStorage.setItem('player_id', data.id);
+				else
+					console.warn('No player ID returned by the backend.');
+				if (data.username)
+					localStorage.setItem('username', data.username);
+				else
+					console.warn('No username returned by the backend.');
                 if (searchParams.has('mfa')) {
                     const mfa = searchParams.get('mfa');
                     localStorage.removeItem('qrcode');

@@ -28,14 +28,6 @@ function setupLoginFormEx(form)
 			if (response.ok) {
                 localStorage.setItem('email', email)
                 alert('MFA is enabled. Please verify code to login.');
-				if (data.id)
-					localStorage.setItem('player_id', data.id);
-				else
-					console.warn('No player ID returned by the backend.');
-				if (data.username)
-					localStorage.setItem('username', data.username);
-				else
-					console.warn('No username returned by the backend.');
                 navigateTo('codeverify');
 			} else {
 				alert(data.error || 'Login failed');

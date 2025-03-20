@@ -8,6 +8,8 @@ import qrcode
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
+        'id': user.id,
+        'username': user.username,
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
