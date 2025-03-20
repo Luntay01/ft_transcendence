@@ -39,8 +39,10 @@ window.addEventListener('hashchange', handleRoute);
 function navigateTo(view, params = new URLSearchParams())
 {
     window.location.hash = view;  // This changes the URL hash, triggering the route handling
-    if (params) {
+    if (params.toString() !== '') {
         window.location.search = params.toString();
+    } else {
+        window.location.href = window.location.href.replace("?", "");
     }
 }
 
