@@ -16,6 +16,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
 from users.serializers import UserSerializer
@@ -51,7 +52,7 @@ class OauthCodeView(views.APIView):
         logging.warning('code: ' + code)    #debug
         state = serializer.validated_data['state']
         logging.warning('state: ' + state)    #debug
-        REDIRECT_URL = HOST_URI + '/callback'
+        REDIRECT_URL = HOST_URI
         post_data = {
             'grant_type': 'authorization_code',
             'code': code,
@@ -100,16 +101,18 @@ class OauthCodeView(views.APIView):
                 logging.warning("input is not valid")
             userializer.save()
 
+        user: User = User.objects.get(username=content['login'])
+
         # return jwt token
-        post_data = {
-            'provider': '42Oauth',
-            'oauth_user_id': content['id'],
-            'password': access_token,
+        refresh = RefreshToken.for_user(user)
+        token_response = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'id': user.id,
+            'username': user.username
         }
-        # The following must be localhost:8000/api/token/ (trailing slash important), as we want the backend to communicate directly with it self
-        response = requests.post("http://localhost:8000/api/token/", data=post_data)
-        return Response(response.json(), status.HTTP_200_OK)
-    
+        return JsonResponse(token_response)
+
 class TokenObtainPairView(jwt_views.TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         if not ('provider' in request.data.keys()):
