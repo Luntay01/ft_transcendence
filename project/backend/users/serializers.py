@@ -67,8 +67,3 @@ class UserSerializer(serializers.ModelSerializer):
         instance.birth_day = validated_data.get('birth_day', instance.birth_day)
         instance.save()
         return instance
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'date_joined']
