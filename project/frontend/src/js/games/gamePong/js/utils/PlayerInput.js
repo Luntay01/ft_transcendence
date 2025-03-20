@@ -9,6 +9,8 @@ window.addEventListener("keyup", (e) => { keyState[e.key] = false; });
 function getCurrentKeyState() { return { ...keyState }; } // return a copy to avoid mutation issues
 export function processPlayerInput(player)
 {
+	if (!wsService || !wsService.isConnected())
+		return;
 	const controls = player.controls;
 	const currentKeys = getCurrentKeyState();
 	let movementDirection = "neutral";
