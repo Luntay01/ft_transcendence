@@ -21,13 +21,13 @@ class Room(models.Model):
 	def update_game_type(self, game_type):
 		if game_type is not None:
 			self.game_type = game_type
-			if self.game_type = 1:
+			if self.game_type == 1:
 				self.matches_left = 4
 			self._update_full_status()
-	def decrement_matches(self):
-		if self.matches_left > 0:
-			self.matches_left -= 1
-			self._update_full_status()
+	#def decrement_matches(self):
+	#	if self.matches_left > 0:
+	#		self.matches_left -= 1
+	#		self._update_full_status()
 	def remove_player(self, player: User) -> None:
 		if self.players.filter(id=player.id).exists():
 			self.players.remove(player)

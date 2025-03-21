@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
                 ('is_full', models.BooleanField(default=False)),
                 ('max_players', models.IntegerField(default=4)),
                 ('game_type', models.IntegerField(default=-1)),
+                ('matches_left', models.IntegerField(default=1)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('players', models.ManyToManyField(related_name='rooms', to=settings.AUTH_USER_MODEL)),
             ],
