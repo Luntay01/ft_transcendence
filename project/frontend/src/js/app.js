@@ -1,8 +1,56 @@
 // Function to handle route changes based on URL fragments
 
 let currentView = '';// track the current view
-function handleRoute()
+
+
+async function handleCallback(code, state) {
+    if (!code || !state) return false;
+
+	const response = await fetch("/api/oauth/", {
+        method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams({ code, state }),
+	})
+    if (!response.ok) {
+        return false;
+	}
+	const data = await response.json();
+    localStorage.setItem('access', data.access);
+    localStorage.setItem('refresh', data.refresh);
+    return true;
+	
+}
+
+async function handleRoute()
 {
+   
+    if (location.search.includes("state=") && 
+        (location.search.includes("code=") || 
+        location.search.includes("error="))) {
+        const queryString = window.location.search;
+    	const urlParms = new URLSearchParams(queryString);
+        const code = urlParms.get('code');
+        const state = urlParms.get('state');
+        window.history.replaceState({}, document.title, "/#login");
+        loadView('login');
+
+        if (localStorage.getItem('auth_request_state') != state) {
+            alert('Invalid state');
+            return ;
+        }
+        const res = await handleCallback(code, state);
+        if (!res) {
+            // console.log("code is not found");
+            alert('Login Failed');
+            return ;
+        }
+        window.history.replaceState({}, document.title, "/");
+        loadView('home');
+        return ;
+    }
+
+
+
     const newView = window.location.hash.replace('#', '') || 'welcome';
 
     // Prevent going back to matchmaking from the game screen
@@ -87,6 +135,8 @@ async function loadView(view)
         }
         const html = await response.text();
         document.getElementById('app').innerHTML = html;
+
+        document.title = `${view.charAt(0).toUpperCase()}${view.slice(1)} - Pong Games`;
 
         // After loading the view, set up the appropriate form handlers
         if (view == 'welcome') {
