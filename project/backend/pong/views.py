@@ -69,8 +69,8 @@ def matchmaking(request):
 			room = next
 			break
 	if room is None:
-	 	room = Room.objects.create_room(max_players=max_players)
-	 	room.update_game_type(game_type)
+		room = Room.objects.create_room(max_players=max_players)
+		room.update_game_type(game_type)
 	#max_players = 2 if game_mode == "2-player" else 4
 	#room = Room.objects.available_rooms(max_players).first()
 	#if not room or not (game_type == room.game_type):
