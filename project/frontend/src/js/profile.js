@@ -3,7 +3,7 @@ export async function setupProfile() {
 	const usernameInfo = document.getElementById('usernameInfo');
 	const access = localStorage.getItem('access');
 	try {
-		const response = await fetch('http://localhost:8000/api/users/me', {
+		const response = await fetch('/api/users/me', {
 			method: 'GET',
 			headers: { 'Authorization': `Bearer ${access}` }
 		});
@@ -13,7 +13,7 @@ export async function setupProfile() {
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
-			let src = `http://localhost:8000/${img}`;
+			let src = `${img}`;
 			let width = '250px';
 			let height = '250px';
 			usernameInfo.innerHTML = 

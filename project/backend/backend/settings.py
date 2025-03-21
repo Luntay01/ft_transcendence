@@ -27,7 +27,7 @@ MEDIA_URL = '/media/'
 #SECRET_KEY = 'django-insecure-=mj775y2rctj9mgdh2sz=_fi=f-65ng$_3&1dveu1*#x5gib9z'
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = int(os.environ.get("DJANGO_DEBUG", default=0))
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'nginx']
+ALLOWED_HOSTS = [os.environ.get('HOST_DOMAIN', 'localhost'), 'localhost', '127.0.0.1', 'nginx']
 REDIS_HOST = os.environ.get("REDIS_HOST", default="localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", default=6379))
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
@@ -179,7 +179,7 @@ PASSWORD_HASHERS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
+	'http://localhost:8080',    # Replace with your frontend domain if you have one
 	'http://localhost',    # Replace with your frontend domain if you have one
 ]
 

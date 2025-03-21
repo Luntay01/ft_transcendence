@@ -5,7 +5,7 @@ export async function setupHome() {
 	const access = localStorage.getItem('access');
 	const matchmakeButtons = document.querySelectorAll('.matchmakeButton');
 	try {
-		const response = await fetch('http://localhost:8000/api/users/me', {
+		const response = await fetch('/api/users/me', {
 			method: 'GET',
 			headers: { 'Authorization': `Bearer ${access}` }
 		});
@@ -15,7 +15,7 @@ export async function setupHome() {
 			let email = data.email;
 			let provider = data.provider;
 			let img = data.picture;
-			let src = `http://localhost:8000/${img}`;
+			let src = `${img}`;
 			let width = '50px';
 			let height = '50px';
 			userinfo.innerHTML = 
@@ -37,6 +37,8 @@ export async function setupHome() {
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
 	}
+	const storedGameMode = localStorage.getItem("gameMode") || "4-player";
+	updateGameModeButtonHighlight(storedGameMode);
 }
 async function buttonHandler(event) {
 	const btnNum = event.target.getAttribute("data-btnNum");
@@ -45,22 +47,19 @@ async function buttonHandler(event) {
 	console.log('Game type set to:', game_type);
 }
 
-function updateGameMode(mode)
-{
-	localStorage.setItem("gameMode", mode);
-	window.GAME_SETTINGS.gameMode = mode;
-	console.log(`Game mode updated to: ${mode}`);
+function updateGameModeButtonHighlight(mode) {
 	const buttons = document.querySelectorAll(".btn-group button");
 	buttons.forEach(button => button.classList.remove("active"));
 	const selectedButton = document.getElementById(`btn-${mode}`);
-	if (selectedButton)
+	if (selectedButton) {
 		selectedButton.classList.add("active");
-	console.log(`Game mode set to: ${mode}`, window.GAME_SETTINGS);
+	}
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-	const mode = localStorage.getItem("gameMode") || "4-player";
-	updateGameMode(mode);
-});
-
+function updateGameMode(mode) {
+	localStorage.setItem("gameMode", mode);
+	window.GAME_SETTINGS.gameMode = mode;
+	console.log(`Game mode updated to: ${mode}`);
+	updateGameModeButtonHighlight(mode);
+}
 window.updateGameMode = updateGameMode;

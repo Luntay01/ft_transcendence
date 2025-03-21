@@ -17,7 +17,8 @@ async def handle_event(event: str, room_id: str, data: dict):
 	if event == "start_game":
 		game_mode = data.get("gameMode", "4-player") 
 		await ensure_all_players_connected(room_id, data["players"])
-		players = connected_players.get(room_id, [])
+		#players = connected_players.get(room_id, [])
+		players = data["players"]
 		game_manager.create_game(room_id, players, game_mode)
 		game_manager.start_game(room_id)
 		logger.info(f"Game started for Room {room_id}")

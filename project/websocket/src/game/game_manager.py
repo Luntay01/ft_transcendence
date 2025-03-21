@@ -45,6 +45,8 @@ class GameManager:
 
 	def update_games(self, delta_time):
 		for game in self.games.values():
+			if not game.is_active:
+				continue
 			game.update(delta_time)
 
 	def cleanup_game(self, room_id):
