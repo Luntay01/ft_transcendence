@@ -8,6 +8,7 @@ class Room(models.Model):
 	players		= models.ManyToManyField(User, related_name='rooms')
 	max_players	= models.IntegerField(default=4)
 	game_type	= models.IntegerField(default=-1)
+	matches_left= models.IntegerField(default=1)
 	created_at	= models.DateTimeField(auto_now_add=True)
 	objects		= RoomManager()
 
@@ -20,6 +21,12 @@ class Room(models.Model):
 	def update_game_type(self, game_type):
 		if game_type is not None:
 			self.game_type = game_type
+			if self.game_type = 1:
+				self.matches_left = 4
+			self._update_full_status()
+	def decrement_matches(self):
+		if self.matches_left > 0:
+			self.matches_left -= 1
 			self._update_full_status()
 	def remove_player(self, player: User) -> None:
 		if self.players.filter(id=player.id).exists():
@@ -35,4 +42,5 @@ class Room(models.Model):
 		self.players.clear()
 		self.is_full = False
 		self.game_type = -1
+		self.matches_left = 1
 		self.save()
