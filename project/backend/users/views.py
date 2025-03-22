@@ -17,14 +17,22 @@ class UserView(views.APIView):
         serializer = UserSerializer(instance=users, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
-    # TODO: update if user is not verified yet
-    # TODO: fail if user is already verified
     def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data, partial=True)
-        if not (serializer.is_valid()):
-            return Response({'error', 'Data is invalid. Failed to create user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        serializer.save()
-        return Response(serializer.data, status.HTTP_201_CREATED)
+        try:
+            user = User.objects.get(email=request.data['email'], provider=request.data['provider'])
+            if user.is_verified:
+                return Response({'error': 'User already exists'}, status.HTTP_409_CONFLICT)
+            serializer = UserSerializer(instance=user, data=request.data, partial=True)
+            if not (serializer.is_valid()):
+                return Response({'error': 'Data is invalid. Failed to update user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            serializer = UserSerializer(data=request.data, partial=True)
+            if not (serializer.is_valid()):
+                return Response({'error', 'Data is invalid. Failed to create user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
 
     def patch(self, request):
         user: User = request.user
