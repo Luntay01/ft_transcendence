@@ -50,8 +50,9 @@ export function setupLoginForm() {
     oauthForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const clientId = "u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38";
-        const redirectUrl = encodeURIComponent(window.location.protocol + "//" + window.location.host + "/callback");
+        const redirectUrl = encodeURIComponent(window.location.protocol + "//" + window.location.host);
         const state = generateState(20);
+        localStorage.setItem('auth_request_state', state);
         const url = `https://api.intra.42.fr/oauth/authorize?` + 
             `client_id=${clientId}&` +
             `redirect_uri=${redirectUrl}&` +

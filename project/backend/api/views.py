@@ -130,7 +130,7 @@ class OauthCodeView(views.APIView):
         logging.warning('code: ' + code)    #debug
         state = serializer.validated_data['state']
         logging.warning('state: ' + state)    #debug
-        REDIRECT_URL = HOST_URI + '/callback'
+        REDIRECT_URL = HOST_URI
         post_data = {
             'grant_type': 'authorization_code',
             'code': code,
@@ -179,6 +179,8 @@ class OauthCodeView(views.APIView):
             if not (userializer.is_valid()):
                 logging.warning("input is not valid")
             userializer.save()
+
+        user: User = User.objects.get(username=content['login'])
 
         # return jwt token
         user = User.objects.get(provider='42Oauth', oauth_user_id=content['id'])
