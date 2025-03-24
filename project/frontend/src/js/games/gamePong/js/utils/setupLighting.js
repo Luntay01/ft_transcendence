@@ -1,4 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 
 /**
  * Adds lighting to the Three.js scene.

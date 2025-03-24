@@ -1,4 +1,6 @@
 // Function to handle route changes based on URL fragments
+import { loadGameSettings } from './games/gamePong/js/config.js';
+
 
 let currentView = '';// track the current view
 
@@ -52,15 +54,13 @@ async function handleRoute()
 
 
     const newView = window.location.hash.replace('#', '') || 'welcome';
-
     // Prevent going back to matchmaking from the game screen
-    if (currentView === 'gamePong' && newView === 'game_matchmaking')
+    if (currentView === 'gamePong' && newView === 'game_matchmaking' || currentView === 'game_end' && newView === 'gamePong')
     {
-        console.warn("Skipping matchmaking when exiting game. Redirecting to home.");
         navigateTo('home');
         return;
     }
-    if (currentView === 'gamePong' && newView !== 'gamePong')
+    if (currentView === 'gamePong' && newView !== 'gamePong'|| currentView === 'game_matchmaking' && newView !== 'gamePong')
     {
         console.log("Exiting game, disconnecting WebSocket...");
         disconnectWebSocket();
@@ -81,13 +81,19 @@ function disconnectWebSocket()
 }
 
 // Load the correct view when the page loads or the URL changes
-window.addEventListener('load', handleRoute);
-window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', async () => {
+    await loadGameSettings();
+    handleRoute();
+});
 
+//window.addEventListener('load', handleRoute);
+window.addEventListener('hashchange', handleRoute);
 function navigateTo(view)
 {
-    window.location.hash = view;  // This changes the URL hash, triggering the route handling
+	window.location.hash = view;  // This changes the URL hash, triggering the route handling
 }
+window.navigateTo = navigateTo;
+
 
 async function silentRefresh()
 {

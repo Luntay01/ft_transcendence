@@ -1,5 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
-
+const GAME_SETTINGS = window.GAME_SETTINGS;
 
 class FertilizerBall
 {
@@ -12,6 +11,7 @@ class FertilizerBall
 		this.targetPosition = new THREE.Vector3();
 		this.lastServerUpdate = performance.now();
 		this.lerpFactor = 0.1; // controls interpolation smoothness
+		this.id = null;
 		this.scale = scale;
 		this.rotationAxis = new THREE.Vector3(0, 1, 0);
 	}

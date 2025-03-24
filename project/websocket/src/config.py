@@ -44,7 +44,11 @@ REDIS_CHANNELS = {
 		"start_game_countdown",
 		"ball_despawn",
 		"player_eliminated",
-		"game_over"
+		"game_over",
+		"game_state",
+		"player_left",
+		"player_voted_out",
+		"game_resumed"
 	]
 }
 
