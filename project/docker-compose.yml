@@ -2,6 +2,8 @@
 
 services:
   nginx:
+    env_file:
+      - .env
     build:
       context: ./nginx
       dockerfile: Dockerfile
@@ -11,7 +13,7 @@ services:
       - static_files:/home/app/staticfiles
       - ./config/settings.json:/config/settings.json
     ports:
-      - "80:80"
+      - "${HOST_PORT:?Please set an appropriate HOST_PORT and HOST_PROTOCOL}:443"
     depends_on:
       - backend
       - frontend
@@ -101,7 +103,7 @@ services:
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "${POSTGRES_EXT_PORT:-5432}:5432"
 
   redis:
     build:
