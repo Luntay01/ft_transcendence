@@ -1,4 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 import mockUsers from "./mockUsers.js";
 import FlowerPot from '../components/FlowerPot.js';
 
@@ -17,7 +17,7 @@ export default async function setupPlayers(scene, playersData)
 	const players = [];
 	for (const [index, player] of playersData.entries())
 	{
-		const flowerPotId = flowerPotIds[index % flowerPotIds.length];
+		const flowerPotId = player.goal_zone;
 		const position = positions[flowerPotId];
 		if (!position)
 		{

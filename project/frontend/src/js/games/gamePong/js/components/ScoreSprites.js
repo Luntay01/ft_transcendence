@@ -1,4 +1,4 @@
-import { GAME_SETTINGS } from '../config.js';
+const GAME_SETTINGS = window.GAME_SETTINGS;
 
 export function createScoreUI(scene, playerCount) {
 	const { positions, colors, radius, textSize, textConfig } = GAME_SETTINGS.scoring.spriteConfig;

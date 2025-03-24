@@ -14,7 +14,37 @@ export function setupMatchmaking()
 {
     const statusMessage = document.getElementById('statusMessage');
     const roomData = { players: [] };
+    let isLeaving = false;
 
+    async function leaveMatchmaking()
+    {
+        if (isLeaving) return;
+        isLeaving = true;
+        const playerId = localStorage.getItem("player_id");
+        if (!playerId) return;
+        try {
+            const response = await fetch("/api/pong/leave_matchmaking/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ player_id: playerId })
+            });
+
+            if (response.ok) {
+                console.log("Successfully left matchmaking.");
+                clearInterval(roomStatusInterval); // Stop status updates
+            } else {
+                console.warn("Failed to leave matchmaking.");
+            }
+        } catch (error) {
+            console.error("Error leaving matchmaking:", error);
+        }
+    }
+    window.addEventListener("beforeunload", leaveMatchmaking);
+    window.addEventListener("hashchange", () => {
+        if (window.location.hash !== "#game_matchmaking") {
+            leaveMatchmaking();
+        }
+    });
     (async function startMatchmaking() {
         statusMessage.textContent = "Searching for a match...";
         try
@@ -33,7 +63,6 @@ export function setupMatchmaking()
             const roomId = initialRoomData.room_id;
             roomData.players = initialRoomData.players;
             updateStatusMessage(roomId, roomData.players);
-            
             const ws = WebSocketService.getInstance(); // singleton WebSocket instance
             ws.connect(getWebsocketURI(`/ws/connect?room_id=${roomId}&player_id=${playerId}&username=${username}`));
             
@@ -41,6 +70,7 @@ export function setupMatchmaking()
                 console.log("Start game event received:", message);
                 localStorage.setItem('roomId', message.room_id);
                 localStorage.setItem('players', JSON.stringify(message.players));
+                localStorage.setItem('gameMode', message.gameMode);
                 if (roomStatusInterval)
                 {
                     clearInterval(roomStatusInterval);
@@ -48,7 +78,6 @@ export function setupMatchmaking()
                 }
                 navigateTo('gamePong');
             });
-
             ws.registerEvent('player_joined', (message) => {
                 console.log("Player joined event received:", message);
                 const existingPlayer = roomData.players.find(player => player.id === message.player_id);
@@ -127,7 +156,7 @@ async function findMatch(playerId)
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId }),
+		body: new URLSearchParams({ player_id: playerId, gameMode: localStorage.getItem('gameMode') || '4-player'}),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');

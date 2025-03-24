@@ -5,6 +5,7 @@ from ..network.room_manager import register_player, unregister_player, connected
 from ..network.redis_utils import broadcast_to_room, notify_players
 from ..config import logger, MAX_PLAYERS_PER_ROOM
 from ..game.game_manager import game_manager
+from ..game.player_manager import eliminate_player
 
 """		Handles a new WebSocket connection.
 - Extracts player and room details from the connection URL.
@@ -53,6 +54,16 @@ async def process_incoming_event(data, websocket):
 	event = data.get("event")
 	room_id = data.get("room_id")
 	player_id = data.get("player_id")
+	if event == "vote_kick":
+		vote_key = data.get("vote_key")
+		if not vote_key or ":" not in vote_key:
+			return
+		voter_id, player_id = vote_key.split(":")
+		logger.info(f"[process_incoming_event] Received vote: Room {room_id}, Voter {voter_id}, Target {player_id}")
+		if voter_id == player_id:
+			logger.error(f"ERROR: Player {voter_id} attempted to vote themselves out! This should not happen.")
+			return
+		await handle_vote_kick(room_id, player_id, voter_id)
 	if event == "reconnect":
 		logger.info(f"Player {player_id} has reconnected to Room {room_id}")
 		await notify_players(room_id, {"event": "player_reconnected", "room_id": room_id, "player_id": player_id})
@@ -66,3 +77,44 @@ async def process_incoming_event(data, websocket):
 		game_instance.update_player_position(player_id, position)
 	else:
 		await broadcast_to_room(room_id, data, exclude=websocket)
+
+async def handle_vote_kick(room_id, player_id, voter_id):
+	room_id = str(room_id)
+	logger.info(f"[handle_vote_kick] Received: Room {room_id}, Voter {voter_id}, Target {player_id}")
+	if player_id == voter_id:
+		logger.error(f"ERROR: Player {voter_id} is trying to vote themselves out! This should not happen.")
+		return
+	game = game_manager.games.get(room_id)
+	if not game:
+		logger.warning(f"Cannot vote kick in Room {room_id}, no active game found.")
+		return
+	if player_id not in game.pending_kicks:
+		logger.warning(f"Player {player_id} is NOT in pending kicks. Ignoring vote.")
+		return
+	active_players = {p["player_id"] for p in connected_players.get(room_id, [])}
+	logger.info(f"Player {voter_id} is voting to kick Player {player_id} in Room {room_id}.")
+	logger.info(f"Active Players: {active_players}")
+	if voter_id not in active_players:
+		logger.warning(f"Invalid vote: Player {voter_id} is not in Room {room_id}.")
+		return
+	if voter_id in game.pending_kicks[player_id]:
+		logger.info(f"Player {voter_id} already voted to kick Player {player_id}. Ignoring duplicate vote.")
+		return
+	game.pending_kicks[player_id].add(voter_id)
+	total_votes_needed = len(active_players)
+	logger.info(f"Player {player_id} has {len(game.pending_kicks[player_id])}/{total_votes_needed} votes to be kicked.")
+	if len(game.pending_kicks[player_id]) >= total_votes_needed:
+		logger.info(f"Player {player_id} has been voted out.")
+		if player_id in game.player_lives:
+			logger.info(f"Setting Player {player_id}'s lives to 0 for elimination.")
+			game.player_lives[player_id] = 0
+		await eliminate_player(game, player_id)
+		await notify_players(room_id, {"event": "player_voted_out", "room_id": room_id, "player_id": player_id})
+		del game.pending_kicks[player_id]
+		if not game.pending_kicks:
+			logger.info(f"All pending kicks resolved. Resuming game in Room {room_id}.")
+			game.is_active = True
+			await notify_players(room_id, {"event": "game_resumed", "room_id": room_id})
+	else:
+		logger.info(f"Waiting for more votes. {len(game.pending_kicks[player_id])}/{total_votes_needed} votes received.")
+
