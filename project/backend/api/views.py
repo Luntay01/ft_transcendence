@@ -75,7 +75,9 @@ class SignupView(views.APIView):
         return
     
     def post(self, request, format=None):
-        UserView().post(request)
+        response = UserView().post(request)
+        if response.status_code not in (200, 201):
+            return response
         self.verify_email(request.data['email'])
         return Response({'message': 'Verification email has been sent'}, status.HTTP_201_CREATED)
 
