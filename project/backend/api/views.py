@@ -49,6 +49,12 @@ class LoginView(views.APIView):
         if (user.count() != 1):
             return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # DEBUG: return tokens without MFA
+        if int(os.getenv('DEBUG_SKIP_MFA', 0)) == 1:
+            tokens = get_tokens_for_user(user.get())
+            return Response(tokens, status=status.HTTP_200_OK)
+        # <-- MFA skip
+
         if user.get().mfa == 'Email':
             verify_code = generate_otp(user.get())
             subject = "Verify Email"

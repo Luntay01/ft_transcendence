@@ -139,4 +139,7 @@ project/
    DJANGO_TEST_NAME_3=test3
    DJANGO_TEST_EMAIL_3=test3@example.com
    DJANGO_TEST_PASSWORD_3=test3
+
+   # For debug
+   DEBUG_SKIP_MFA=<0:MFA enabled / 1:MFA disabled>
    ```

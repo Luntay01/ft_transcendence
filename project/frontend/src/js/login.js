@@ -27,6 +27,16 @@ function setupLoginFormEx(form)
 			const data = await response.json();
 			if (response.ok) {
                 localStorage.setItem('email', email)
+                // DEBUG: skip MFA
+                if (data.access) {
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                    localStorage.setItem('player_id', data.id);
+                    localStorage.setItem('username', data.username);
+                    navigateTo('home');
+                    return ;
+                }
+                // <-- MFA skip
                 alert('MFA is enabled. Please verify code to login.');
                 navigateTo('codeverify');
 			} else {
