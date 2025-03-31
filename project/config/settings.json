@@ -105,7 +105,7 @@
         },
         "ambientLight": {
             "color": "#FFFFFF",
-            "intensity": 0.5
+            "intensity": 0.1
         },
         "backgroundColor": "#009900"
     },
@@ -114,10 +114,11 @@
         "returnSpeed": 1.5
     },
     "modelPaths": {
-        "flowerPot": "/js/games/gamePong/assets/models/flower_pot.glb",
-        "gardenBed": "/js/games/gamePong/assets/models/garden_bed.glb",
+        "flowerPot": "/js/games/gamePong/assets/models/pot.gltf",
+        "gardenBed": "/js/games/gamePong/assets/models/planter.gltf",
         "grassBlade": "/js/games/gamePong/assets/models/grass_blade.glb",
-        "fertilizerBall": "/js/games/gamePong/assets/models/fertilizer_ball.glb"
+        "background": "/js/games/gamePong/assets/models/scene2.gltf",
+        "fertilizerBall": "/js/games/gamePong/assets/models/ball.gltf"
     },
     "sounds": {
         "collision": "/js/games/gamePong/assets/collision.mp3",

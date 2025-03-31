@@ -43,6 +43,7 @@ export async function initPong()
 		//await loadGameSettings();
 		const renderer = createRenderer(container);
 		const gameLogic = new GameLogic(renderer);
+		window.game = gameLogic;
 		const handleResize = setupResizeListener(renderer, gameLogic);
 		await gameLogic.init();
 		const animationId = startAnimation(gameLogic, renderer);

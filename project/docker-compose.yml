@@ -71,25 +71,25 @@ services:
       - backend
       - redis
 
-  ai_worker:
-    build:
-      context: ./ai
-      dockerfile: Dockerfile
-    container_name: ai_worker
-    depends_on:
-      - redis
-    env_file:
-      - .env
+  # ai_worker:
+  #   build:
+  #     context: ./ai
+  #     dockerfile: Dockerfile
+  #   container_name: ai_worker
+  #   depends_on:
+  #     - redis
+  #   env_file:
+  #     - .env
 
-  cli_game:
-    build:
-      context: ./cli_game
-      dockerfile: Dockerfile
-    container_name: cli_game
-    depends_on:
-      - backend
-    env_file:
-      - .env
+  # cli_game:
+  #   build:
+  #     context: ./cli_game
+  #     dockerfile: Dockerfile
+  #   container_name: cli_game
+  #   depends_on:
+  #     - backend
+  #   env_file:
+  #     - .env
 
   postgres:
     build:

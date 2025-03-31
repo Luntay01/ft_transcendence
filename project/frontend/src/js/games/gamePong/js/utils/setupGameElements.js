@@ -25,11 +25,13 @@ export default async function setupGameElements(scene, objects, ballPool)
 	}
 
 	// create and add grass
-	const grassModel = await ModelLoader.loadModel(modelPaths.grassBlade);
-	const grassInstance = new Grass(grassModel);
-	const grassField = grassInstance.createGrassField();
-	scene.add(grassField);
-	objects.push(grassInstance);
+	// const grassModel = await ModelLoader.loadModel(modelPaths.grassBlade);
+	//const grassInstance = new Grass(grassModel);
+	//const grassField = grassInstance.createGrassField();
+	const backgroundScene = await ModelLoader.loadModel(modelPaths.background)
+	scene.add(backgroundScene);
+	console.log("We updaintgin?");
+	//objects.push(backgroundScene);
 
 	// create and add FertilizerBalls to the ballPool
 	for (let i = 0; i < 5; i++)
@@ -41,5 +43,4 @@ export default async function setupGameElements(scene, objects, ballPool)
 		fertilizerBall.id = i+1;
 		ballPool.push(fertilizerBall);  // sdd to the pool
 	}
-
 }
