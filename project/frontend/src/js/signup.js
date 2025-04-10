@@ -8,15 +8,16 @@ export function setupSignupForm() {
         const provider = 'Pong';
 
         try {
-            const response = await fetch('/api/users/', {
+            const response = await fetch('/api/signup/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password, email, provider }),
             });
             const data = await response.json();
             if (response.ok) {
-                alert('Signup successful! Please login.');
-                window.location.hash = 'login';
+                localStorage.setItem('email', email);
+                alert('Verification code is sent to your email! Please verify your email.');
+                navigateTo('codeverify');
             } else {
                 alert(data.error || 'Signup failed');
             }

@@ -68,15 +68,18 @@ project/
 - **Docker** for containerization
 
 ## API endpoint
-### Token
+### Application Service
 | Method | Path | Usage | 
 | ---- | ---- | --- |
-| POST | /api/token | get jwt using email and password|
+| POST | /api/codeverify | verify code in MFA |
+| POST | /api/login | login by email and password |
+| POST | /api/signup | signup a user and send verification mail |
+| POST | /api/oauth| get jwt using authentication code in Oauth |
+| PATCH | /api/profile| update profiles |
 | POST | /api/token/refresh | refresh jwt usign refresh token |
 | POST | /api/token/verify | verify acccess token or refresh token |
-| POST | /api/oauth| get jwt using authentication code in Oauth |
 
-### User
+### User Model
 | Method | Path | Loigin required | Usage | 
 | ----  | ---- | ---- | --- |
 | GET   | /api/users/ | Y | list all users' data |
@@ -113,10 +116,30 @@ project/
    DJANGO_DEBUG=1
 
    # 42 Oauth Authorization App
-   # NOTE: secret will expire on 22 Jan 2025
+   # NOTE: secret is updated every 4 weeks
    CLIENT_ID=u-s4t2ud-7eb0d578913ab9934c2b116843901211c2e920a996f3a96f058464f1d33e1f38
    CLIENT_SECRET=< client secret (*contact developers to get value) >
 
    # Websocket/frontend shared volume path
    CONFIG_PATH=/config/settings.json
+
+   # Email Settings
+   EMAIL_HOST_PASSWORD=< SendGrid API key >
+   EMAIL_ACCOUNT=no-reply@42transcendencepong.com
+
+   # Test User (optional)
+   DJANGO_TEST_NAME_1=test1
+   DJANGO_TEST_EMAIL_1=test1@example.com
+   DJANGO_TEST_PASSWORD_1=test1
+
+   DJANGO_TEST_NAME_2=test2
+   DJANGO_TEST_EMAIL_2=test2@example.com
+   DJANGO_TEST_PASSWORD_2=test2
+
+   DJANGO_TEST_NAME_3=test3
+   DJANGO_TEST_EMAIL_3=test3@example.com
+   DJANGO_TEST_PASSWORD_3=test3
+
+   # For debug
+   DEBUG_SKIP_MFA=<0:MFA enabled / 1:MFA disabled>
    ```
