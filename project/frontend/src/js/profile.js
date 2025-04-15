@@ -23,30 +23,15 @@ export async function setupProfile() {
 			const src = `${img}`;
 			const width = '250px';
 			const height = '250px';
-			usernameInfo.innerHTML = 
-			`
-			<h1>${data.username}'s Profile</h1>
-			`;
+			usernameInfo.textContent = `${data.username}'s Profile`;
 			picture.innerHTML = 
 			`
 			<img src="${src}" alt="no picture found" width="${width}" height="${height}">
 			`;
-			username.innerHTML =
-			`
-            <h2 id="currentUsername">${data.username}</h2>
-			`;
-            email.innerHTML =
-            `
-            <h2 id="currentEmail">${data.email}</h2>
-            `;
-            provider.innerHTML =
-            `
-            <h2 id="currentProvider">${data.provider}</h2>
-            `;
-            mfa.innerHTML =
-            `
-            <h2 id="currentMfa">${data.mfa}</h2>
-            `;
+			username.textContent = data.username;
+            email.textContent = data.email;
+            provider.textContent = data.provider;
+            mfa.textContent = data.mfa;
 		}
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
@@ -54,16 +39,16 @@ export async function setupProfile() {
 }
 
 function setupProfileModal() {
-    const username = document.getElementById('currentUsername');
-    const email = document.getElementById('currentEmail');
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
     const usernameInput = document.getElementById('usernameInput');
     const emailInput = document.getElementById('emailInput');
-    usernameInput.value = username.innerText;
-    emailInput.value = email.innerText;
+    usernameInput.value = username.textContent;
+    emailInput.value = email.textContent;
 }
 
 function setupMfaModal() {
-    const mfa = document.getElementById('currentMfa');
+    const mfa = document.getElementById('mfa');
     const mfaSelect = document.getElementById('mfaSelect');
     mfaSelect.value = mfa.innerText;
 }

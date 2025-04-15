@@ -17,18 +17,9 @@ export async function setupHome() {
 			let src = `${img}`;
 			let width = '50px';
 			let height = '50px';
-			userinfo.innerHTML = 
-			`
-			<div class ="top-right">
-			<img src="${src}" alt="picture is not found" width=${width} height=${height}>
-			</div>
-			<div class="center-container">
-			<p> Welcome back, ${username}!</p>
-			</div>
-			<div class="bottom-container">
-			<p> Service Provider: ${provider} </p>
-			</div>
-			`
+			document.getElementById("userGreeting").textContent = `Welcome back, ${username}!`;
+			document.getElementById("profilePicture").innerHTML = `<img src="${src}" alt="picture is not found" width=${width} height=${height}>`;
+			document.getElementById("serviceProvider").textContent = `Service Provider: ${provider}`;
 		}
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
