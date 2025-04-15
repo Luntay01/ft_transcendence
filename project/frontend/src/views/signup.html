@@ -13,7 +13,7 @@
 <body>
     <h2>Enter Details Below</h2>
     <form id="signupForm" class="form-group">
-        <input type="text" name="usernameSignup" class="form-control" placeholder="Username" maxlenght="256" required>
+        <input type="text" name="usernameSignup" class="form-control" placeholder="Username" pattern="[0-9a-zA-z]*$" maxlenght="256" required>
         <input type="password" name="passwordSignup" class="form-control" placeholder="Password" maxlenght="256" required>
         <input type="email" name="emailSignup" class="form-control" placeholder="Email" maxlength=320 required>
         <button type="submit" class="btn btn-success mt-2">Signup</button>
