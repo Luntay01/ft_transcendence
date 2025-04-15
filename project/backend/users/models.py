@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import EmailValidator
+from django.core.validators import EmailValidator, RegexValidator
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
@@ -11,6 +11,9 @@ from .managers import UserManager
 # Users
 # TODO: validate inputs
 class User(AbstractBaseUser, PermissionsMixin):
+
+	alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+
 	id = models.AutoField(auto_created=True, primary_key=True)
 	email = models.EmailField(max_length=512, validators=[EmailValidator])
 	PROVIDER = {
@@ -20,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	provider = models.CharField(max_length=20, choices=PROVIDER, default='Pong')
 	oauth_user_id = models.CharField(max_length=20, null=True)
 	password = models.CharField(max_length=256)
-	username = models.CharField(max_length=256, unique=True)
+	username = models.CharField(max_length=256, unique=True, validators=[alphanumeric])
 	picture = models.ImageField(upload_to='images/', default='images/default.png')
 
 	otp_secret = models.CharField(max_length=256, default=pyotp.random_base32)
