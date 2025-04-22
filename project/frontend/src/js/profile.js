@@ -5,6 +5,7 @@ window.updateProfile = updateProfile;
 window.updateMfa = updateMfa;
 window.previewImage = previewImage;
 window.updatePicture = updatePicture;
+window.logout = logout;
 
 export async function setupProfile() {
 	const usernameInfo = document.getElementById('usernameInfo');
@@ -157,4 +158,9 @@ async function updatePicture() {
         alert('Fail to upload picture:', error);
     }
     setupProfile();
+}
+
+function logout() {
+    localStorage.clear();
+    navigateTo('');
 }
