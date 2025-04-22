@@ -3,6 +3,8 @@ window.setupProfile = setupProfile;
 window.setupMfaModal = setupMfaModal;
 window.updateProfile = updateProfile;
 window.updateMfa = updateMfa;
+window.previewImage = previewImage;
+window.updatePicture = updatePicture;
 
 export async function setupProfile() {
 	const usernameInfo = document.getElementById('usernameInfo');
@@ -119,4 +121,40 @@ async function updateMfa() {
         alert('Fail to save user information:', error);
     }
     navigateTo('codeverify', new URLSearchParams({ mfa }));
+}
+
+function previewImage() {
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const file = fileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+async function updatePicture() {
+    const fileInput = document.getElementById('fileInput')
+    const form = new FormData();
+    form.append('picture', fileInput.files[0]);
+    try { const response = await fetch('/api/profile/', {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access')}`
+            },
+            body: form
+        });
+        if (response.ok) {
+            alert('PIcute has been uploaded!');
+        } else {
+            alert('Fail to upload picture:', response.statusText);
+        }
+    } catch (error) {
+        alert('Fail to upload picture:', error);
+    }
+    setupProfile();
 }
