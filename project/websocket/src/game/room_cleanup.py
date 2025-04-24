@@ -37,8 +37,7 @@ class RoomCleanup:
 		if room_id in game_manager.games:
 			game_manager.games[room_id].ball_manager.stop()
 			del game_manager.games[room_id]
-			logger.info(f"Game state for Room {room_id} removed.")
-
+			logger.info(f"Game state inroomcleanup.pyfor Room {room_id} removed.")
 			redis_client.delete(f"room_state:{room_id}")
 			redis_client.delete(f"room_cleanup:{room_id}")
 			logger.info(f"Redis data for Room {room_id} cleared.")

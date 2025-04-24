@@ -1,6 +1,7 @@
 from ..game.game_manager import GameManager
 from ..network.room_manager import connected_players
 from ..config import logger
+from ..network.websocket_handler import get_game_type
 import asyncio
 
 game_manager = GameManager()
@@ -15,14 +16,23 @@ game_manager = GameManager()
 """
 async def handle_event(event: str, room_id: str, data: dict):
 	if event == "start_game":
-		game_mode = data.get("gameMode", "4-player") 
+		game_mode = data.get("gameMode", "4-player")
+		game_type = get_game_type(room_id) 
 		await ensure_all_players_connected(room_id, data["players"])
 		#players = connected_players.get(room_id, [])
 		players = data["players"]
-		game_manager.create_game(room_id, players, game_mode)
+		game_manager.create_game(room_id, players, game_mode, game_type)
 		game_manager.start_game(room_id)
 		logger.info(f"Game started for Room {room_id}")
-
+	if event == "update_matches":
+		matches = data.get("matches")
+		room_done = data.get("room_done")
+		logger.info(f"updateMatch Eventhand, Matches: {matches}, roomdone: {room_done}")
+		game_manager.update_matches(room_id, matches, room_done)
+	if event == "tourn_signal":
+		signal = data.get("signal")
+		logger.info(f"tournpage signal recived: {signal}")
+		game_manager.signal_store(room_id, signal)
 """
 	Wait until all expected players are connected to the specified room.
 

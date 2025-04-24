@@ -62,8 +62,11 @@ export function setupMatchmaking()
             if(!game_type)
                 console.error("game_type not found");
             const initialRoomData = await findMatch(playerId);
-            //could break here
             const roomId = initialRoomData.room_id;
+            let matches = 1;
+            if (game_type == 1)
+                matches = 4;
+            localStorage.setItem('matches', matches);
             roomData.players = initialRoomData.players;
             updateStatusMessage(roomId, roomData.players);
             const ws = WebSocketService.getInstance(); // singleton WebSocket instance
@@ -74,6 +77,7 @@ export function setupMatchmaking()
                 localStorage.setItem('roomId', message.room_id);
                 localStorage.setItem('players', JSON.stringify(message.players));
                 localStorage.setItem('gameMode', message.gameMode);
+                console.log("matchmaking games leftforstartevent : ", localStorage.getItem("matches"));
                 if (roomStatusInterval)
                 {
                     clearInterval(roomStatusInterval);

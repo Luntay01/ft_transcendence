@@ -146,6 +146,22 @@ class GameLogic
 		localStorage.removeItem('players');
 	}
 
+	async sendMatchCount(matchesleft) {
+		console.log("Sending match count:", matchesleft, localStorage.getItem('roomId'));
+		const response = await fetch('/api/pong/update_matches/', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({ matches: matchesleft, room_id: localStorage.getItem('roomId') }),
+		});
+	
+		if (!response.ok) {
+			const errorText = await response.text();
+			console.error("Server responded with an error:", response.status, errorText);
+			throw new Error('Failed to update matchcount, Please try again.');
+		}
+		const data = await response.json();
+		return data;
+	}
 
 	endGame(winnerId)
 	{
@@ -157,10 +173,30 @@ class GameLogic
 		}
 		else
 			localStorage.setItem("gameWinner", winnerId);
-		this.cleanup();
-		navigateTo('game_end');
+		const game_type = localStorage.getItem('game_type');
+		if (game_type == 1){
+			console.log(`game_type: ${game_type} with players:`, game_type);
+			console.log("Raw matches from localStorage:", localStorage.getItem("matches"));
+			let matches = localStorage.getItem("matches");
+			matches -= 1;
+			localStorage.setItem('matches', matches);
+			this.sendMatchCount(matches);
+			if (matches != 0){
+				//localStorage.setItem('matches', matches);
+				//this.cleanup();
+				navigateTo('tourn_display');
+			}
+			else{
+				this.cleanup();
+				navigateTo('game_end');
+			}
+		}
+		else
+		{
+			this.cleanup();
+			navigateTo('game_end');
+		}
 	}
-	
 
 }
 

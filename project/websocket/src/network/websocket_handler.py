@@ -16,6 +16,15 @@ Args:
 	websocket (WebSocketServerProtocol): The WebSocket connection.
 	path (str): The request path containing query parameters.
 """
+def get_game_type(room_id):
+	room = connected_players.get(room_id, [])
+	if room:
+		for player in room:
+			game_type = player.get("game_type")
+			if game_type:
+				return game_type
+	return None
+
 async def handler(websocket, path):
 	def parse_connection_params(path):
 		parsed_path = urlparse(path)

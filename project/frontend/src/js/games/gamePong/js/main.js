@@ -48,6 +48,7 @@ export async function initPong()
 		await gameLogic.init();
 		const animationId = startAnimation(gameLogic, renderer);
 		setupMutationObserver(container, animationId, renderer, handleResize);
+		console.log("init complete");
 	}
 	catch (error)
 	{

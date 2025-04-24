@@ -29,6 +29,6 @@ async def eliminate_player(self, player_id):
 	if player_id in self.player_positions:
 		del self.player_positions[player_id]
 	remaining_players = [pid for pid, lives in self.player_lives.items() if lives > 0]
-	if len(remaining_players) == 1:
+	if len(remaining_players) == 1:		
 		self.elimination_order.append(remaining_players[0])
 		asyncio.create_task(self._end_game(winner_id=remaining_players[0]))

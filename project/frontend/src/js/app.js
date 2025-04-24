@@ -60,7 +60,9 @@ async function handleRoute()
         navigateTo('home');
         return;
     }
-    if (currentView === 'gamePong' && newView !== 'gamePong'|| currentView === 'game_matchmaking' && newView !== 'gamePong')
+    if ((currentView === 'gamePong' || currentView === 'game_matchmaking' || currentView === 'tourn_display') &&
+	newView !== 'gamePong' &&
+	newView !== 'tourn_display')
     {
         console.log("Exiting game, disconnecting WebSocket...");
         disconnectWebSocket();
@@ -172,6 +174,10 @@ async function loadView(view)
             else if (view === 'gamePong') {
                 const { initPong } = await import('./games/gamePong/js/main.js');
                 initPong();
+            }
+            else if (view === 'tourn_display') {
+                const { setupEndMatchScreen } = await import('./tourn_display.js');
+                setupEndMatchScreen();
             }
             else if (view === 'game_end') {
                 const { setupEndGameScreen } = await import('./game_end.js');

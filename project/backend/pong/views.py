@@ -198,6 +198,59 @@ def get_match_results(request, winner_id):
 		return JsonResponse({"error": "Match not found"}, status=404)
 
 @csrf_exempt
+def tournpage_response(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Invalid request method")
+	signal = 0
+	signal = int(request.POST.get('signal', 0))
+	room_id = request.POST.get('room_id', 0)
+	
+	if signal is None:
+		return HttpResponseBadRequest("signal not found to send")
+	signal_data = {
+		"event": "tourn_signal",
+		"room_id": room_id,
+		"signal": signal,
+    }
+	redis_client.publish("update_matches", json.dumps(signal_data))
+	return JsonResponse({"message": f"tourn signal page swap sent"})
+
+
+@csrf_exempt
+def update_matches(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Invalid request method")
+	matches = request.POST.get('matches')
+	room_id = request.POST.get('room_id')
+	#matches number err check
+	#room_id = int(room_id)
+	#room = Room.objects.filter(id=room_id).first()
+	#room = None
+	room, created = Room.objects.get_or_create(id=room_id)
+	if created:
+		logger.warning(f" Room {room_id} was recreated to allow match result storage.")
+	#for next in Room.objects.full_rooms():
+	#	logger.info(f"room_id: {room_id}")
+	#	logger.info(f"Room dot ID: {next.id}")
+	#	if next.id == room_id:
+	#		room = next
+	#		break
+	if room is None:
+		return HttpResponseBadRequest("Room id not found to decrement matches")
+	room.decrement_matches(matches)
+	room_payload = {
+		"event": "update_matches",
+		"room_id": room.id, 
+		"matches": room.matches_left,
+		"room_done": room.room_done,
+	}
+	#send off updates to a monitor waiting
+	#if room.room_done == True:
+	redis_client.publish("update_matches", json.dumps(room_payload))
+	return JsonResponse({"message": f"matches updated successfully"})
+
+
+@csrf_exempt
 def leave_matchmaking(request):
 	if request.method != "POST":
 		return JsonResponse({"error": "Invalid request method"}, status=405)
