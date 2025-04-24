@@ -2,6 +2,7 @@ import json
 import asyncio
 import copy
 import aiohttp
+import time
 from ..config import logger, update_logger, redis_client
 from .game import Game
 from .game_state_manager import game_state_manager
@@ -69,7 +70,9 @@ class GameManager:
 			"gameMode": game_mode,
 			"game_type" : game_type,
 		}
+		del self.games[room_id]
 		logger.info(f"restart game fucntion called.")
+		time.sleep(5)
 		redis_client.publish("start_game", json.dumps(start_game_payload))
 	
 	def update_matches(self, room_id, matches, room_done):
@@ -84,9 +87,10 @@ class GameManager:
 			self.games[room_id].ball_manager.stop()
 			if self.games[room_id].game_type == 1 and self.games[room_id].room_done == False:# and self.games[room_id].signal == 1: 
 				self.restart_game(room_id)
-			del self.games[room_id]
-			logger.info(f"Game stateingamemanage for Room {room_id} removed.")
-			game_state_manager.clear_game_state(room_id)
+			else:
+				del self.games[room_id]
+				logger.info(f"Game stateingamemanage for Room {room_id} removed.")
+				game_state_manager.clear_game_state(room_id)
 
 game_manager = GameManager()
 
