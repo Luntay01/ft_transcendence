@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import User
+from django.core.files.base import ContentFile
+from django.conf import settings
+import os
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +45,12 @@ class UserSerializer(serializers.ModelSerializer):
     
     # override to hash password
     def create(self, validated_data):
+        picture = validated_data.pop('picture', None)
+        if picture is None:
+            with open(os.path.join(settings.MEDIA_ROOT, 'images', 'default.png'), 'rb') as image_file:
+                image_content = image_file.read()
+            image = ContentFile(image_content, name=validated_data['username']+'.png')
+            validated_data['picture'] = image
         unhashed_password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if unhashed_password is not None:
