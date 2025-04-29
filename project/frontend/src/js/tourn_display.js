@@ -1,4 +1,4 @@
-export async function setupEndMatchScreen()
+export async function setupEndTournScreen()
 {
 	const winnerId = localStorage.getItem("gameWinner");
 	const accessToken = localStorage.getItem("access"); 

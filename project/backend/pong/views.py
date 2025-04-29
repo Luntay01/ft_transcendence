@@ -268,6 +268,7 @@ def leave_matchmaking(request):
 		return JsonResponse({"error": "Player is not in a matchmaking room"}, status=404)
 	room.remove_player(player)
 	room.save()
+	#clear room function from kyle not used here, pretty sure delete doesnt work or at least doesnt clear variables
 	if room.players.count() == 0:
 		room.delete()
 	return JsonResponse({"message": f"Player {player_id} removed from matchmaking"})

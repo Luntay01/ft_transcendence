@@ -176,8 +176,8 @@ async function loadView(view)
                 initPong();
             }
             else if (view === 'tourn_display') {
-                const { setupEndMatchScreen } = await import('./tourn_display.js');
-                setupEndMatchScreen();
+                const { setupEndTournScreen } = await import('./tourn_display.js');
+                setupEndTournScreen();
             }
             else if (view === 'game_end') {
                 const { setupEndGameScreen } = await import('./game_end.js');
