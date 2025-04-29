@@ -23,7 +23,6 @@ export async function setupProfile() {
 		const data = await response.json();
 		if (response.ok) {
 			const img = data.picture;
-			const src = `${img}`;
 			const width = '250px';
 			const height = '250px';
 			usernameInfo.innerHTML = 
@@ -32,7 +31,7 @@ export async function setupProfile() {
 			`;
 			picture.innerHTML = 
 			`
-			<img src="${src}" alt="no picture found" width="${width}" height="${height}">
+			<img src="${img}?lastmod=${Date.now()}" alt="no picture found" width="${width}" height="${height}">
 			`;
 			username.innerHTML =
 			`

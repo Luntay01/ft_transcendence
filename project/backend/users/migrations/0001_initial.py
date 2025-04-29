@@ -2,6 +2,7 @@
 
 import django.core.validators
 import django.utils.timezone
+from django.conf import settings
 from django.db import migrations, models
 import pyotp
 
@@ -25,7 +26,7 @@ class Migration(migrations.Migration):
                 ('oauth_user_id', models.CharField(max_length=20, null=True)),
                 ('password', models.CharField(max_length=256)),
                 ('username', models.CharField(max_length=256, unique=True)),
-                ('picture', models.ImageField(default='images/default.png', upload_to='images/')),
+                ('picture', models.ImageField(default=settings.DEFAULT_IMAGE_PATH, upload_to='images/')),
                 ('first_name', models.CharField(max_length=128)),
                 ('last_name', models.CharField(max_length=128)),
                 ('mfa', models.CharField(choices=[('Email', 'Email'), ('Authenticator', 'Authenticator')], max_length=20, default='Email')),
