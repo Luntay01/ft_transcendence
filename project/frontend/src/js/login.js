@@ -19,25 +19,26 @@ function setupLoginFormEx(form)
 		const provider = 'Pong';
 
 		try {
-			const response = await fetch('/api/token/', {
+			const response = await fetch('/api/login/', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body: new URLSearchParams({ email, password, provider }),
 			});
 			const data = await response.json();
 			if (response.ok) {
-				alert('Login successful!');
-				localStorage.setItem('access', data.access);
-				localStorage.setItem('refresh', data.refresh);
-				if (data.id)
-					localStorage.setItem('player_id', data.id);
-				else
-					console.warn('No player ID returned by the backend.');
-				if (data.username)
-					localStorage.setItem('username', data.username);
-				else
-					console.warn('No username returned by the backend.');
-				navigateTo('home');
+                localStorage.setItem('email', email)
+                // DEBUG: skip MFA
+                if (data.access) {
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                    localStorage.setItem('player_id', data.id);
+                    localStorage.setItem('username', data.username);
+                    navigateTo('home');
+                    return ;
+                }
+                // <-- MFA skip
+                alert('MFA is enabled. Please verify code to login.');
+                navigateTo('codeverify');
 			} else {
 				alert(data.error || 'Login failed');
 			}

@@ -90,9 +90,15 @@ window.addEventListener('load', async () => {
 
 //window.addEventListener('load', handleRoute);
 window.addEventListener('hashchange', handleRoute);
-function navigateTo(view)
+
+function navigateTo(view, params = new URLSearchParams())
 {
-	window.location.hash = view;  // This changes the URL hash, triggering the route handling
+    window.location.hash = view;  // This changes the URL hash, triggering the route handling
+    if (params.toString() !== '') {
+        window.location.search = params.toString();
+    } else {
+        window.location.href = window.location.href.replace("?", "");
+    }
 }
 window.navigateTo = navigateTo;
 
@@ -155,6 +161,9 @@ async function loadView(view)
         } else if (view === 'signup') {
             const { setupSignupForm } = await import('./signup.js');
             setupSignupForm();
+        } else if (view === 'codeverify') {
+            const { setupCodeVerifyForm } = await import('./codeverify.js');
+            setupCodeVerifyForm();
         } else {
             const isTokenValid = await silentRefresh();
             if (!isTokenValid) {

@@ -3,7 +3,7 @@
 import django.core.validators
 import django.utils.timezone
 from django.db import migrations, models
-
+import pyotp
 
 class Migration(migrations.Migration):
 
@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                 ('picture', models.ImageField(default='images/default.png', upload_to='images/')),
                 ('first_name', models.CharField(max_length=128)),
                 ('last_name', models.CharField(max_length=128)),
+                ('mfa', models.CharField(choices=[('Email', 'Email'), ('Authenticator', 'Authenticator')], max_length=20, default='Email')),
                 ('trophies', models.IntegerField(default=0)),
+                ('otp_secret', models.CharField(max_length=256, default=pyotp.random_base32)),
+                ('is_verified', models.BooleanField(default=False)),
                 ('is_staff', models.BooleanField(default=False)),
                 ('is_active', models.BooleanField(default=True)),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now)),

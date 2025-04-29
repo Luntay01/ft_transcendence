@@ -2,7 +2,6 @@ from django.http import Http404
 from rest_framework import views, status
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer
 from .models import User
@@ -12,24 +11,34 @@ class UserView(views.APIView):
         if self.request.method == 'POST':
             return [AllowAny()]
         return [IsAuthenticated()]
-
+    
     def get(self, request, format=None):
         users = User.objects.all()
         serializer = UserSerializer(instance=users, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data, partial=True)
-        if not (serializer.is_valid()):
-            return Response('', status.HTTP_422_UNPROCESSABLE_ENTITY)
-        serializer.save()
-        return Response(serializer.data, status.HTTP_201_CREATED)
+        try:
+            user = User.objects.get(email=request.data['email'], provider=request.data['provider'])
+            if user.is_verified:
+                return Response({'error': 'User already exists'}, status.HTTP_409_CONFLICT)
+            serializer = UserSerializer(instance=user, data=request.data, partial=True)
+            if not (serializer.is_valid()):
+                return Response({'error': 'Data is invalid. Failed to update user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            serializer = UserSerializer(data=request.data, partial=True)
+            if not (serializer.is_valid()):
+                return Response({'error', 'Data is invalid. Failed to create user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
 
     def patch(self, request):
         user: User = request.user
         serializer = UserSerializer(instance=user, data=request.data, partial=True)
         if not (serializer.is_valid()):
-            return Response({'error': 'invalid data and unable to update'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({'error': 'Data is invalid. Failded to update user'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
 

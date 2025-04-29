@@ -9,20 +9,106 @@ def ping(request):
 
 from .serializers import OauthCodeSerializer
 from rest_framework import views, status
-from rest_framework_simplejwt import views as jwt_views
-from rest_framework_simplejwt import exceptions as jwt_exp
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from .otp import generate_otp, verify_otp
+from .utils import get_tokens_for_user, get_image_b64, get_auth_url
 
+from django.core.mail import send_mail
+from django.conf import settings
 from users.models import User
 from users.serializers import UserSerializer
+from users.views import UserView
 import requests
 import logging
 import os
+
+class CodeVerifyView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, fromat=None):
+        user = User.objects.get(email=request.data['email'], provider='Pong')
+        verify_code = request.data['verify_code']
+        if verify_otp(user, verify_code):
+            user.is_verified = True
+            user.save()
+            tokens = get_tokens_for_user(user)
+            return Response(tokens, status.HTTP_200_OK)
+        return Response({'error': 'Invalid OTP'}, status.HTTP_401_UNAUTHORIZED)
+
+class LoginView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, format=None):
+        if not ('provider' in request.data.keys()):
+            return Response({'error': 'Auth provider is not provided'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        provider = request.data['provider']
+
+        if (provider != 'Pong'):
+            return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        user = User.objects.filter(email=request.data['email'], provider=provider, is_verified=True)
+
+        if (user.count() != 1):
+            return Response({'error': 'User does not exist. Please sign up and verify email.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # DEBUG: return tokens without MFA
+        if int(os.getenv('DEBUG_SKIP_MFA', 0)) == 1:
+            tokens = get_tokens_for_user(user.get())
+            return Response(tokens, status=status.HTTP_200_OK)
+        # <-- MFA skip
+
+        if user.get().mfa == 'Email':
+            verify_code = generate_otp(user.get())
+            subject = "Verify Email"
+            message = f'This is one-time password for login.\nVerify it within 5 minutes.\n\n{verify_code}'
+            from_mail = settings.EMAIL_ACCOUNT
+            recipient_list = [user.get().email]
+            send_mail(subject, message, from_mail, recipient_list)
+            return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
+        elif user.get().mfa == 'Authenticator':
+            image = get_image_b64(get_auth_url(user.get()))
+            return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SignupView(views.APIView):
+    permission_classes = [AllowAny]
+    def verify_email(self, address):
+        subject = "Verify Email"
+        user = User.objects.get(email=address, provider='Pong')
+        message = f'This is one-time password for signup.\nPlease verify it within 5 minutes.\n\n{generate_otp(user)}'
+        from_mail = settings.EMAIL_ACCOUNT
+        recipient_list = [address]
+        send_mail(subject, message, from_mail, recipient_list)
+        return
+    
+    def post(self, request, format=None):
+        response = UserView().post(request)
+        if response.status_code not in (200, 201):
+            return response
+        self.verify_email(request.data['email'])
+        return Response({'message': 'Verification email has been sent'}, status.HTTP_201_CREATED)
+
+class ProfileView(views.APIView):
+    def patch(self, request, format=None):
+        if 'mfa' in request.data:
+            user = request.user
+            if request.data['mfa'] == 'Email':
+                verify_code = generate_otp(user)
+                subject = "Verify Email"
+                message = f'This is one-time password for setting MFA option.\nVerify it within 5 minutes.\n\n{verify_code}'
+                from_mail = settings.EMAIL_ACCOUNT
+                recipient_list = [user.email]
+                send_mail(subject, message, from_mail, recipient_list)
+                return Response({'message': 'Email has been sent' }, status.HTTP_200_OK)
+            elif request.data['mfa'] == 'Authenticator':
+                image = get_image_b64(get_auth_url(user))
+                return Response({'message': 'QRCode is generated', 'image': image}, status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid MFA method is set'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user = UserView().patch(request)
+        if user.status_code != 200:
+            return Response({'error': 'Failed to update user'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        tokens = get_tokens_for_user(User.objects.get(id=user.data['id']))
+        return Response(tokens, status=status.HTTP_200_OK)
 
 class OauthCodeView(views.APIView):
     permission_classes = [AllowAny]
@@ -95,6 +181,7 @@ class OauthCodeView(views.APIView):
                 'oauth_user_id': content['id'],
                 'password': access_token,
                 'username': content['login'],
+                'is_verified': True,
             }
             userializer = UserSerializer(data=data, partial=True)
             if not (userializer.is_valid()):
@@ -104,47 +191,6 @@ class OauthCodeView(views.APIView):
         user: User = User.objects.get(username=content['login'])
 
         # return jwt token
-        refresh = RefreshToken.for_user(user)
-        token_response = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'id': user.id,
-            'username': user.username
-        }
-        return JsonResponse(token_response)
-
-class TokenObtainPairView(jwt_views.TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
-        if not ('provider' in request.data.keys()):
-            return Response({'error': 'Auth provider is not provided'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        provider = request.data['provider']
-
-        if (provider == 'Pong'):
-            user = User.objects.filter(email=request.data['email'], provider=provider)
-        elif (provider == '42Oauth'):
-            user = User.objects.filter(oauth_user_id=request.data['oauth_user_id'], provider=provider)
-        else:
-            return Response({'error': 'Auth provider is invalid'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-        if (user.count() != 1):
-            return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        data = request.data
-        _mutable = data._mutable
-        data._mutable = True
-        data['id'] = user.get().id
-        data._mutable = _mutable
-        serializer = self.get_serializer(data=data)
-
-        try:
-            serializer.is_valid(raise_exception=True)
-        except jwt_exp.TokenError as e:
-            raise jwt_exp.InvalidToken(e.args[0])
-        
-         # including the user ID in the response
-        token_response = serializer.validated_data
-        user_instance = user.get()
-        token_response['id'] = user_instance.id  # Add the user ID
-        token_response['username'] = user_instance.username  # Add the username
-
-        return Response(token_response, status=status.HTTP_200_OK)
+        user = User.objects.get(provider='42Oauth', oauth_user_id=content['id'])
+        tokens = get_tokens_for_user(user)
+        return Response(tokens, status.HTTP_200_OK)
