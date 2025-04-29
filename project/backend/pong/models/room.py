@@ -48,4 +48,5 @@ class Room(models.Model):
 		self.is_full = False
 		self.game_type = -1
 		self.matches_left = 1
+		self.room_done = False
 		self.save()
