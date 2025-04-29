@@ -114,6 +114,8 @@ async function silentRefresh()
     });
     if (verifyAccessResponse.ok)
         return true;
+    else
+        console.log("Access token is invalid or expired. Attempting to refresh...");
 
     const refresh = localStorage.getItem('refresh');
     const verifyRefreshResponse = await fetch('/api/token/verify/', {
@@ -130,8 +132,11 @@ async function silentRefresh()
         });
         const data = await refreshResponse.json();
         localStorage.setItem('access', data.access);
+        console.log("Access token refreshed successfully.");
         return true;
     }
+    console.log("Refresh token is invalid or expired. Please login again.");
+    alert('Refresh token is invalid or expired. Please login again.');
     return false;
 }
 
