@@ -6,7 +6,7 @@ export async function setupEndGameScreen()
 	const matchDetailsElement = document.getElementById("matchDetails");
 	if (!winnerId)
 	{
-		console.warn("No winner ID found in localStorage.");
+		console.log("No winner ID found in localStorage.");
 		return;
 	}
 	if (!accessToken)
@@ -22,7 +22,7 @@ export async function setupEndGameScreen()
 		if (!response.ok)
 		{
 			if (response.status === 401)
-				console.warn("Unauthorized request. Token may be invalid or expired.");
+				console.log("Unauthorized request. Token may be invalid or expired.");
 			else
 				console.log("Failed to fetch match results:", response.statusText);
 			return;

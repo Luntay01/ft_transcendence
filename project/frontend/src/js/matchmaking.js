@@ -33,7 +33,7 @@ export function setupMatchmaking()
                 console.log("Successfully left matchmaking.");
                 clearInterval(roomStatusInterval); // Stop status updates
             } else {
-                console.warn("Failed to leave matchmaking.");
+                console.log("Failed to leave matchmaking.");
             }
         } catch (error) {
             console.log("Error leaving matchmaking:", error);

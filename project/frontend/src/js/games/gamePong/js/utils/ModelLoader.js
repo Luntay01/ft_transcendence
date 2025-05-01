@@ -1,6 +1,6 @@
 
-const originalWarn = console.warn;
-console.warn = function (msg, ...args) {
+const originalWarn = console.log;
+console.log = function (msg, ...args) {
     if (typeof msg === 'string') {
         if (
 			msg.includes('THREE.GLTFLoader: Custom UV set') ||

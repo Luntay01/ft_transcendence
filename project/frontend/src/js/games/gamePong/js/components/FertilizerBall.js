@@ -27,7 +27,7 @@ class FertilizerBall
 	{
 		if (!this.model)
 		{
-			console.warn("ball model not loaded yet. delaying spawn...");
+			console.log("ball model not loaded yet. delaying spawn...");
 			setTimeout(() => this.addBall(position, velocity), 100);
 			return;
 		}
@@ -65,7 +65,7 @@ class FertilizerBall
 	updateFromServer(data)
 	{
 		if (!this.model) return;
-		if (!this.model.position) { console.warn("Model position not available."); return; }
+		if (!this.model.position) { console.log("Model position not available."); return; }
 	
 		this.targetPosition.set(data.position.x, data.position.y, data.position.z);
 		this.velocity.set(data.velocity.x, data.velocity.y, data.velocity.z);

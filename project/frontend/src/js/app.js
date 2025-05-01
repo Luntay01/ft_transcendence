@@ -5,8 +5,8 @@ import { loadGameSettings } from './games/gamePong/js/config.js';
 let currentView = '';// track the current view
 
 
-const originalWarn = console.warn;
-console.warn = function (msg, ...args) {
+const originalWarn = console.log;
+console.log = function (msg, ...args) {
     if (typeof msg === 'string') {
         if (
 			msg.includes('THREE.GLTFLoader: Custom UV set') ||

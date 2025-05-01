@@ -25,7 +25,7 @@ export async function setupGameWebSocketHandlers(gameLogic)
 		const player = gameLogic.playerMap[player_id];
 		if (!player)
 		{
-			console.warn(`No player found with ID ${player_id}`);
+			console.log(`No player found with ID ${player_id}`);
 			return;
 		}
 		if (player.flowerPot.direction !== direction || player.flowerPot.isMoving !== isMoving)

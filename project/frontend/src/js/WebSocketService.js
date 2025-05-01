@@ -55,7 +55,7 @@ class WebSocketService
 	{
 		if (this.ws && this.ws.readyState === WebSocket.OPEN)
 			{
-			console.warn("WebScoket already connected. Skipping reconnection.");
+			console.log("WebScoket already connected. Skipping reconnection.");
 			return;
 		}
 		this.url = url;
@@ -93,7 +93,7 @@ class WebSocketService
 				}
 				const handlers = this.eventHandlers.get(eventType) || [];
 				if (!Array.isArray(handlers)) {
-					console.warn(`Event handlers for '${eventType}' is not an array! Resetting.`);
+					console.log(`Event handlers for '${eventType}' is not an array! Resetting.`);
 					this.eventHandlers.set(eventType, []);
 					return;
 				}
@@ -116,10 +116,10 @@ class WebSocketService
 
 		this.ws.onclose = (event) => {
 			if (!this.shouldReconnect) {
-				console.warn("WebSocket closed intentionally, no reconnection.");
+				console.log("WebSocket closed intentionally, no reconnection.");
 				return;
 			}
-			console.warn("WebSocket connection lost. Attempting to reconnect...");
+			console.log("WebSocket connection lost. Attempting to reconnect...");
 			if (!this.isReconnecting) {
 				this.isReconnecting = true;
 				this.reconnect();
