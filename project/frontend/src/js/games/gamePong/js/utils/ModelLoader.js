@@ -1,4 +1,21 @@
 
+const originalWarn = console.warn;
+console.warn = function (msg, ...args) {
+    if (typeof msg === 'string') {
+        if (
+			msg.includes('THREE.GLTFLoader: Custom UV set') ||
+            msg.includes('WebScoket already connected') ||
+			msg.includes('WebSocket closed intentionally')
+        ) {
+            return;
+        }
+    }
+    originalWarn.call(console, msg, ...args);
+};
+
+
+
+
 export default class ModelLoader
 {
 	static loader = new THREE.GLTFLoader(); // Create a loader instance
@@ -8,7 +25,7 @@ export default class ModelLoader
 			url,
 			(gltf) => { resolve(gltf.scene); },
 			undefined,
-			(error) => { console.error('Error loading model:', error); reject(error); }
+			(error) => { console.log('Error loading model:', error); reject(error); }
 		);
 		});
 	}

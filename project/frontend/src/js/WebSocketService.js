@@ -104,13 +104,13 @@ class WebSocketService
 					}
 					catch (error)
 					{
-						console.error(`Error in handler for event '${eventType}':`, error);
+						console.log(`Error in handler for event '${eventType}':`, error);
 					}
 				});
 			}
 			catch (error)
 			{
-				console.error("Error processing WebSocket message:", error);
+				console.log("Error processing WebSocket message:", error);
 			}
 		};
 
@@ -125,13 +125,13 @@ class WebSocketService
 				this.reconnect();
 			}
 		};
-		this.ws.onerror = (error) => { console.error("WebSocket error:", error); };
+		this.ws.onerror = (error) => { console.log("WebSocket error:", error); };
 	}
 	reconnect()
 	{
 		if (this.reconnectAttempts >= this.maxReconnectAttempts)
 		{
-			console.error("Max reconnection attempts reached. Stopping.");
+			console.log("Max reconnection attempts reached. Stopping.");
 			return;
 		}
 		this.reconnectAttempts++;
@@ -175,7 +175,7 @@ class WebSocketService
 		if (this.ws && this.ws.readyState === WebSocket.OPEN)
 			this.ws.send(JSON.stringify({ event, ...data }));
 		else
-			console.error("WebSocket is not connected.");
+			console.log("WebSocket is not connected.");
 	}
 
 	unregisterAllEvents()

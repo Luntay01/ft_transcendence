@@ -43,7 +43,7 @@ function setupLoginFormEx(form)
 				alert(data.error || 'Login failed');
 			}
 		} catch (error) {
-			console.error('Login error:', error);
+			console.log('Login error:', error);
 		}
 	});
 }
@@ -51,7 +51,7 @@ function setupLoginFormEx(form)
 export function setupLoginForm() {
 
 	// multiple login forms for user / and debug testing users quickshortcuts
-	const loginForms = document.querySelectorAll("#loginForm");
+	const loginForms = document.querySelectorAll(".loginForm");
 	loginForms.forEach(loginForm => {
 		setupLoginFormEx(loginForm);
 	});

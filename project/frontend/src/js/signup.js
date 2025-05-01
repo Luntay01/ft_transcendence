@@ -22,7 +22,7 @@ export function setupSignupForm() {
                 alert(data.error || 'Signup failed');
             }
         } catch (error) {
-            console.error('Signup error:', error);
+            console.log('Signup error:', error);
         }
     });
 }

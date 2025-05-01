@@ -1,6 +1,7 @@
 // Entry point for initializing the Pong game.
 // Sets up the renderer, game logic, and event listeners, and starts the animation loop.
 
+
 import
 {
 	createRenderer, 
@@ -16,6 +17,8 @@ import { ensureWebSocketService } from './utils/GameWebSocketHandlers.js';
 
 //const GAME_SETTINGS = window.GAME_SETTINGS;
 
+
+
 export async function initPong()
 {
 	const roomId = localStorage.getItem('roomId');
@@ -24,7 +27,7 @@ export async function initPong()
 	const username = localStorage.getItem('username');
 	if (!roomId || !players|| !playerId)
 	{
-		console.error("Missing game data. Redirecting to matchmaking...");
+		console.log("Missing game data. Redirecting to matchmaking...");
 		navigateTo('matchmaking');
 		return;
 	}
@@ -35,7 +38,7 @@ export async function initPong()
 	const container = document.getElementById('pongContainer');
 	if (!container)
 	{
-		console.error('pongContainer element not found!');
+		console.log('pongContainer element not found!');
 		return ;
 	}
 	try
@@ -51,6 +54,6 @@ export async function initPong()
 	}
 	catch (error)
 	{
-		console.error('initPong: Error occurred:', error);
+		console.log('initPong: Error occurred:', error);
 	}
 }

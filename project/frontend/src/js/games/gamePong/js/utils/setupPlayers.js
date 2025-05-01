@@ -21,7 +21,7 @@ export default async function setupPlayers(scene, playersData)
 		const position = positions[flowerPotId];
 		if (!position)
 		{
-			console.error(`Invalid flowerPotId for user: ${user.name}`);
+			console.log(`Invalid flowerPotId for user: ${user.name}`);
 			continue;
 		}
 		const { x, y, z, rotationY, movementDirection } = position;

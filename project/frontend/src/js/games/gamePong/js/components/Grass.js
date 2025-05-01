@@ -20,7 +20,7 @@ class Grass
 			});
 		}
 		else
-			console.error('Grass blade model does not contan valid geometry.');
+			console.log('Grass blade model does not contan valid geometry.');
 	
 		this.instanceMesh = null; // InstancedMesh for performance
 	}
@@ -30,7 +30,7 @@ class Grass
 		const { randomPositionOffset, randomTiltX, randomTiltY, randomTiltZ, defaultScale } = GAME_SETTINGS.grass;
 		if (!this.geometry || !this.material)
 		{
-			console.error('Grass geometry or material is missing.');
+			console.log('Grass geometry or material is missing.');
 			return null;
 		}
 		this.instanceMesh = new THREE.InstancedMesh(

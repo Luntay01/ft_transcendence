@@ -5,6 +5,21 @@ import { loadGameSettings } from './games/gamePong/js/config.js';
 let currentView = '';// track the current view
 
 
+const originalWarn = console.warn;
+console.warn = function (msg, ...args) {
+    if (typeof msg === 'string') {
+        if (
+			msg.includes('THREE.GLTFLoader: Custom UV set') ||
+            msg.includes('[DOM] Found') ||
+            msg.includes('WebScoket already connected')
+        ) {
+            return;
+        }
+    }
+    originalWarn.call(console, msg, ...args);
+};
+
+
 async function handleCallback(code, state) {
     if (!code || !state) return false;
 
@@ -193,7 +208,7 @@ async function loadView(view)
             }
         }
     } catch (error) {
-        console.error('Error loading view:', error);
+        console.log('Error loading view:', error);
         document.getElementById('app').innerHTML = '<p>Error loading view.</p>';
     }
 }

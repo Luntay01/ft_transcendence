@@ -11,7 +11,7 @@ export async function setupEndGameScreen()
 	}
 	if (!accessToken)
 	{
-		console.error("No access token found. User may not be logged in.");
+		console.log("No access token found. User may not be logged in.");
 		return;
 	}
 	try {
@@ -24,7 +24,7 @@ export async function setupEndGameScreen()
 			if (response.status === 401)
 				console.warn("Unauthorized request. Token may be invalid or expired.");
 			else
-				console.error("Failed to fetch match results:", response.statusText);
+				console.log("Failed to fetch match results:", response.statusText);
 			return;
 		}
 		const matchData = await response.json();
@@ -50,7 +50,7 @@ export async function setupEndGameScreen()
 	}
 	catch (error)
 	{
-		console.error("Error loading match results:", error);
+		console.log("Error loading match results:", error);
 		if (winnerNameElement)
 			winnerNameElement.textContent = `🏆 Winner: Player ${winnerId}`;
 	}

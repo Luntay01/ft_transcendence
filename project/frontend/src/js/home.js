@@ -31,7 +31,7 @@ export async function setupHome() {
 			`
 		}
 	} catch (error) {
-		console.error('Fail to fetch user information:', error);
+		console.log('Fail to fetch user information:', error);
 	}
 	const storedGameMode = localStorage.getItem("gameMode") || "4-player";
 	updateGameModeButtonHighlight(storedGameMode);

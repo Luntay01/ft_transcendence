@@ -36,7 +36,7 @@ export function setupMatchmaking()
                 console.warn("Failed to leave matchmaking.");
             }
         } catch (error) {
-            console.error("Error leaving matchmaking:", error);
+            console.log("Error leaving matchmaking:", error);
         }
     }
     window.addEventListener("beforeunload", leaveMatchmaking);
@@ -57,7 +57,7 @@ export function setupMatchmaking()
             }
             const username = localStorage.getItem('username');
             if (!username)
-                console.error("Username not found");
+                console.log("Username not found");
             
             const initialRoomData = await findMatch(playerId);
             const roomId = initialRoomData.room_id;
@@ -99,7 +99,7 @@ export function setupMatchmaking()
         }
         catch (error)
         {
-            console.error('Error during matchmaking:', error);
+            console.log('Error during matchmaking:', error);
             statusMessage.textContent = "An error occurred. Please try again.";
         }
     })();
@@ -134,7 +134,7 @@ async function fetchRoomStatus(roomId)
     }
 	catch (error)
 	{
-        console.error('Error fetching room status:', error);
+        console.log('Error fetching room status:', error);
     }
 }
 function updateStatusMessage(roomId, players)

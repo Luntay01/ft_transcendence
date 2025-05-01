@@ -66,7 +66,7 @@ export function processPlayerInput(player)
 	const boundaries = GAME_SETTINGS.playerConfig.bounds[position];
 	if (!boundaries)
 	{
-		console.error(`Invalid position '${position}' for player.`);
+		console.log(`Invalid position '${position}' for player.`);
 		return;
 	}
 

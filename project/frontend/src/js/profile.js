@@ -49,7 +49,7 @@ export async function setupProfile() {
             `;
 		}
 	} catch (error) {
-		console.error('Fail to fetch user information:', error);
+		console.log('Fail to fetch user information:', error);
 	}
 }
 

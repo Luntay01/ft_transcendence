@@ -12,6 +12,6 @@ export async function loadGameSettings()
 	}
 	catch (error)
 	{
-		console.error("Failed to load game settings:", error);
+		console.log("Failed to load game settings:", error);
 	}
 }

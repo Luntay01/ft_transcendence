@@ -88,7 +88,7 @@ class FlowerPot
 		const boundaries = GAME_SETTINGS.playerConfig.bounds[this.position];
 		if (!boundaries)
 		{
-			console.error(`invalid boundaries for position: ${this.position}`);
+			console.log(`invalid boundaries for position: ${this.position}`);
 			return;
 		}
 		this.model.position[this.movementAxis] += this.speed * this.movementMultiplier * (this.direction === "left" ? -1 : 1);
