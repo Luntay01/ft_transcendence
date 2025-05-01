@@ -41,7 +41,8 @@ export async function setupEndGameScreen()
 					${matchData.players.map((player) => {
 						const placementIndex = reversedOrder.indexOf(player.id.toString());
 						const placement = placementIndex !== -1 ? placementIndex + 1 : 1;
-						return `<li><strong>${getOrdinal(placement)}</strong> - ${player.username} 🏆 ${player.trophies} trophies</li>`;
+						//return `<li><strong>${getOrdinal(placement)}</strong> - ${player.username} 🏆 ${player.trophies} trophies</li>`;
+						return `<li> - ${player.username} 🏆 ${player.trophies} trophies</li>`;
 					}).join('')}
 				</ul>
 			`;
