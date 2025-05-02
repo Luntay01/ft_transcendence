@@ -46,7 +46,7 @@ Args:
 	player_id (str): The player's unique identifier.
 	username (str): The player's username.
 """
-async def register_player(websocket, room_id, player_id, username):
+async def register_player(websocket, room_id, player_id, username, game_type):
 	if not username:
 		logger.warning(f"Player {player_id} has no username. Rejecting connection.")
 		await websocket.close()
@@ -69,6 +69,7 @@ async def register_player(websocket, room_id, player_id, username):
 			"websocket": websocket,
 			"player_id": player_id,
 			"username": username,
+			"game_type": game_type,
 		})
 		logger.info(f"Player {player_id} ({username}) JOINED Room {room_id}.")
 		await notify_players(room_id, {
@@ -93,7 +94,7 @@ Args:
 	room_id (str): The ID of the room.
 	player_id (str): The player's unique identifier.
 """
-async def unregister_player(websocket, room_id, player_id):
+async def unregister_player(websocket, room_id, player_id, game_type):
 	if room_id in connected_players:
 		player_to_remove = None
 		for player in connected_players[room_id]:
@@ -109,6 +110,7 @@ async def unregister_player(websocket, room_id, player_id):
 			player_state = {
 				"player_id": player_id,
 				"room_id": room_id,
+				"game_type": game_type,
 				"username": player_to_remove["username"]
 			}
 			redis_client.set(f"player_state:{player_id}", json.dumps(player_state))

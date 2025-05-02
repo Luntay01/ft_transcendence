@@ -32,7 +32,7 @@ export default async function setupGameElements(scene, objects, ballPool)
 	objects.push(grassInstance);
 
 	// create and add FertilizerBalls to the ballPool
-	for (let i = 0; i < 5; i++)
+	for (let i = 0; i < 30; i++)
 	{  // preload 5 balls (adjust as needed)
 		const fertilizerBall = new FertilizerBall();
 		await fertilizerBall.loadModel(modelPaths.fertilizerBall);

@@ -42,23 +42,47 @@ def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
 	game_mode = request.POST.get('gameMode', '4-player')
+	game_type = request.POST.get('game_type')
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
+	if not game_type:
+		logger.error("Missing game_type in request")
+		return HttpResponseBadRequest("game_type is required")
+	try:
+		game_type = int(game_type)
+		if not (0 <= game_type < 4):
+			raise ValueError("game_type out of range")
+	except ValueError:
+		logger.error("game_type {game_type} is not a valid game type (not numeric or outside)")
+		return HttpResponseBadRequest("game_type is required to be numeric")
 	try:
 		player = User.objects.get(id=player_id)
 	except User.DoesNotExist:
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
+	# create a new room with the specified game_type
+	room = None
 	max_players = 2 if game_mode == "2-player" else 4
-	room = Room.objects.available_rooms(max_players).first()
-	if not room:
+	for next in Room.objects.available_rooms(max_players):
+		if next.game_type == game_type:
+			room = next
+			break
+	if room is None:
 		room = Room.objects.create_room(max_players=max_players)
+		room.update_game_type(game_type)
+	#max_players = 2 if game_mode == "2-player" else 4
+	#room = Room.objects.available_rooms(max_players).first()
+	#if not room or not (game_type == room.game_type):
+	#	room = Room.objects.create_room(max_players=max_players)
+	#	room.update_game_type(game_type)
+
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
 	redis_client.publish("player_joined", json.dumps({ "event": "player_joined", "room_id": room.id, "player_id": player.id, "player_username": player.username,}))
 	#logger.info(f"Published player_joined event for Player {player.id} in Room {room.id}")
+	#logger.debug(f"Player connected to room: {room.id} on game_type: {room.game_type} max_players: {room.max_players} is_full: {room.is_full}")
 	if room.is_full:
 		goal_zones = ["bottom", "top"] if game_mode == "2-player" else ["bottom", "top", "left", "right"]
 		players_with_goals = []
@@ -73,6 +97,7 @@ def matchmaking(request):
 			"room_id": room.id, 
 			"players": players_with_goals,
 			"gameMode": game_mode,
+			"game_type" : game_type,
 		}
 		redis_client.publish("start_game", json.dumps(start_game_payload))
 
@@ -81,6 +106,7 @@ def matchmaking(request):
 		'is_full': room.is_full,
 		'players': [{"player_id": p.id, "username": p.username} for p in room.players.all()],
 		'gameMode': game_mode,
+		'game_type': game_type,
 	}
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)
@@ -172,6 +198,59 @@ def get_match_results(request, winner_id):
 		return JsonResponse({"error": "Match not found"}, status=404)
 
 @csrf_exempt
+def tournpage_response(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Invalid request method")
+	signal = 0
+	signal = int(request.POST.get('signal', 0))
+	room_id = request.POST.get('room_id', 0)
+	
+	if signal is None:
+		return HttpResponseBadRequest("signal not found to send")
+	signal_data = {
+		"event": "tourn_signal",
+		"room_id": room_id,
+		"signal": signal,
+    }
+	redis_client.publish("update_matches", json.dumps(signal_data))
+	return JsonResponse({"message": f"tourn signal page swap sent"})
+
+
+@csrf_exempt
+def update_matches(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Invalid request method")
+	matches = request.POST.get('matches')
+	room_id = request.POST.get('room_id')
+	#matches number err check
+	#room_id = int(room_id)
+	#room = Room.objects.filter(id=room_id).first()
+	#room = None
+	room, created = Room.objects.get_or_create(id=room_id)
+	if created:
+		logger.warning(f" Room {room_id} was recreated to allow match result storage.")
+	#for next in Room.objects.full_rooms():
+	#	logger.info(f"room_id: {room_id}")
+	#	logger.info(f"Room dot ID: {next.id}")
+	#	if next.id == room_id:
+	#		room = next
+	#		break
+	if room is None:
+		return HttpResponseBadRequest("Room id not found to decrement matches")
+	room.decrement_matches(matches)
+	room_payload = {
+		"event": "update_matches",
+		"room_id": room.id, 
+		"matches": room.matches_left,
+		"room_done": room.room_done,
+	}
+	#send off updates to a monitor waiting
+	#if room.room_done == True:
+	redis_client.publish("update_matches", json.dumps(room_payload))
+	return JsonResponse({"message": f"matches updated successfully"})
+
+
+@csrf_exempt
 def leave_matchmaking(request):
 	if request.method != "POST":
 		return JsonResponse({"error": "Invalid request method"}, status=405)
@@ -189,6 +268,8 @@ def leave_matchmaking(request):
 		return JsonResponse({"error": "Player is not in a matchmaking room"}, status=404)
 	room.remove_player(player)
 	room.save()
+	#clear room function from kyle not used here, pretty sure delete doesnt work or at least doesnt clear variables
 	if room.players.count() == 0:
+		#room.clear_room()
 		room.delete()
 	return JsonResponse({"message": f"Player {player_id} removed from matchmaking"})

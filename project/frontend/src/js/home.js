@@ -3,6 +3,7 @@ import { loadGameSettings } from './games/gamePong/js/config.js';
 export async function setupHome() {
 	const userinfo = document.getElementById('userinfo');
 	const access = localStorage.getItem('access');
+	const matchmakeButtons = document.querySelectorAll('.matchmakeButton');
 	try {
 		const response = await fetch('/api/users/me', {
 			method: 'GET',
@@ -29,12 +30,21 @@ export async function setupHome() {
 			<p> Service Provider: ${provider} </p>
 			</div>
 			`
+			matchmakeButtons.forEach(button => {
+				button.addEventListener('click', buttonHandler);
+			});
 		}
 	} catch (error) {
 		console.error('Fail to fetch user information:', error);
 	}
 	const storedGameMode = localStorage.getItem("gameMode") || "4-player";
 	updateGameModeButtonHighlight(storedGameMode);
+}
+async function buttonHandler(event) {
+	const btnNum = event.target.getAttribute("data-btnNum");
+	localStorage.setItem('game_type', btnNum);
+	const game_type = localStorage.getItem('game_type');
+	console.log('Game type set to:', game_type);
 }
 
 function updateGameModeButtonHighlight(mode) {

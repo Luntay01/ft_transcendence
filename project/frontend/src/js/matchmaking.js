@@ -58,19 +58,26 @@ export function setupMatchmaking()
             const username = localStorage.getItem('username');
             if (!username)
                 console.error("Username not found");
-            
+            const game_type = localStorage.getItem('game_type');
+            if(!game_type)
+                console.error("game_type not found");
             const initialRoomData = await findMatch(playerId);
             const roomId = initialRoomData.room_id;
+            let matches = 1;
+            if (game_type == 1)
+                matches = 4;
+            localStorage.setItem('matches', matches);
             roomData.players = initialRoomData.players;
             updateStatusMessage(roomId, roomData.players);
             const ws = WebSocketService.getInstance(); // singleton WebSocket instance
-            ws.connect(getWebsocketURI(`/ws/connect?room_id=${roomId}&player_id=${playerId}&username=${username}`));
+            ws.connect(getWebsocketURI(`/ws/connect?room_id=${roomId}&player_id=${playerId}&username=${username}&game_type=${game_type}`));
             
             ws.registerEvent('start_game', (message) => {
                 console.log("Start game event received:", message);
                 localStorage.setItem('roomId', message.room_id);
                 localStorage.setItem('players', JSON.stringify(message.players));
                 localStorage.setItem('gameMode', message.gameMode);
+                console.log("matchmaking games leftforstartevent : ", localStorage.getItem("matches"));
                 if (roomStatusInterval)
                 {
                     clearInterval(roomStatusInterval);
@@ -104,7 +111,7 @@ export function setupMatchmaking()
         }
     })();
 }
-
+//if room id is fine then its in here
 async function fetchRoomStatus(roomId)
 {
     try {
@@ -156,7 +163,7 @@ async function findMatch(playerId)
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId, gameMode: localStorage.getItem('gameMode') || '4-player'}),
+		body: new URLSearchParams({ player_id: playerId, gameMode: localStorage.getItem('gameMode') || '4-player', game_type: localStorage.getItem('game_type')}),
 	});
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');

@@ -16,6 +16,15 @@ Args:
 	websocket (WebSocketServerProtocol): The WebSocket connection.
 	path (str): The request path containing query parameters.
 """
+def get_game_type(room_id):
+	room = connected_players.get(room_id, [])
+	if room:
+		for player in room:
+			game_type = player.get("game_type")
+			if game_type:
+				return game_type
+	return None
+
 async def handler(websocket, path):
 	def parse_connection_params(path):
 		parsed_path = urlparse(path)
@@ -23,15 +32,34 @@ async def handler(websocket, path):
 		room_id = query_params.get("room_id", [None])[0]
 		player_id = query_params.get("player_id", [None])[0]
 		username = query_params.get("username", [None])[0]
+		game_type = query_params.get("game_type",[None])[0]
+
+		game_type = int(game_type)
+		if not (0 <= game_type < 4):
+			raise ValueError("game_type out of range")
+
+		logger.warning(f"gametype {game_type}")
 		if not room_id or not player_id or not username:
-			raise ValueError("Missing room_id, player_id, or username")
-		return room_id, player_id, username
+			raise ValueError("Missssing room_id, player_id, username")
+		return room_id, player_id, username, game_type
+#grabs room for the room id passed, if exits it iterates through the dictionary to find the rooms existing game mode,
+#if they match it returns the existing one and if not it returns null to tell the handler to setup a different room for that game_type
+	def get_game_type(room_id):
+		room = connected_players.get(room_id, [])
+		if room:
+			for player in room:
+				game_type = player.get("game_type")
+				if game_type:
+					return game_type
+		return None
 	try:
-		room_id, player_id, username = parse_connection_params(path)
+		room_id, player_id, username, game_type = parse_connection_params(path)
+		existing_game_type = get_game_type(room_id)
 		if player_id in [p["player_id"] for p in connected_players.get(room_id, [])]:
 			logger.info(f"Player {player_id} is reconnecting to Room {room_id}")
+		#setup of new room if game_types dont match and not reconnecting to old match
 		else:
-			await register_player(websocket, room_id, player_id, username)
+			await register_player(websocket, room_id, player_id, username, game_type)
 		async for message in websocket:
 			data = json.loads(message)
 			data.update({"room_id": room_id, "player_id": player_id})
@@ -40,7 +68,7 @@ async def handler(websocket, path):
 		logger.warning(f"Connection rejected: {ve}")
 		await websocket.close()
 	finally:
-		await unregister_player(websocket, room_id, player_id)
+		await unregister_player(websocket, room_id, player_id, game_type)
 
 """		Processes an incoming event from a WebSocket message.
 - Handles player reconnection.

@@ -22,7 +22,8 @@ export async function initPong()
 	const players = JSON.parse(localStorage.getItem('players'));
 	const playerId = localStorage.getItem('player_id');
 	const username = localStorage.getItem('username');
-	if (!roomId || !players|| !playerId)
+	const game_type = localStorage.getItem('game_type');
+	if (!roomId || !players|| !playerId || !game_type)
 	{
 		console.error("Missing game data. Redirecting to matchmaking...");
 		navigateTo('matchmaking');
@@ -47,6 +48,7 @@ export async function initPong()
 		await gameLogic.init();
 		const animationId = startAnimation(gameLogic, renderer);
 		setupMutationObserver(container, animationId, renderer, handleResize);
+		console.log("init complete");
 	}
 	catch (error)
 	{

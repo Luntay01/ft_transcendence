@@ -4,9 +4,13 @@ from .managers import RoomManager
 
 class Room(models.Model):
 	id			= models.AutoField(primary_key=True)
+	#int_id		= models.IntegerField(default=-1)
 	is_full		= models.BooleanField(default=False)
 	players		= models.ManyToManyField(User, related_name='rooms')
 	max_players	= models.IntegerField(default=4)
+	game_type	= models.IntegerField(default=-1)
+	matches_left= models.IntegerField(default=1)
+	room_done	= models.BooleanField(default=False)
 	created_at	= models.DateTimeField(auto_now_add=True)
 	objects		= RoomManager()
 
@@ -15,6 +19,19 @@ class Room(models.Model):
 	def add_player(self, player):
 		if self.has_space():
 			self.players.add(player)
+			self._update_full_status()
+	def update_game_type(self, game_type):
+		if game_type is not None:
+			self.game_type = game_type
+			if self.game_type == 1:
+				self.matches_left = 4
+			self._update_full_status()
+	def decrement_matches(self, matches):
+		if matches:
+			self.matches_left = matches
+			self._update_full_status()
+		if self.matches_left == 0:
+			self.room_done = True
 			self._update_full_status()
 	def remove_player(self, player: User) -> None:
 		if self.players.filter(id=player.id).exists():
@@ -29,4 +46,7 @@ class Room(models.Model):
 	def clear_room(self) -> None:
 		self.players.clear()
 		self.is_full = False
+		self.game_type = -1
+		self.matches_left = 1
+		self.room_done = False
 		self.save()

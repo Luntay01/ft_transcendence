@@ -48,7 +48,9 @@ REDIS_CHANNELS = {
 		"game_state",
 		"player_left",
 		"player_voted_out",
-		"game_resumed"
+		"game_resumed",
+		"update_matches",
+		"tourn_signal"
 	]
 }
 

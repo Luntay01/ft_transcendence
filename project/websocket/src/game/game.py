@@ -9,7 +9,7 @@ from .game_events import start_countdown
 #from .player_manager import eliminate_player
 
 class Game:
-	def __init__(self, room_id, players, game_manager, game_mode):
+	def __init__(self, room_id, players, game_manager, game_mode, game_type):
 		self.room_id = room_id
 		self.players = players
 		self.game_manager = game_manager
@@ -19,6 +19,10 @@ class Game:
 		self.elapsed_time = 0
 		self.last_spawn_interval = 0
 		self.game_mode = game_mode
+		self.game_type = game_type
+		self.room_done = False
+		self.matches = 1
+		self.signal = 0
 		self.player_positions = {}
 		self.elimination_order = []
 		self.start_time = datetime.utcnow() #TODO:need to chnage this to like self.start_time = datetime.now(timezone.utc) but has to sync with backend
@@ -97,8 +101,9 @@ class Game:
 			async with session.post("http://nginx/api/pong/match_results/", json=match_data) as response:
 				response_text = await response.text()
 				logger.info(f"Match results response: {response.status} - {response_text}")
+		#if self.game_type != 1:
 		self.game_manager.cleanup_game(self.room_id)
-		logger.info(f"Game state cleaned up for Room {self.room_id}.")
+		logger.info(f"Game state ingame.pycleaned up for Room {self.room_id}.")
 
 	def restore_state(self, state):
 		self.is_active = state.get("is_active", False)

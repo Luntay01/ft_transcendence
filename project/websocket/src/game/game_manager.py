@@ -1,4 +1,9 @@
-from ..config import logger, update_logger
+import json
+import asyncio
+import copy
+import aiohttp
+import time
+from ..config import logger, update_logger, redis_client
 from .game import Game
 from .game_state_manager import game_state_manager
 
@@ -21,10 +26,10 @@ class GameManager:
 		self.__initialized = True
 		self.games = {}
 
-	def create_game(self, room_id, players, game_mode):
+	def create_game(self, room_id, players, game_mode, game_type):
 		room_id = str(room_id)
 		if room_id not in self.games:
-			self.games[room_id] = Game(room_id, players, self, game_mode)
+			self.games[room_id] = Game(room_id, players, self, game_mode, game_type)
 			logger.info(f"Created game for Room {room_id}.")
 			saved_state = game_state_manager.load_game_state(room_id)
 			if saved_state and saved_state.get("is_active", False):
@@ -48,13 +53,44 @@ class GameManager:
 			if not game.is_active:
 				continue
 			game.update(delta_time)
-
+	
+	def signal_store(self, room_id, signal):
+		if room_id in self.games:
+			self.games[room_id].signal = signal
+			logger.info(f"signal stored in game")
+	
+	def restart_game(self, room_id):
+		players = self.games[room_id].players
+		game_mode = self.games[room_id].game_mode
+		game_type = self.games[room_id].game_type
+		start_game_payload = {
+			"event": "start_game",
+			"room_id": room_id, 
+			"players": players,
+			"gameMode": game_mode,
+			"game_type" : game_type,
+		}
+		del self.games[room_id]
+		logger.info(f"restart game fucntion called.")
+		time.sleep(5)
+		redis_client.publish("start_game", json.dumps(start_game_payload))
+	
+	def update_matches(self, room_id, matches, room_done):
+		if room_id in self.games:
+			self.games[room_id].matches = matches
+			self.games[room_id].room_done = room_done
+			logger.info(f"updatematches finined exeing, before cleanup?")
+	
 	def cleanup_game(self, room_id):
 		if room_id in self.games:
+			logger.info(f"cleanup start called, is after updatematches?")
 			self.games[room_id].ball_manager.stop()
-			del self.games[room_id]
-			logger.info(f"Game state for Room {room_id} removed.")
-			game_state_manager.clear_game_state(room_id)
+			if self.games[room_id].game_type == 1 and self.games[room_id].room_done == False:# and self.games[room_id].signal == 1: 
+				self.restart_game(room_id)
+			else:
+				del self.games[room_id]
+				logger.info(f"Game stateingamemanage for Room {room_id} removed.")
+				game_state_manager.clear_game_state(room_id)
 
 game_manager = GameManager()
 
