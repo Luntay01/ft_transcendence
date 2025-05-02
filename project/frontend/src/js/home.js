@@ -33,11 +33,41 @@ export async function setupHome() {
 	} catch (error) {
 		console.log('Fail to fetch user information:', error);
 	}
+	await loadLeaderboard();
 	const storedGameMode = localStorage.getItem("gameMode") || "4-player";
 	updateGameModeButtonHighlight(storedGameMode);
 	const storedMatchType = localStorage.getItem("matchType") || "ranked";
 	updateMatchTypeButtonHighlight(storedMatchType);
 	//window.GAME_SETTINGS.matchType = storedMatchType;
+	const intervalId = setInterval(() => {
+		if (window.location.hash === '#home') {
+			loadLeaderboard();
+		} else {
+			clearInterval(intervalId); // Stop refreshing once you leave home
+		}
+	}, 5000);
+}
+
+
+async function loadLeaderboard() {
+	try {
+		const response = await fetch('/api/users/leaderboard/');
+		const data = await response.json();
+		const leaderboardList = document.getElementById('leaderboardList');
+		leaderboardList.innerHTML = '';
+
+		data.forEach((user, index) => {
+			const li = document.createElement('li');
+			li.className = 'list-group-item d-flex justify-content-between align-items-center';
+			li.innerHTML = `
+				<span>${index + 1}. ${user.username}</span>
+				<span>🏅 ${user.trophies}</span>
+			`;
+			leaderboardList.appendChild(li);
+		});
+	} catch (error) {
+		console.error('Error loading leaderboard:', error);
+	}
 }
 
 function updateGameModeButtonHighlight(mode) {

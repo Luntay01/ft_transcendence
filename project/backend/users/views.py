@@ -60,3 +60,22 @@ class UserDetailView(views.APIView):
         user = self.get_object(username)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data, status.HTTP_200_OK)
+    
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def leaderboard_view(request):
+    top_users = User.objects.filter(is_active=True).order_by('-trophies')[:10]
+    data = [
+        {
+            'username': user.username,
+            'trophies': user.trophies,
+            'picture': user.picture.url if user.picture else None
+        }
+        for user in top_users
+    ]
+    return Response(data, status=status.HTTP_200_OK)
