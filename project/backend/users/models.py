@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.core.validators import EmailValidator
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -21,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	oauth_user_id = models.CharField(max_length=20, null=True)
 	password = models.CharField(max_length=256)
 	username = models.CharField(max_length=256, unique=True)
-	picture = models.ImageField(upload_to='images/', default='images/default.png')
+	picture = models.ImageField(upload_to='images/', default=settings.DEFAULT_IMAGE_PATH)
 
 	otp_secret = models.CharField(max_length=256, default=pyotp.random_base32)
 	is_verified = models.BooleanField(default=False)

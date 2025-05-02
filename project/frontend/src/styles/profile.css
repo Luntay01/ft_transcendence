@@ -53,8 +53,9 @@ h2{
 }
 .img-wrapper img {
 	width: 300px;
-	height: auto;
+	height: 300px;
 	display: block; 
+	object-fit: contain;
 }
 .translucent-background{
 	background-color: rgba(189, 195, 199, 0.8);

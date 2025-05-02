@@ -1,7 +1,7 @@
 import setupLighting			from './utils/setupLighting.js';
 import setupPlayers				from './utils/setupPlayers.js';
 import { processPlayerInput }	from "./utils/PlayerInput.js";
-import setupGameElements		from './utils/setupGameElements.js';
+import setupGameElements, { rotateBackgroundForPosition } from './utils/setupGameElements.js';
 import handleCollisions			from './utils/handleCollisions.js';
 import { setupGameWebSocketHandlers, ensureWebSocketService } from './utils/GameWebSocketHandlers.js';
 import { createScoreUI, updateScoreText } from './components/ScoreSprites.js';
@@ -50,10 +50,12 @@ class GameLogic
 		await setupGameWebSocketHandlers(this);
 		const players = JSON.parse(localStorage.getItem('players'))
 		this.players = await setupPlayers(this.scene, players);
+
 		this.playerMap = this.players.reduce((map, player) => { map[player.playerId] = player; return map; }, {});
 		console.log("Populated playerMap:", this.playerMap);
 		const currentPlayerId = localStorage.getItem('player_id');
 		this.currentPlayer = this.playerMap[currentPlayerId];
+		rotateBackgroundForPosition(this.currentPlayer.position, this.scene);
 		if (this.currentPlayer)
 		{
 			const { position, lookAt } = this.currentPlayer.cameraState;

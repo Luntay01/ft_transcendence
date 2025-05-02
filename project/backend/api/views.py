@@ -14,11 +14,14 @@ from rest_framework.response import Response
 from .otp import generate_otp, verify_otp
 from .utils import get_tokens_for_user, get_image_b64, get_auth_url
 
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.conf import settings
+from io import BytesIO
 from users.models import User
 from users.serializers import UserSerializer
 from users.views import UserView
+from PIL import Image
 import requests
 import logging
 import os
@@ -175,6 +178,17 @@ class OauthCodeView(views.APIView):
                 logging.warning("access token in password field is not valid")
             instance.save()
         else:
+            picture_src = content['image']['link'] 
+            response = requests.get(picture_src)
+            if response.status_code != 200:
+                logging.error('Unable to get user image from 42 API')
+                return Response({'error': 'Unable to get user image from 42 API'}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+            image = Image.open(BytesIO(response.content))
+
+            image_file = BytesIO()
+            image.save(image_file, format='PNG')
+            picture = ContentFile(image_file.getvalue(), name=content['login'] + '.png')
+
             data = {
                 'email': content['email'],
                 'provider': '42Oauth',
@@ -182,6 +196,7 @@ class OauthCodeView(views.APIView):
                 'password': access_token,
                 'username': content['login'],
                 'is_verified': True,
+                'picture': picture,
             }
             userializer = UserSerializer(data=data, partial=True)
             if not (userializer.is_valid()):
