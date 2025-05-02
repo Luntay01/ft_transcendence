@@ -93,12 +93,13 @@ window.addEventListener('hashchange', handleRoute);
 
 function navigateTo(view, params = new URLSearchParams())
 {
-    window.location.hash = view;  // This changes the URL hash, triggering the route handling
-    if (params.toString() !== '') {
-        window.location.search = params.toString();
-    } else {
-        window.location.href = window.location.href.replace("?", "");
+    const url = new URL(window.location.origin);
+    for (const [key, value] of params) {
+        url.searchParams.set(key, value);
     }
+    url.hash = view
+    window.location.hash = view;  // This changes the URL hash, triggering the route handling
+    window.history.replaceState({}, document.title, url);
 }
 window.navigateTo = navigateTo;
 
