@@ -4,12 +4,26 @@ import FertilizerBall from '../components/FertilizerBall.js';
 import ModelLoader from '../utils/ModelLoader.js';
 const GAME_SETTINGS = window.GAME_SETTINGS;
 
+
+
+export function rotateBackgroundForPosition(position, scene) {
+	const background = scene.userData.backgroundScene;
+	if (!background) return;
+	switch (position) {
+		case 'top': background.rotation.y = Math.PI; break;
+		case 'left': background.rotation.y = Math.PI / 2; break;
+		case 'right': background.rotation.y = -Math.PI / 2; break;
+		case 'bottom':
+		default: background.rotation.y = 0; break;
+	}
+}
+
+
 /**
  * Loads and sets up game elements like garden beds, grass, and the ball.
  * @param {THREE.Scene} scene - The Three.js scene.
  * @param {Array} objects - Array to store objects for updates.
  */
-
 export default async function setupGameElements(scene, objects, ballPool)
 {
 	const { modelPaths, gardenBeds, grass, playerConfig } = GAME_SETTINGS;
@@ -30,6 +44,7 @@ export default async function setupGameElements(scene, objects, ballPool)
 	//const grassField = grassInstance.createGrassField();
 	const backgroundScene = await ModelLoader.loadModel(modelPaths.background)
 	scene.add(backgroundScene);
+	scene.userData.backgroundScene = backgroundScene;
 	console.log("We updaintgin?");
 	//objects.push(backgroundScene);
 
@@ -44,3 +59,4 @@ export default async function setupGameElements(scene, objects, ballPool)
 		ballPool.push(fertilizerBall);  // sdd to the pool
 	}
 }
+
