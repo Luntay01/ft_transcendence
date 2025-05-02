@@ -52,7 +52,7 @@
         "collisionDetectionInterval": 0.02
     },
     "scoring": {
-        "startingScore": 1,
+        "startingScore": 5,
         "goalZones": {
             "bottom": { "minX": -11, "maxX": 11, "minZ": 13, "maxZ": 15, "playerId": null },
             "top": { "minX": -11, "maxX": 11, "minZ": -15, "maxZ": -13, "playerId": null },

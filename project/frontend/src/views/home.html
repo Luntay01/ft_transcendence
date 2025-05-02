@@ -63,8 +63,8 @@
 			</div>
 			<div class="col text-center">
 				<div class="btn-group" role="group" aria-label="Match Type">
-					<button id="btn-ranked" class="btn btn-outline-success active" onclick="updateMatchType('ranked')">Ranked</button>
-					<button id="btn-unranked" class="btn btn-outline-secondary" onclick="updateMatchType('unranked')">Unranked</button>
+					<button id="btn-ranked" class="btn btn-outline-success active" onclick="updateMatchType('ranked')">Tournament</button>
+					<button id="btn-unranked" class="btn btn-outline-secondary" onclick="updateMatchType('unranked')">Casual</button>
 				</div>
 			</div>
 		</div>
@@ -73,13 +73,12 @@
 		<div class="d-flex justify-content-center align-items-center">
 			</div>
 			<div class="col text-center">
-				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('game_tournament')">Join Tournament!</button>
 				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('game_matchmaking')">Find Match!</button>
 			</div>
 		</div>
 	</div>
 	<div class="leaderboard-container mt-5">
-		<h3>🏆 Top Players</h3>
+		<h3>🏆 Tournament Leaders</h3>
 		<ul id="leaderboardList" class="list-group"></ul>
 	</div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
