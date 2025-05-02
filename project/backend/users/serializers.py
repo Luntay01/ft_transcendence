@@ -1,5 +1,9 @@
+from datetime import datetime
 from rest_framework import serializers
 from .models import User
+from django.core.files.base import ContentFile
+from django.conf import settings
+import os
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
     
     # override to hash password
     def create(self, validated_data):
+        picture = validated_data.pop('picture', None)
+        if picture is None:
+            with open(settings.MEDIA_ROOT.joinpath(settings.DEFAULT_IMAGE_PATH), 'rb') as image_file:
+                image_content = image_file.read()
+            image = ContentFile(image_content, name=f"{validated_data['username']}_profile.png")
+            validated_data['picture'] = image
         unhashed_password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if unhashed_password is not None:
@@ -57,7 +67,13 @@ class UserSerializer(serializers.ModelSerializer):
         if unhashed_password is not None:
             instance.set_password(unhashed_password)
         instance.username = validated_data.get('username', instance.username)
-        instance.picture = validated_data.get('picture', instance.picture)
+        new_picture = validated_data.pop('picture', None)
+        if new_picture is not None:
+            # Delete the old picture file if it exists
+            if instance.picture and os.path.isfile(instance.picture.path) and instance.picture.path != settings.DEFAULT_IMAGE_PATH:
+                os.remove(instance.picture.path)
+            new_picture_name = f"{instance.username}_profile.png"
+            instance.picture.save(new_picture_name, new_picture, save=False)
         instance.otp_secret = validated_data.get('otp_secret', instance.otp_secret)
         instance.is_verified = validated_data.get('is_verified', instance.is_verified)
         instance.mfa = validated_data.get('mfa', instance.mfa)
