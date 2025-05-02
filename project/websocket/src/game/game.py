@@ -9,7 +9,7 @@ from .game_events import start_countdown
 #from .player_manager import eliminate_player
 
 class Game:
-	def __init__(self, room_id, players, game_manager, game_mode):
+	def __init__(self, room_id, players, game_manager, game_mode, match_type="ranked"):
 		self.room_id = room_id
 		self.players = players
 		self.game_manager = game_manager
@@ -19,6 +19,7 @@ class Game:
 		self.elapsed_time = 0
 		self.last_spawn_interval = 0
 		self.game_mode = game_mode
+		self.match_type = match_type
 		self.player_positions = {}
 		self.elimination_order = []
 		self.start_time = datetime.utcnow() #TODO:need to chnage this to like self.start_time = datetime.now(timezone.utc) but has to sync with backend
@@ -91,7 +92,9 @@ class Game:
 			"winner_id": winner_id,
 			"players": player_results,
 			"start_time": self.start_time.isoformat(),
-			"elimination_order": elimination_order_int
+			"elimination_order": elimination_order_int,
+			"matchType": self.match_type,
+			"gameMode": self.game_mode,
 		}
 		async with aiohttp.ClientSession() as session:
 			async with session.post("http://nginx/api/pong/match_results/", json=match_data) as response:

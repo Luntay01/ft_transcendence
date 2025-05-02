@@ -42,6 +42,8 @@ def matchmaking(request):
 	if request.method != 'POST': return HttpResponseBadRequest("Invalid request method")
 	player_id = request.POST.get('player_id')
 	game_mode = request.POST.get('gameMode', '4-player')
+	match_type = request.POST.get('matchType', 'ranked')
+	logger.info(f"📥 Received matchmaking POST: player_id={player_id}, gameMode={game_mode}, matchType={match_type}")
 	if not player_id:
 		logger.error("Missing player_id in request")
 		return HttpResponseBadRequest("player_id is required")
@@ -51,9 +53,9 @@ def matchmaking(request):
 		logger.error(f"User with ID {player_id} does not exist")
 		return JsonResponse({"error": "User does not exist"}, status=404)
 	max_players = 2 if game_mode == "2-player" else 4
-	room = Room.objects.available_rooms(max_players).first()
+	room = Room.objects.available_rooms(max_players, match_type).first()
 	if not room:
-		room = Room.objects.create_room(max_players=max_players)
+		room = Room.objects.create_room(max_players=max_players, match_type=match_type)
 	logger.info(f"Player {player.username} (ID: {player.id}) is joining Room {room.id}")
 	room.add_player(player)
 	#logger.info(f"Added player {player.username} (ID: {player.id}) to Room {room.id}")
@@ -73,6 +75,7 @@ def matchmaking(request):
 			"room_id": room.id, 
 			"players": players_with_goals,
 			"gameMode": game_mode,
+			"matchType": match_type,
 		}
 		redis_client.publish("start_game", json.dumps(start_game_payload))
 
@@ -81,7 +84,9 @@ def matchmaking(request):
 		'is_full': room.is_full,
 		'players': [{"player_id": p.id, "username": p.username} for p in room.players.all()],
 		'gameMode': game_mode,
+		'matchType': match_type,
 	}
+
 	#logger.debug(f"Matchmaking API response: {json.dumps(response_payload)}")
 	return JsonResponse(response_payload)
 
@@ -106,29 +111,49 @@ def room_status(request, room_id):
 @permission_classes([AllowAny])
 def submit_match_result(request):
 	if request.method != "POST":
-		return Response({"error": "Metod Not Allowed Use POST instead."}, status=405)
+		return Response({"error": "Method Not Allowed. Use POST instead."}, status=405)
+
 	data = request.data
 	room_id = data.get("room_id")
 	winner_id = data.get("winner_id")
 	player_results = data.get("players")
 	elimination_order = data.get("elimination_order", [])
+	match_type_from_client = data.get("matchType", "unranked")  # fallback safely
+
 	if isinstance(elimination_order, str):
 		try:
 			elimination_order = json.loads(elimination_order)
 		except json.JSONDecodeError:
 			return Response({"error": "Invalid elimination_order format"}, status=400)
+
 	if not room_id or not winner_id or not player_results:
 		return Response({"error": "Missing required data"}, status=400)
-	room, created = Room.objects.get_or_create(id=room_id)
-	if created:
-		logger.warning(f" Room {room_id} was recreated to allow match result storage.")
+
+	game_mode_from_client = data.get("gameMode", "4-player")  # NEW
+
+	try:
+		room = Room.objects.get(id=room_id)
+		logger.info(f"📦 Loaded room {room.id} with match_type={room.match_type}")
+	except Room.DoesNotExist:
+		room = Room.objects.create(
+			id=room_id,
+			match_type=match_type_from_client,
+			max_players=2 if game_mode_from_client == "2-player" else 4,
+			is_full=True  # optional: assume match is complete
+		)
+		logger.warning(f"⚠️ Room {room_id} was recreated with match_type={match_type_from_client}, gameMode={game_mode_from_client}")
+
+
 	try:
 		winner = User.objects.get(id=winner_id)
 	except User.DoesNotExist:
-		logger.error(f"Error: Winner {winner_id} does not exist")
+		logger.error(f"❌ Winner {winner_id} does not exist")
 		return Response({"error": f"Invalid winner {winner_id}"}, status=400)
-	logger.info(f"Winner: {winner.username}")
-	logger.info(f"Room ID: {room.id}")
+
+	logger.info(f"🏆 Winner: {winner.username}")
+	logger.info(f"🧾 Room ID: {room.id}")
+	logger.info(f"🏷️ Room match_type resolved as: '{room.match_type}'")
+
 	match = MatchResult.objects.create(
 		room=room,
 		winner=winner,
@@ -136,19 +161,35 @@ def submit_match_result(request):
 		end_time=now(),
 		elimination_order=elimination_order
 	)
-	placement_rewards = [50, 20, 0, -10]
-	for index, player_id in enumerate(reversed(elimination_order)):
-		try:
-			player = User.objects.get(id=player_id)
-			match.players.add(player)
-			change = placement_rewards[min(index, len(placement_rewards) - 1)]
-			player.trophies = max(0, player.trophies + change)
-			player.save()
-			logger.info(f"Updated {player.username}'s trophies by {change}. New total: {player.trophies}")
-		except User.DoesNotExist:
-			return Response({"error": f"Player {player_id} does not exist"}, status=400)
+
+	if room.match_type == 'ranked':
+		logger.info(f"Ranked match — awarding trophies.")
+		placement_rewards = [50, 20, 0, -10]
+		for index, player_id in enumerate(reversed(elimination_order)):
+			try:
+				player = User.objects.get(id=player_id)
+				match.players.add(player)
+				change = placement_rewards[min(index, len(placement_rewards) - 1)]
+				player.trophies = max(0, player.trophies + change)
+				player.save()
+				logger.info(f"✅ Updated {player.username}'s trophies by {change}. New total: {player.trophies}")
+			except User.DoesNotExist:
+				return Response({"error": f"Player {player_id} does not exist"}, status=400)
+	else:
+		logger.info("Unranked match — skipping trophy updates.")
+		for player_id in elimination_order:
+			try:
+				player = User.objects.get(id=player_id)
+				match.players.add(player)
+			except User.DoesNotExist:
+				return Response({"error": f"Player {player_id} does not exist"}, status=400)
+
 	match.save()
-	return Response({"message": "Match result stored successfully", "match_id": match.id}, status=201)
+	return Response({
+		"message": f"{room.match_type.capitalize()} match result stored successfully",
+		"match_id": match.id
+	}, status=201)
+
 
 @api_view(['GET'])
 def get_match_results(request, winner_id):

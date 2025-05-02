@@ -7,6 +7,7 @@ class Room(models.Model):
 	is_full		= models.BooleanField(default=False)
 	players		= models.ManyToManyField(User, related_name='rooms')
 	max_players	= models.IntegerField(default=4)
+	match_type = models.CharField(max_length=20, choices=[('ranked', 'Ranked'), ('unranked', 'Unranked')], default='ranked')
 	created_at	= models.DateTimeField(auto_now_add=True)
 	objects		= RoomManager()
 

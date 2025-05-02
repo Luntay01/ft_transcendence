@@ -71,6 +71,7 @@ export function setupMatchmaking()
                 localStorage.setItem('roomId', message.room_id);
                 localStorage.setItem('players', JSON.stringify(message.players));
                 localStorage.setItem('gameMode', message.gameMode);
+                localStorage.setItem('matchType', message.matchType);
                 if (roomStatusInterval)
                 {
                     clearInterval(roomStatusInterval);
@@ -151,16 +152,23 @@ function updateStatusMessage(roomId, players)
 	statusMessage.textContent = `Joined Room ${roomId} with players: ${playerNames}`;
 }
 
-async function findMatch(playerId)
-{
+async function findMatch(playerId) {
+	const gameMode = localStorage.getItem('gameMode') || '4-player';
+	const matchType = localStorage.getItem('matchType') || 'ranked';
+
 	const response = await fetch('/api/pong/matchmaking/', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({ player_id: playerId, gameMode: localStorage.getItem('gameMode') || '4-player'}),
+		body: new URLSearchParams({
+			player_id: playerId,
+			gameMode: gameMode,
+			matchType: matchType
+		}),
 	});
+
 	if (!response.ok)
 		throw new Error('Failed to find a match. Please try again.');
+
 	const data = await response.json();
 	return data;
 }
-

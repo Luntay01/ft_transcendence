@@ -61,24 +61,20 @@
 					<button id="btn-2-player" class="btn btn-outline-primary" onclick="updateGameMode('2-player')">2 Player</button>
 				</div>
 			</div>
-		</div>
-	</div>
-	
-	<div class="row mt-2">
-		<div class="d-flex justify-content-center align-items-center">
-			</div>
 			<div class="col text-center">
-				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('gamePong')">Play with Keyboard!</button>
-			</div>
-			<div class="col text-center">
-				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('game_matchmaking')">Find Match!</button>
+				<div class="btn-group" role="group" aria-label="Match Type">
+					<button id="btn-ranked" class="btn btn-outline-success active" onclick="updateMatchType('ranked')">Ranked</button>
+					<button id="btn-unranked" class="btn btn-outline-secondary" onclick="updateMatchType('unranked')">Unranked</button>
+				</div>
 			</div>
 		</div>
 	</div>
 	<div class="row mt-2">
 		<div class="d-flex justify-content-center align-items-center">
+			</div>
 			<div class="col text-center">
 				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('game_tournament')">Join Tournament!</button>
+				<button class="btn btn-secondary btn-custom border border-dark rounded glow" onclick="navigateTo('game_matchmaking')">Find Match!</button>
 			</div>
 		</div>
 	</div>
